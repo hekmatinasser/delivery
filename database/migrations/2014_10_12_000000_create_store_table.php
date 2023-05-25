@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('store', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
+            $table->unsignedInteger('category_id');
             $table->foreign('category_id')->references('id')->on('store_category')->onUpdate('cascade');
             $table->integer('areaType')->unsigned()->nullable();
             $table->string('address')->nullable();
-            $table->string('postCode', 20)->nullable();
-            $table->integer('phone', 15)->nullable();
+            $table->string('postCode')->nullable();
+            $table->integer('phone')->nullable();
             $table->string('name')->nullable();
-            $table->string('lot', 100)->nullable();
-            $table->string('lang' ,100)->nullable();
+            $table->string('lot')->nullable();
+            $table->string('lang')->nullable();
             $table->timestamps();
         });
 

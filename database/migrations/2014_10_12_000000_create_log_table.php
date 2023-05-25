@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('log', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('userType')->unsigned()->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
-            $table->string('model', 100)->nullable();
-            $table->string('action', 100)->nullable();
-            $table->string('title' ,100)->nullable();
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->string('model')->nullable();
+            $table->string('action')->nullable();
+            $table->string('title')->nullable();
             $table->integer('item_id')->nullable();
             $table->timestamps();
         });

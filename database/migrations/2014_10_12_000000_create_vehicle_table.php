@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('vehicle', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
             $table->integer('type')->unsigned()->nullable();
             $table->string('brand')->nullable();
-            $table->string('pelak', 20)->nullable();
-            $table->string('color', 15)->nullable();
-            $table->string('model' , 100)->nullable();
+            $table->string('pelak')->nullable();
+            $table->string('color')->nullable();
+            $table->string('model')->nullable();
             $table->timestamps();
         });
 
