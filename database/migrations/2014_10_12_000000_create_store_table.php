@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('store', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
             $table->foreign('category_id')->references('id')->on('store_category')->onUpdate('cascade');
             $table->integer('areaType')->unsigned()->nullable();

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('verify_code', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->integer('mobile' , 20)->unsigned();
             $table->integer('code' ,10)->unsigned();
             $table->timestamps();

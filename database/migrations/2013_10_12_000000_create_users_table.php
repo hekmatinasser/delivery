@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('name');
             $table->string('family')->nullable();
             $table->integer('mobile' , 15)->nullable();
             $table->integer('nationalCode' , 11)->nullable();
             $table->string('nationalPhoto')->nullable();
-            $table->integer('status' , 1)->unsigned()->default(0)->nullable();
-            $table->integer('unValidCodeCount')->unsigned()->default(1);
+            $table->integer('status')->default("0")->unsigned();
+            $table->integer('unValidCodeCount')->unsigned()->default("1");
             $table->string('address')->nullable();
             $table->string('postCode', 20)->nullable();
             $table->integer('phone', 15)->nullable();

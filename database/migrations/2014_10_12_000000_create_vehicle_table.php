@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vehicle', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
             $table->integer('type')->unsigned()->nullable();
             $table->string('brand')->nullable();
