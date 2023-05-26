@@ -15,14 +15,14 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('family')->nullable();
-            $table->integer('mobile')->nullable();
-            $table->integer('nationalCode')->nullable();
+            $table->string('mobile')->nullable();
+            $table->string('nationalCode')->nullable();
             $table->string('nationalPhoto')->nullable();
             $table->integer('status')->default("0")->unsigned();
             $table->integer('unValidCodeCount')->unsigned()->default("1");
             $table->string('address')->nullable();
             $table->string('postCode')->nullable();
-            $table->integer('phone')->nullable();
+            $table->string('phone')->nullable();
             $table->string('userType')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
