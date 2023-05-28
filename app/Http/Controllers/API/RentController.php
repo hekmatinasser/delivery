@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Http\Requests\StoreWalletRequest;
-use App\Http\Requests\UpdateWalletRequest;
-use App\Models\Wallet;
+use App\Http\Requests\StoreRentRequest;
+use App\Http\Requests\UpdateRentRequest;
+use App\Models\Rent;
 
-class WalletController extends Controller
+class RentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class WalletController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreWalletRequest $request)
+    public function store(StoreRentRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class WalletController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Wallet $wallet)
+    public function show(Rent $rent)
     {
         //
     }
@@ -43,7 +43,7 @@ class WalletController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Wallet $wallet)
+    public function edit(Rent $rent)
     {
         //
     }
@@ -51,7 +51,7 @@ class WalletController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateWalletRequest $request, Wallet $wallet)
+    public function update(UpdateRentRequest $request, Rent $rent)
     {
         //
     }
@@ -59,7 +59,7 @@ class WalletController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Wallet $wallet)
+    public function destroy(Rent $rent)
     {
         //
     }

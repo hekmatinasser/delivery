@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Http\Requests\StoreDistrictRequest;
-use App\Http\Requests\UpdateDistrictRequest;
-use App\Models\District;
+use App\Http\Requests\StoreWalletRequest;
+use App\Http\Requests\UpdateWalletRequest;
+use App\Models\Wallet;
 
-class DistrictController extends Controller
+class WalletController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class DistrictController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDistrictRequest $request)
+    public function store(StoreWalletRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class DistrictController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(District $district)
+    public function show(Wallet $wallet)
     {
         //
     }
@@ -43,7 +43,7 @@ class DistrictController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(District $district)
+    public function edit(Wallet $wallet)
     {
         //
     }
@@ -51,7 +51,7 @@ class DistrictController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDistrictRequest $request, District $district)
+    public function update(UpdateWalletRequest $request, Wallet $wallet)
     {
         //
     }
@@ -59,7 +59,7 @@ class DistrictController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(District $district)
+    public function destroy(Wallet $wallet)
     {
         //
     }

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Http\Requests\StoreRentRequest;
-use App\Http\Requests\UpdateRentRequest;
-use App\Models\Rent;
+use App\Http\Requests\StoreDistrictRequest;
+use App\Http\Requests\UpdateDistrictRequest;
+use App\Models\District;
 
-class RentController extends Controller
+class DistrictController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class RentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRentRequest $request)
+    public function store(StoreDistrictRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class RentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Rent $rent)
+    public function show(District $district)
     {
         //
     }
@@ -43,7 +43,7 @@ class RentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Rent $rent)
+    public function edit(District $district)
     {
         //
     }
@@ -51,7 +51,7 @@ class RentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRentRequest $request, Rent $rent)
+    public function update(UpdateDistrictRequest $request, District $district)
     {
         //
     }
@@ -59,7 +59,7 @@ class RentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rent $rent)
+    public function destroy(District $district)
     {
         //
     }
