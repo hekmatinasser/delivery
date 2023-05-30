@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Http\JsonResponse;
 
-class TransactionController extends Controller
+
+class TransactionController extends BaseController
 {
 
 
@@ -32,7 +33,7 @@ class TransactionController extends Controller
         }
 
         $input = $request->all();
-        Vehicle::create($input);
+        Transaction::create($input);
         Log::store(0, Auth::user()->id, 'Transaction', 0);
 
         return $this->sendResponse('', 'تراکنش با موفقیت ایجاد شد');
