@@ -10,15 +10,14 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Http\JsonResponse;
+use SoapClient;
 
 class SmsController extends BaseController
 {
-    public function ($number, $content)
+    public function send($number, $content)
     {
-    
         ini_set("soap.wsdl_cache_enabled", "0");
         $sms_client = new \SoapClient('http://payamak-service.ir/SendService.svc?wsdl', array('encoding' => 'UTF-8'));
-
         try {
             $parameters['userName'] = "";
             $parameters['password'] = '';
