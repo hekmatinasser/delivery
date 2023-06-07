@@ -12,14 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
+            $table->id();
             $table->string('gateway');
-            $table->string('transaction_type');
             $table->string('transaction_number');
-            $table->string('transaction_status');
-            $table->string('price');
+            $table->string('amount');
+            $table->string('status')->default('unpaid');
+            $table->timestamp('transaction_at')->nullable();
             $table->timestamps();
         });
     }

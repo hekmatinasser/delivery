@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CoinWallet\StoreCoinWalletTransactionRequest;
+use App\Http\Requests\CoinWallet\StoreTravelTransactionRequest;
 use App\Http\Requests\Wallet\NewTransactionRequest;
-use App\Http\Requests\Wallet\StoreWalletTransactionRequest;
 use App\Models\CoinWalletTransaction;
 use App\Models\CoinWalletTransactionReason;
 use App\Models\Transaction;
@@ -13,34 +14,33 @@ use App\Models\WalletTransaction;
 use App\Models\WalletTransactionReason;
 use App\Payment\Gateways\Mellat\Mellat;
 use App\Payment\Gateways\Zarinpal\ZarinPal;
-use App\Traits\FileHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-class WalletController extends BaseController
+class CoinWalletController extends BaseController
 {
-    use FileHandler;
+    protected $coinPrice = 100;
     /**
-     * Show wallet detail
+     * Show coin wallet detail
      *
      * @return \Illuminate\Http\Response
      */
     public function show()
     {
         $user = Auth::user();
-        $wallet = $user->wallet;
+        $wallet = $user->coinWallet;
 
-        return $this->sendResponse(compact('wallet'));
+        return $this->sendResponse($wallet);
     }
 
     /**
-     * Insert New transaction for wallet
+     * Insert New transaction for coin wallet
      *
-     * @param StoreWalletTransactionRequest $request
+     * @param StoreCoinWalletTransactionRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function storeTransaction(StoreWalletTransactionRequest $request)
+    public function storeTransaction(StoreCoinWalletTransactionRequest $request)
     {
         $validated = $request->validated();
         if (!empty($validated['user_id'])) {
@@ -50,24 +50,24 @@ class WalletController extends BaseController
             $user = Auth::user();
             $changer = $user;
         }
-        $wallet = $user->wallet;
+        $wallet = $user->coinWallet;
 
-        $reason_id = WalletTransactionReason::whereCode($validated['reason_code'])->first()->id;
+        $reason_id = CoinWalletTransactionReason::whereCode($validated['reason_code'])->first()->id;
 
-        $newAmount = $wallet->amount;
+        $newCoins = $wallet->coins;
         switch ($validated['action']) {
             case 'increase':
-                $newAmount = $wallet->amount + $validated['amount'];
+                $newCoins = $wallet->coins + $validated['coins'];
                 break;
             case 'decrease':
-                $newAmount = $wallet->amount - $validated['amount'];
-                if ($newAmount < 0) {
-                    return $this->sendError('مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد', [], Response::HTTP_UNPROCESSABLE_ENTITY);
+                $newCoins = $wallet->coins - $validated['coins'];
+                if ($newCoins < 0) {
+                    return $this->sendError('مقدار سکه وارد شده بیشتر از موجودی کیف سکه میباشد', [], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 break;
         }
 
-        $wallet->update(['amount' => $newAmount]);
+        $wallet->update(['coins' => $newCoins]);
         $wallet = $wallet->fresh();
 
         unset($validated['user_id']);
@@ -75,11 +75,11 @@ class WalletController extends BaseController
         unset($validated['image']);
 
         $validated['user_id'] = $user->id;
-        $validated['final_amount'] = $newAmount;
+        $validated['final_coins'] = $newCoins;
         $validated['reason_id'] = $reason_id;
         $validated['changer_id'] = $changer->id;
 
-        $transaction = WalletTransaction::query()->create($validated);
+        $transaction = CoinWalletTransaction::query()->create($validated);
 
         if(!empty($request->image)) {
             $path = $this->uploadNewTransactionImage($request->image, $transaction);
@@ -89,96 +89,71 @@ class WalletController extends BaseController
         return $this->sendResponse(compact('wallet'), 'تراکنش با موفقیت انجام شد');
     }
 
+
     /**
-     * Buy coin with wallet
+     * Store Travel Transaction
      *
      * @param Request $request
      * @return Response
      */
-    public function buyCoin(Request $request)
+    public function storeTravelTransaction(Request $request)
     {
         $validated = $request->validate([
-            'amount' => ['required', 'numeric']
+            'travel_id' => ['required']
         ]);
 
-        $coinPrice = 100; // each coin price
+        $travelCoin = 10; // travel coin
 
         $user = Auth::user();
-        $wallet = $user->wallet;
-        $coinWallet = $user->coinWallet;
+        $wallet = $user->coinWallet;
 
-        if ($validated['amount'] > $wallet->amount) {
-            return $this->sendError('مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد', [], Response::HTTP_UNPROCESSABLE_ENTITY);
+        $newCoins = $wallet->coins - $travelCoin;
+        if ($newCoins < 0) {
+            return $this->sendError('موجودی کافی نیست', [], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+        $reason_id = CoinWalletTransactionReason::whereCode(21)->first()->id; //get new travel reason code
 
-        if ($validated['amount'] < $coinPrice) {
-            return $this->sendError('مبلغ وارد شده کمتر از هزینه یک سکه است، هزینه هر سکه' . $coinPrice . ' تومان است', [], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        // convert input amount to coins
-        $coins = round($validated['amount'] / $coinPrice);
-        $newCoins = $coinWallet->coins + $coins;
-        $newAmount = $wallet->amount - $validated['amount'];
-
-        $coinWallet->update(['coins' => $newCoins]);
-        $wallet->update(['amount' => $newAmount]);
-
-        $coinWallet = $coinWallet->fresh();
+        $wallet->update(['coins' => $newCoins]);
         $wallet = $wallet->fresh();
-
-        // insert wallet transaction for buy coin
-        $walletTransaction = WalletTransaction::query()->create([
-            'user_id' => $user->id,
-            'amount' => $validated['amount'],
+        CoinWalletTransaction::query()->create([
             'action' => 'decrease',
-            'final_amount' => $newAmount,
-            'reason_id' => WalletTransactionReason::query()->whereCode(21)->first()->id,
+            'travel_id' => $validated['travel_id'],
+            'reason_id' => $reason_id,
+            'coins' => $travelCoin,
+            'final_coins' => $newCoins,
+            'user_id' => $user->id,
             'changer_id' => $user->id
         ]);
 
-        // insert coin wallet transaction for buy coin
-        $coinWalletTransaction = CoinWalletTransaction::query()->create([
-            'user_id' => $user->id,
-            'coins' => $coins,
-            'action' => 'increase',
-            'final_coins' => $newCoins,
-            'reason_id' => CoinWalletTransactionReason::query()->whereCode(11)->first()->id,
-            'changer_id' => $user->id,
-            'wallet_transaction_id' => $walletTransaction->id
-        ]);
-
-        // add coin wallet transaction id to wallet transaction
-        $walletTransaction->update([
-            'coin_wallet_transaction_id' => $coinWalletTransaction->id
-        ]);
-
-        return $this->sendResponse(compact('wallet', 'coinWallet'), 'تراکنش با موفقیت انجام شد');
+        return $this->sendResponse(compact('wallet'), 'تراکنش با موفقیت انجام شد');
     }
 
     /**
-     * Increase wallet with online gateway
+     * Buy coin online
      *
      * @param Request $request
      * @return Response
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function increaseWalletOnline(Request $request)
+    public function buyCoinOnline(Request $request)
     {
         $validated = $request->validate([
             'gateway' => ['required', 'in:' . implode(',', config('payment.active_gateways'))],
-            'amount' => ['required', 'numeric']
+            'coins' => ['required', 'numeric']
         ]);
+
+        $coinsAmount = $validated['coins'] * $this->coinPrice;
 
         $user = Auth::user();
 
         $gateway = $this->gatewayFactory($validated['gateway']);
 
-        $pay = $gateway->setAmount($validated['amount'])
-            ->setCallbackURL(route('wallet::increase.verify-payment'))
+        $pay = $gateway->setAmount($coinsAmount)
+            ->setCallbackURL(route('coin-wallet::buy-coin.verify-payment'))
             ->setUserID($user->id)
             ->setMobile($user->mobile)
             ->setEmail($user->email)
-            ->setDescription('افزایش موجودی کیف پول')
+            ->setDescription('افزایش موجودی کیف سکه')
             ->pay();
 
 
@@ -199,7 +174,7 @@ class WalletController extends BaseController
             'user_id' => $user->id,
             'gateway' => $validated['gateway'],
             'transaction_number' => $transaction_number,
-            'amount' => $validated['amount'],
+            'amount' => $coinsAmount,
             'status' => 'unpaid'
         ]);
 
@@ -208,19 +183,18 @@ class WalletController extends BaseController
         ]);
     }
 
-
     /**
-     * Verify increase wallet payment
+     * Verify coin payment
      *
      * @param Request $request
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function verifyIncreaseWalletPayment(Request $request)
+    public function verifyBuyCoinPayment(Request $request)
     {
         if (!empty($request->Authority)) {
             // zarinpal gateway
-            return $this->verifyIncreaseWalletPaymentHanlder('zarinpal', $request->Authority);
+            return $this->verifyBuyCoinPaymentHandler('zarinpal', $request->Authority);
 
         } else if(!is_null($request->ResCode)) {
             // mellat gateway
@@ -232,14 +206,14 @@ class WalletController extends BaseController
                 return 'پرداخت انجام نشد!';
             }
 
-            return $this->verifyIncreaseWalletPaymentHanlder('mellat', $refID, ['sale_ref_id' => $saleRefID]);
+            return $this->verifyBuyCoinPaymentHandler('mellat', $refID, ['sale_ref_id' => $saleRefID]);
         }
 
         return 'فرایند قابل انجام نیست';
     }
 
     /**
-     * Verify increase wallet payment handler
+     * Verify buy coin payment handler
      *
      * @param $gatewayName
      * @param $verifyCode
@@ -247,7 +221,7 @@ class WalletController extends BaseController
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function verifyIncreaseWalletPaymentHanlder($gatewayName, $verifyCode, array $attributes = [])
+    public function verifyBuyCoinPaymentHandler($gatewayName, $verifyCode, array $attributes = [])
     {
         $transaction = Transaction::where('transaction_number', $verifyCode)->first();
         if (!$transaction) {
@@ -262,10 +236,10 @@ class WalletController extends BaseController
 
         switch ($gatewayName) {
             case 'zarinpal':
-                $verify = $this->zarinpalVerifyIncreaseWalletPayment($gateway, $verifyCode, $transaction->amount);
+                $verify = $this->zarinpalVerifyBuyCoin($gateway, $verifyCode, $transaction->amount);
                 break;
             case 'mellat':
-                $verify = $this->mellatVerifyIncreaseWalletPayment($gateway, $attributes['sale_ref_id']);
+                $verify = $this->mellatVerifyBuyCoin($gateway, $attributes['sale_ref_id']);
         }
 
         if (!$verify->isOk()) {
@@ -274,6 +248,7 @@ class WalletController extends BaseController
 
         $user = $transaction->user;
         $wallet = $user->wallet;
+        $coinWallet = $user->coinWallet;
 
         $transaction->update([
             'status' => 'paid',
@@ -281,8 +256,12 @@ class WalletController extends BaseController
         ]);
 
         $newAmount = $wallet->amount + $transaction->amount;
-        $wallet->update([
-            'amount' => $newAmount
+
+        $coins = $transaction->amount / $this->coinPrice;
+        $newCoins = $coinWallet->coins + $coins;
+
+        $coinWallet->update([
+            'coins' => $newCoins
         ]);
 
         // insert wallet transaction for increase wallet
@@ -296,11 +275,37 @@ class WalletController extends BaseController
             'changer_id' => $user->id
         ]);
 
+        // insert wallet transaction for decrease wallet
+        $walletTransaction2 = WalletTransaction::query()->create([
+            'user_id' => $user->id,
+            'amount' => $transaction->amount,
+            'action' => 'decrease',
+            'final_amount' => $wallet->amount,
+            'reason_id' => WalletTransactionReason::query()->whereCode(21)->first()->id,
+            'transaction_id' => $transaction->id,
+            'changer_id' => $user->id
+        ]);
+
+        // insert coin wallet transaction for increase
+        $coinWalletTransaction = CoinWalletTransaction::query()->create([
+            'action' => 'decrease',
+            'reason_id' => CoinWalletTransactionReason::query()->whereCode(11)->first()->id,
+            'coins' => $coins,
+            'final_coins' => $newCoins,
+            'user_id' => $user->id,
+            'changer_id' => $user->id,
+            'wallet_transaction_id' => $walletTransaction2->id
+        ]);
+
+        $walletTransaction2->update([
+            'coin_wallet_transaction_id' => $walletTransaction2->id
+        ]);
+
         return 'پرداخت با شماره پیگیری ' . $verify->getReferenceID() . ' با موفقیت انجام شد';
     }
 
     /**
-     * Verify payment with zarinpal
+     * Zarinpal verify buy coin
      *
      * @param ZarinPal $instance
      * @param $authority
@@ -308,7 +313,7 @@ class WalletController extends BaseController
      * @return ZarinPal
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function zarinpalVerifyIncreaseWalletPayment(ZarinPal $instance, $authority, $amount)
+    public function zarinpalVerifyBuyCoin(ZarinPal $instance, $authority, $amount)
     {
         $verify = $instance->setAuthorityCode($authority)->setAmount($amount)->verify();
         return $verify;
@@ -321,12 +326,11 @@ class WalletController extends BaseController
      * @param $saleRefId
      * @return Mellat|mixed
      */
-    public function mellatVerifyIncreaseWalletPayment(Mellat $instance, $saleRefId)
+    public function mellatVerifyBuyCoin(Mellat $instance, $saleRefId)
     {
         $verify = $instance->verify($saleRefId);
         return $verify;
     }
-
 
     /**
      * Call gateway instance
@@ -357,7 +361,7 @@ class WalletController extends BaseController
      */
     protected function uploadNewTransactionImage($file, $transaction)
     {
-        $imagePath = 'uploads/transaction/wallet/' . $transaction->id . '/';
+        $imagePath = 'uploads/transaction/coin-wallet/' . $transaction->id . '/';
         $fileName = $this->uploadFile($file, $imagePath);
 
         return $imagePath . $fileName;

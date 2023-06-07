@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Wallet>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CoinWallet>
  */
-class WalletFactory extends Factory
+class CoinWalletFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,7 +20,7 @@ class WalletFactory extends Factory
         $user = User::factory()->create();
         return [
             'user_id' => $user->id,
-            'amount' => rand(0, 200000)
+            'coins' => rand(0, 200000)
         ];
     }
 }

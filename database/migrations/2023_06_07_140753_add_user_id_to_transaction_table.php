@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('wallets', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->unsignedInteger('user_id')->after('id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 
@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wallets');
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropColumn('user_id');
+        });
     }
 };

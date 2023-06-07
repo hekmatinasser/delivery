@@ -5,19 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Wallet extends Model
+class WalletTransactionReason extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
     /**
-     * CoinWallet belong to a user
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function user()
+    public function walletTransaction()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(WalletTransaction::class);
     }
 }

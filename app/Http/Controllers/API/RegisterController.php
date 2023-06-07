@@ -38,6 +38,8 @@ class RegisterController extends BaseController
         $input['status'] = 0;
         $input['unValidCodeCount'] = 0;
         $user = User::create($input);
+        $user->wallet()->create();
+        $user->coinWallet()->create();
 
         VerifyCode::where('mobile', $user->mobile)->delete();
         $code = rand(1000, 9999);
