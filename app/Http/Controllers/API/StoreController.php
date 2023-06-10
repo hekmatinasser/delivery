@@ -10,8 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class StoreController extends BaseController
 {
@@ -26,7 +25,7 @@ class StoreController extends BaseController
         return $this->sendResponse(StoreCategory::select('title')->get(), 'Store Categories');
     }
 
-    public function my(Request $request): JsonResponse
+    public function my(Request $request)
     {
         $user = Auth::user();
         $all = [];
@@ -44,7 +43,7 @@ class StoreController extends BaseController
         return $this->sendResponse($all, 'All Store');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'category' => 'required',
@@ -66,7 +65,7 @@ class StoreController extends BaseController
         return $this->sendResponse('', 'مغازه با موفقیت ایجاد شد');
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'storeID' => 'required',
@@ -93,7 +92,7 @@ class StoreController extends BaseController
         return $this->sendResponse('', 'بروزرسانی با موفقیت انجام شد');
     }
 
-    public function delete(Request $request): JsonResponse
+    public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'storeID' => 'required',

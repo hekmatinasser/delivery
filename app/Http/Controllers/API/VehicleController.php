@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class VehicleController extends BaseController
 {
@@ -19,7 +19,7 @@ class VehicleController extends BaseController
         $v = new Vehicle();
         return $this->sendResponse($v->types(), 'Vehicle Types');
     }
-    public function my(Request $request): JsonResponse
+    public function my(Request $request)
     {
         $user = Auth::user();
         $all = [];
@@ -34,7 +34,7 @@ class VehicleController extends BaseController
         return $this->sendResponse($all, 'All Vehicle');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|max:255',
@@ -54,7 +54,7 @@ class VehicleController extends BaseController
         return $this->sendResponse('', 'وسیله نقلیه با موفقیت ایجاد شد');
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'vehicleID' => 'required',
@@ -79,7 +79,7 @@ class VehicleController extends BaseController
         return $this->sendResponse('', 'بروزرسانی با موفقیت انجام شد');
     }
 
-    public function delete(Request $request): JsonResponse
+    public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'vehicleID' => 'required',

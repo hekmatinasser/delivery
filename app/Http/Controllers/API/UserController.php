@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends BaseController
 {
-    public function profile(Request $request): JsonResponse
+    public function profile(Request $request)
     {
         $user = Auth::user();
         $success['name'] =  $user->name;
@@ -27,7 +27,7 @@ class UserController extends BaseController
     }
 
 
-    public function update(Request $request): JsonResponse
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'nullable|max:255',
@@ -53,7 +53,7 @@ class UserController extends BaseController
         $input['status'] = 0;
 
         $user = Auth::user();
-        $user = $user->update($input);
+        // $user = $user->update($input);
         $success['name'] =  $user->name;
         $success['family'] =  $user->family;
 

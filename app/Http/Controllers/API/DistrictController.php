@@ -5,8 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\StoreDistrictRequest;
 use App\Http\Requests\UpdateDistrictRequest;
 use App\Models\District;
+use App\Http\Controllers\API\BaseController as BaseController;
 
-class DistrictController extends Controller
+class DistrictController extends BaseController
 {
     /**
      * Display a listing of the resource.

@@ -7,15 +7,14 @@ use App\Models\user\UserVerify;
 use App\Models\VerifyCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends BaseController
 {
-    public function register(Request $request): JsonResponse
+    public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
@@ -26,12 +25,12 @@ class RegisterController extends BaseController
             'c_password' => 'required|same:password',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if(!checkNationalcode($request->nationalCode))
-            return $this->sendError('national Code Not Valid.', ['error'=>'کد ملی معتبر نمی باشد']);
+        if (!checkNationalcode($request->nationalCode))
+            return $this->sendError('national Code Not Valid.', ['error' => 'کد ملی معتبر نمی باشد']);
 
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
@@ -53,32 +52,31 @@ class RegisterController extends BaseController
         return $this->sendResponse('', 'کد تایید برای شما ارسال شد');
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric',
             'password' => 'required',
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if(Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])){
+        if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
             $user = Auth::user();
             Log::store(0, $user->id, 'Login', 5);
-            $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+            // $success['token'] =  $user->createToken('MyApp')->plainTextToken;
             $success['name'] =  $user->name;
             $success['family'] =  $user->family;
             return $this->sendResponse($success, 'ورود با موفقیت انجام شد');
-        }
-        else{
-            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
+        } else {
+            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
         }
     }
 
-    public function forgetPass(Request $request): \Illuminate\Http\JsonResponse
+    public function forgetPass(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric',
         ]);
         if ($validator->fails())
@@ -87,24 +85,23 @@ class RegisterController extends BaseController
         $user = User::where('mobile', $request->mobile)->first();
         if ($user) {
             $last = User::where('updated_at', '>=', Carbon::now()->subSecond(60)->toDateTimeString())
-                ->where('user_id' , $user->id,)->first();
-            if($last)
-            {
+                ->where('user_id', $user->id,)->first();
+            if ($last) {
                 return $this->sendResponse('', 'رمز عبور برای شما ارسال شده است');
-            }else{
+            } else {
                 Log::store(0, $user->id, 'ResetPass', 5);
                 $pass = rand(1000, 9999);
                 $user->update(['password' => bcrypt($pass)]);
-                smsForgetPass($user, $pass);
+                // smsForgetPass($user, $pass);
                 return $this->sendResponse('', 'رمز عبور برای شما ارسال شد');
             }
         } else
             return $this->sendError('Mobile Error.', 'برای شماره تلفن ارسال شده حساب کاربری یافت نشد');
     }
 
-    public function verify(Request $request): \Illuminate\Http\JsonResponse
+    public function verify(Request $request): JsonResponse
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'code' => 'required|max:4',
         ]);
         if ($validator->fails())
@@ -121,7 +118,7 @@ class RegisterController extends BaseController
             return $this->sendError('Mobile Error.', 'برای شماره تلفن ارسال شده حساب کاربری یافت نشد');
 
         $verify->delete();
-//        $user->update(['status' => 1]);
+        //        $user->update(['status' => 1]);
 
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['name'] =  $user->name;
@@ -136,5 +133,4 @@ class RegisterController extends BaseController
         $request->user()->token()->revoke();
         return $this->sendResponse("", 'خروج از حساب کاربری با موفقیت انجام شد');
     }
-
 }
