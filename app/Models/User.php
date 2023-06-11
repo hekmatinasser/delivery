@@ -10,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -36,8 +36,8 @@ class User extends Authenticatable
     public function userTypes()
     {
         return [
-          0 => 'seller',
-          1 => 'delivery',
+            0 => 'seller',
+            1 => 'delivery',
         ];
     }
 
@@ -75,5 +75,23 @@ class User extends Authenticatable
     public function coinWallet()
     {
         return $this->hasOne(CoinWallet::class);
+    }
+
+    public static function findByMobile(string $mobile): ?User
+    {
+        return static::where('mobile', $mobile)->first();
+    }
+
+    public function getUserByActivationCode(string $activationCode): ?User
+    {
+        $verifyCode = VerifyCode::where('code', $activationCode)
+            ->where('created_at', '>=', now()->subMinutes(15))
+            ->first();
+
+        if ($verifyCode) {
+            return $this->findByMobile($verifyCode->mobile);
+        }
+
+        return null;
     }
 }

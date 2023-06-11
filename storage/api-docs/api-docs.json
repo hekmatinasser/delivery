@@ -2,21 +2,679 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Snapp API",
-        "version": "0.0.1"
+        "version": "1.0"
     },
     "paths": {
-        "/api": {}
+        "/api": {},
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Registers a new user and sends a verification code via SMS",
+                "operationId": "4f180d96579be230948368a8ef1bab66",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "is_new": {
+                                                    "type": "bolean",
+                                                    "example": "true"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authentication code sent to your mobile."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/verify": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Complete user registration",
+                "description": "Complete user registration with activation code",
+                "operationId": "eaabe2331d6853f1538efbe76edd7ef8",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "hash-value"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "family": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Completed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "description": "Login user with mobile number",
+                "operationId": "777e65b246a8910073b45de4f1d18782",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Verification code sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": ""
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authentication code sent to your mobile."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login/code": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login with activation code and mobile number",
+                "description": "Logs in a user with an activation code and mobile number",
+                "operationId": "51ae64416aad5c2719156fd5f697e3db",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginWithCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "hash-value"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "family": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login/password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login with mobile number and password",
+                "description": "Logs in a user with a mobile number and password",
+                "operationId": "ec1ac7a4616b1c0116598eb75987f773",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginWithPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "hash-value"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "family": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized login response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorised."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/forgot-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Send verification code to reset password",
+                "description": "Sends a verification code to the user's mobile number to reset their password",
+                "operationId": "069ac36dab250c365f39d64399ba4d61",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": ""
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Verification code has been sent."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/reset-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset user's password",
+                "description": "Resets the user's password using the verification code sent to their mobile number",
+                "operationId": "16200b77b3fc69127ea91efd4f81a8e1",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": ""
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "password is updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
     "components": {
         "schemas": {
-            "Result": {
-                "title": "Sample schema for using references",
+            "SuccessResponse": {
+                "title": "Success Response",
+                "description": "Schema for a successful API response",
                 "properties": {
-                    "status": {
-                        "type": "string"
+                    "success": {
+                        "description": "Indicates if the request was successful",
+                        "type": "boolean",
+                        "example": true
                     },
-                    "error": {
-                        "type": "string"
+                    "data": {
+                        "description": "Response data",
+                        "type": "object",
+                        "example": []
+                    },
+                    "message": {
+                        "description": "Response message",
+                        "type": "string",
+                        "example": "Success"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Error Response",
+                "description": "Schema for an error API response",
+                "properties": {
+                    "success": {
+                        "description": "Indicates if the request was successful",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "description": "Error message",
+                        "type": "string",
+                        "example": "Error"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorValidation": {
+                "title": "Error Validation",
+                "description": "Schema for an error Validation API response",
+                "properties": {
+                    "message": {
+                        "description": "Error message",
+                        "type": "string",
+                        "example": "Error"
+                    },
+                    "errors": {
+                        "description": "Error data",
+                        "properties": {
+                            "fieldName": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": [
+                                        "field is wrong."
+                                    ]
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ForgotPasswordRequest": {
+                "title": "Forgot Password Request",
+                "description": "Pass user's mobile number",
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "format": "mobile",
+                        "example": "09123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginRequest": {
+                "title": "Login Request",
+                "description": "Pass user mobile number",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "example": "09123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginWithCodeRequest": {
+                "title": "Login With Code Request",
+                "description": "Pass user activation code and mobile number",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "format": "code",
+                        "example": "1234"
+                    },
+                    "mobile": {
+                        "type": "string",
+                        "format": "mobile",
+                        "example": "09123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginWithPasswordRequest": {
+                "title": "Login With PasswordRequest",
+                "description": "Pass user mobile number and password",
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "format": "mobile",
+                        "example": "09123456789"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "MyNewPassword123"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "title": "Register Request",
+                "description": "Schema for the registration request",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "mobile": {
+                        "description": "User's mobile number",
+                        "type": "string",
+                        "example": "09123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "ResetPasswordRequest": {
+                "title": "Reset Password Request",
+                "description": "Pass verification code and new password",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "1234"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "newpassword"
+                    }
+                },
+                "type": "object"
+            },
+            "VerifyRequest": {
+                "title": "Compleate RegistrationRequest Request",
+                "description": "Pass user mobile number and activation code",
+                "required": [
+                    "mobile",
+                    "code",
+                    "password"
+                ],
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "1234"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "MyNewPassword123"
                     }
                 },
                 "type": "object"
