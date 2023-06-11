@@ -117,7 +117,6 @@ class RegisterController extends BaseController
         }
 
         VerifyCode::where('mobile', $user->mobile)->delete();
-        // return $this->sendResponse($success, 'منتظر تایید ادمین باشید');
 
         $user->password = bcrypt($request->password);
         $user->wallet()->create();
@@ -435,43 +434,6 @@ class RegisterController extends BaseController
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::RESET_PASSWORD, LogActionsEnum::SUCCESS);
         // TODO CLEAR this LOGGER after SECCUSS ACTION
         return $this->sendResponse('', Lang::get('passwords.reset'));
-    }
-
-    public function register2(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'family' => 'required|max:255',
-            'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users',
-            'nationalCode' => 'required|digits:10|numeric',
-            'password' => 'required',
-            'c_password' => 'required|same:password',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        if (!checkNationalcode($request->nationalCode))
-            return $this->sendError('national Code Not Valid.', ['error' => 'کد ملی معتبر نمی باشد']);
-
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-        $input['status'] = 0;
-        $input['unValidCodeCount'] = 0;
-        $user = User::create($input);
-        $user->wallet()->create();
-        $user->coinWallet()->create();
-
-        VerifyCode::where('mobile', $user->mobile)->delete();
-        $code = rand(1000, 9999);
-        VerifyCode::create([
-            'code' => $code,
-            'mobile' => $user->mobile,
-        ]);
-        verifySMS($user->mobile, $code);
-
-        return $this->sendResponse('', 'کد تایید برای شما ارسال شد');
     }
 
     public function logout(Request $request)
