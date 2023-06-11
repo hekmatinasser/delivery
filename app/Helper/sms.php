@@ -25,9 +25,10 @@ use Illuminate\Support\Facades\Log;
 function verifySMS($number, $code)
 {
     if (env('APP_ENV') == 'local') return false;
-    $userName = "sms-test";
-    $password = "fsdD9dsD$0f8";
-    $fromNumber = "10000100000";
+    $userName = env('SMS_PANEL_USERNAME', 'username');
+    $password = env('SMS_PANEL_USERNAME', 'password');
+    $fromNumber = env('SMS_PANEL_USERNAME', '1000000');
+
     $toNumbers = $number;
     $messageContent = "کد تایید شما : " . $code;
     $url = "http://sms1.webhoma.ir/SMSInOutBox/SendSms?username=" . $userName . "&password=" . $password . "&from=" . $fromNumber . "&to=" . $toNumbers . "&text=" . $messageContent;
