@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('verify_code', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('mobile')->unsigned();
+            $table->string('mobile', 11);
             $table->integer('code')->unsigned();
             $table->timestamps();
         });
-
     }
 
     /**
