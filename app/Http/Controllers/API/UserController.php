@@ -47,7 +47,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Patch(
+     * @OA\Post(
      *     path="/api/v1/user",
      *     summary="Update user profile",
      *     description="Update the authenticated user's profile information",
@@ -65,7 +65,7 @@ class UserController extends BaseController
      *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
      *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
      *                      @OA\Property(property="address", type="string", maxLength=255),
-     *                      @OA\Property(property="postalCode", type="string", format="postalCode", example="1234567890"),
+     *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
      *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890")
      *                 )
      *             )
@@ -112,13 +112,11 @@ class UserController extends BaseController
         $input['status'] = 0;
 
         $oldData = $user->toArray();
-        $success = $user->update($input);
-
-        $user->update($request->all());
+        $user->update($input);
         $newData = $user->toArray();
 
         (new User())->logUserModelChanges($user, $oldData, $newData);
 
-        return $this->sendResponse($success, ".بروزرسانی با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($newData, ".بروزرسانی با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
     }
 }
