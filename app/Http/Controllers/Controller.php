@@ -7,18 +7,12 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
  /**
- * @OA\Schema(
- *  schema="Result",
- *  title="Sample schema for using references",
- * 	@OA\Property(
- * 		property="status",
- * 		type="string"
- * 	),
- * 	@OA\Property(
- * 		property="error",
- * 		type="string"
- * 	)
+ * @OA\Info(
+ *     version="1.0",
+ *     title="Snapp API"
  * )
+ *
+ * @OA\PathItem(path="/api")
  */
 class Controller extends BaseController
 {
