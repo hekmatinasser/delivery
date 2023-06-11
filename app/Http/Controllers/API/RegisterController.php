@@ -109,7 +109,8 @@ class RegisterController extends BaseController
         // TODO CHECK if validation Logger is available
         $user = (new User())->getUserByActivationCode($request->code);
         if (!$user || $user->mobile != $request->mobile) {
-            if ($user) {
+            if (!$user) {
+                $user = User::findByMobile($request->mobile);
                 Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::REGISTER, LogActionsEnum::FAILED, Lang::get('auth.code_failed'));
             }
             return $this->sendError(Lang::get('auth.code_failed'), [], 400);
@@ -241,7 +242,8 @@ class RegisterController extends BaseController
         $user = (new User())->getUserByActivationCode($request->code);
 
         if (!$user || $user->mobile != $request->mobile) {
-            if ($user) {
+            if (!$user) {
+                $user = User::findByMobile($request->mobile);
                 Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::FAILED, Lang::get('auth.code_failed'));
             }
             return $this->sendError(Lang::get('auth.code_failed'), [], 400);
@@ -419,17 +421,14 @@ class RegisterController extends BaseController
      */
     public function restPassword(ResetPasswordRequest $request)
     {
-        // TODO CHECK if validation Logger is available
         $user = (new User())->getUserByActivationCode($request->code);
         if (!$user) {
-            if ($user) {
-                Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::RESET_PASSWORD, LogActionsEnum::FAILED, Lang::get('auth.code_failed'));
-            }
             return $this->sendError(Lang::get('auth.code_failed'), [], 400);
         }
 
         VerifyCode::where('mobile', $user->mobile)->delete();
 
+        // TODO CHECK if validation Logger is available
         $user->password = bcrypt($request->password);
         $user->save();
 
