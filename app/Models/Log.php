@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\LogActionsEnum;
+use App\Enums\LogModelsEnum;
+use App\Enums\LogUserTypesEnum;
 use App\Models\admin\Admin;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Log extends Model
 {
@@ -19,11 +21,12 @@ class Log extends Model
         'item_id',
     ];
 
-    public function user(){
+    public function user()
+    {
         if ($this->userType == 0)
-            return $this->belongsTo(User::class , 'user_id');
+            return $this->belongsTo(User::class, 'user_id');
         else
-            return $this->belongsTo(Admin::class , 'user_id');
+            return $this->belongsTo(Admin::class, 'user_id');
     }
 
     public function userTypes(): array
@@ -43,6 +46,8 @@ class Log extends Model
             '3' => 'حذف کردن',
             '4' => 'مشاهده همه',
             '5' => 'درخواست',
+            '6' => 'موفق',
+            '7' => 'نا موفق',
             '9' => 'ثبت نام',
             '10' => 'مشاهده پروفایل',
             '11' => 'ویرایش پروفایل',
@@ -54,7 +59,8 @@ class Log extends Model
         return [
             'Login' => 'ورود',
             'Register' => 'ثبت نام',
-            'ResetPass' => 'فراموشی رمزعبور',
+            'ForgotPass' => 'فراموشی رمزعبور',
+            'ResetPass' => 'تغییر رمزعبور',
             'Verify' => 'تایید شماره تلفن',
             'Logout' => 'خروج از سیستم',
             'User' => 'کاربر',
@@ -62,13 +68,27 @@ class Log extends Model
         ];
     }
 
-    static function store($userType, $userId, $model, $action, $title = null, $itemID = null)
+    /**
+     * Store a log entry for a user action
+     *
+     * @param LogUserTypesEnum $userType The type of user (e.g. 'admin', 'user')
+     * @param int $userId The ID of the user performing the action
+     * @param LogModelsEnum $model The model being acted upon (e.g. 'Login', 'Register')
+     * @param LogActionsEnum $action The action being performed (e.g. 'create', 'update', 'delete')
+     * @param string|null $title The title of the item being acted upon (optional)
+     * @param int|null $itemID The ID of the item being acted upon (optional)
+     *
+     * @return void
+     */
+    static function store(LogUserTypesEnum $userType, $userId, LogModelsEnum $model, LogActionsEnum $action, $title = null, $itemID = null)
     {
-        $last = Log::where('created_at', '>=', Carbon::now()->subSecond(30)->toDateTimeString())
-            ->where(['userType' => $userType,
+        $last = Log::where('created_at', '>=', Carbon::now()->subSecondS(30)->toDateTimeString())
+            ->where([
+                'userType' => $userType,
                 'user_id' => $userId,
                 'model' => $model,
-                'action' => $action,])
+                'action' => $action,
+            ])
             ->first();
         if (!$last)
             Log::create([
