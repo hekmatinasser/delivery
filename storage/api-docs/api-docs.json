@@ -494,6 +494,147 @@
                     }
                 }
             }
+        },
+        "/api/v1/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user profile",
+                "description": "Returns the authenticated user's profile information",
+                "operationId": "15119e7ff16d411ed7969cc14573885f",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user profile",
+                "description": "Update the authenticated user's profile information",
+                "operationId": "06a5199a5336d2ee8d8ed4942535943c",
+                "requestBody": {
+                    "description": "The user's profile information to update",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postalCode": {
+                                        "type": "string",
+                                        "format": "postalCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The updated user profile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The user profile was successfully updated and is awaiting admin approval."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -678,14 +819,189 @@
                     }
                 },
                 "type": "object"
+            },
+            "UpdateProfileRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 70
+                    },
+                    "family": {
+                        "type": "string",
+                        "maxLength": 70
+                    },
+                    "mobile": {
+                        "type": "string",
+                        "format": "mobile",
+                        "example": "09123456789"
+                    },
+                    "nationalCode": {
+                        "type": "string",
+                        "format": "nationalCode",
+                        "example": "0123456789"
+                    },
+                    "nationalPhoto": {
+                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "format": "postalCode",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "format": "phone",
+                        "example": "1234567890"
+                    }
+                },
+                "type": "object"
+            },
+            "CoinWallet": {
+                "title": "CoinWallet",
+                "description": "A Coin Wallet object",
+                "required": [
+                    "user_id",
+                    "coins"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "coins": {
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "A user object",
+                "properties": {
+                    "id": {
+                        "description": "The user's ID",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "The user's name",
+                        "type": "string"
+                    },
+                    "family": {
+                        "description": "The user's family name",
+                        "type": "string"
+                    },
+                    "mobile": {
+                        "description": "The user's mobile number",
+                        "type": "string"
+                    },
+                    "nationalCode": {
+                        "description": "The user's national code",
+                        "type": "string"
+                    },
+                    "nationalPhoto": {
+                        "description": "The user's national photo",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "The user's email address",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "The user's status",
+                        "type": "integer"
+                    },
+                    "unValidCodeCount": {
+                        "description": "The user's unvalidated code count",
+                        "type": "integer"
+                    },
+                    "address": {
+                        "description": "The user's address",
+                        "type": "string"
+                    },
+                    "postCode": {
+                        "description": "The user's postal code",
+                        "type": "string"
+                    },
+                    "phone": {
+                        "description": "The user's phone number",
+                        "type": "string"
+                    },
+                    "userType": {
+                        "description": "The user's type (0 => seller or 1 => delivery)",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "description": "The date/time the user was created",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "The date/time the user was last updated",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "wallet": {
+                        "$ref": "#/components/schemas/Wallet"
+                    },
+                    "coinWallet": {
+                        "$ref": "#/components/schemas/CoinWallet"
+                    }
+                },
+                "type": "object"
+            },
+            "Wallet": {
+                "required": [
+                    "user_id",
+                    "amount"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
             "sanctum": {
-                "type": "apiKey",
-                "description": "Enter token in format (Bearer <token>)",
-                "name": "Authorization",
-                "in": "header"
+                "type": "http",
+                "description": "Enter token",
+                "name": "Token",
+                "in": "header",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     }

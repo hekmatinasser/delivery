@@ -22,9 +22,9 @@ Route::controller(RegisterController::class)->prefix('v1')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('user')->controller(UserController::class)->group(function () {
-        Route::post('profile', 'profile');
-        Route::post('update', 'update');
+    Route::prefix('v1/user')->controller(UserController::class)->group(function () {
+        Route::get('', 'profile');
+        Route::patch('', 'update');
     });
 
 
