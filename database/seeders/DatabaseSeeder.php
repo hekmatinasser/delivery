@@ -21,8 +21,9 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-           WalletTransactionReasonSeeder::class,
-           CoinWalletTransactionReasonSeeder::class
+            WalletTransactionReasonSeeder::class,
+            CoinWalletTransactionReasonSeeder::class,
+            StoreCategorySeeder::class
         ]);
     }
 }

@@ -6,7 +6,7 @@ use App\Http\Requests\StoreRentRequest;
 use App\Http\Requests\UpdateRentRequest;
 use App\Models\Rent;
 
-class RentController extends Controller
+class RentController extends BaseController
 {
     /**
      * Display a listing of the resource.

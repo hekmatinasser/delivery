@@ -3,14 +3,40 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\LogActionsEnum;
+use App\Enums\LogModelsEnum;
+use App\Enums\LogUserTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @OA\Schema(
+ *     schema="User",
+ *     title="User",
+ *     description="A user object",
+ *     @OA\Property(property="id", type="integer", description="The user's ID"),
+ *     @OA\Property(property="name", type="string", description="The user's name"),
+ *     @OA\Property(property="family", type="string", description="The user's family name"),
+ *     @OA\Property(property="mobile", type="string", description="The user's mobile number"),
+ *     @OA\Property(property="nationalCode", type="string", description="The user's national code"),
+ *     @OA\Property(property="nationalPhoto", type="string", description="The user's national photo"),
+ *     @OA\Property(property="email", type="string", description="The user's email address"),
+ *     @OA\Property(property="status", type="integer", description="The user's status"),
+ *     @OA\Property(property="unValidCodeCount", type="integer", description="The user's unvalidated code count"),
+ *     @OA\Property(property="address", type="string", description="The user's address"),
+ *     @OA\Property(property="postCode", type="string", description="The user's postal code"),
+ *     @OA\Property(property="phone", type="string", description="The user's phone number"),
+ *     @OA\Property(property="userType", type="string", description="The user's type (0 => seller or 1 => delivery)"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", description="The date/time the user was created"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", description="The date/time the user was last updated"),
+ * )
+ */
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -36,8 +62,8 @@ class User extends Authenticatable
     public function userTypes()
     {
         return [
-          0 => 'seller',
-          1 => 'delivery',
+            0 => 'seller',
+            1 => 'delivery',
         ];
     }
 
@@ -62,7 +88,15 @@ class User extends Authenticatable
     ];
 
     /**
+     * Get the user's wallet.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="wallet",
+     *     type="object",
+     *     ref="#/components/schemas/Wallet"
+     * )
      */
     public function wallet()
     {
@@ -70,10 +104,107 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's coin wallet.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="coinWallet",
+     *     type="object",
+     *     ref="#/components/schemas/CoinWallet"
+     * )
      */
     public function coinWallet()
     {
         return $this->hasOne(CoinWallet::class);
+    }
+
+    /**
+     * Get the user's vehicle.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="vehicle",
+     *     type="object",
+     *     ref="#/components/schemas/Vehicle"
+     * )
+     */
+    public function vehicle()
+    {
+        return $this->hasOne(Vehicle::class);
+    }
+
+    /**
+     * Get the user's store.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="store",
+     *     type="object",
+     *     ref="#/components/schemas/Store"
+     * )
+     */
+    public function store()
+    {
+        return $this->hasOne(Store::class)->with(['category']);
+    }
+
+    /**
+     * Find a user by mobile number.
+     *
+     * @param string $mobile The user's mobile number
+     *
+     * @return User|null
+     *
+     */
+    public static function findByMobile(string $mobile): ?User
+    {
+        return static::where('mobile', $mobile)->first();
+    }
+
+    /**
+     * Retrieves a user by their activation code, if it is valid and not expired.
+     *
+     * @param string $activationCode The activation code to search for.
+     * @return User|null The user associated with the activation code, or null if not found or expired.
+     */
+    public function getUserByActivationCode(string $activationCode): ?User
+    {
+        $verifyCode = VerifyCode::where('code', $activationCode)
+            ->where('created_at', '>=', now()->subMinutes(15))
+            ->first();
+
+        if ($verifyCode) {
+            return $this->findByMobile($verifyCode->mobile);
+        }
+
+        return null;
+    }
+
+    /** Log changes to user model when updating profile.
+     *
+     * @param User $user The user model being updated.
+     * @param array $oldData The original data for the user model.
+     * @param array $newData The updated data for the user model.
+     * @return void
+     */
+    function logUserModelChanges(User $user, array $oldData, array $newData): void
+    {
+        $changes = [];
+
+        foreach ($newData as $key => $value) {
+            if ($value !== $oldData[$key]) {
+                $changes[$key] = [
+                    'old' => $oldData[$key],
+                    'new' => $value,
+                ];
+            }
+        }
+
+        if (!empty($changes)) {
+            Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::USER, LogActionsEnum::EDIT, json_encode($changes));
+        }
     }
 }
