@@ -2,9 +2,59 @@
 
 namespace App\Models;
 
+use App\Enums\LogActionsEnum;
+use App\Enums\LogModelsEnum;
+use App\Enums\LogUserTypesEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LaravelLang\Publisher\Constants\Types;
 
+/**
+ * @OA\Schema(
+ *     schema="Vehicle",
+ *     title="Vehicle",
+ *     description="Vehicle model",
+ *     @OA\Property(
+ *         property="id",
+ *         description="ID of the vehicle",
+ *         type="integer",
+ *         format="int64"
+ *     ),
+ *     @OA\Property(
+ *         property="user_id",
+ *         description="ID of the user who owns the vehicle",
+ *         type="integer",
+ *         format="int64"
+ *     ),
+ *     @OA\Property(
+ *         property="type",
+ *         description="Type of the vehicle",
+ *         type="string",
+ *         enum={"MOTOR", "CAR"}
+ *     ),
+ *     @OA\Property(
+ *         property="brand",
+ *         description="Brand of the vehicle",
+ *         type="string"
+ *     ),
+ *     @OA\Property(
+ *         property="pelak",
+ *         description="License plate number of the vehicle",
+ *         type="string"
+ *     ),
+ *     @OA\Property(
+ *         property="color",
+ *         description="Color of the vehicle",
+ *         type="string"
+ *     ),
+ *     @OA\Property(
+ *         property="model",
+ *         description="Model of the vehicle",
+ *         type="string"
+ *     )
+ * )
+ */
 class Vehicle extends Model
 {
     use HasFactory;
@@ -22,13 +72,42 @@ class Vehicle extends Model
     public function types()
     {
         return [
-            0 => 'motor',
-            1 => 'car',
+            0 => 'MOTOR',
+            1 => 'CAR',
         ];
+    }
 
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) =>  $this->types()[$value],
+            set: fn (string $value) => array_search($value, $this->types()),
+        );
     }
 
 
+    /** Log changes to Vehicle model when updating Vehicle.
+     *
+     * @param User $user The User model.
+     * @param array $oldData The original data for the vehicle model.
+     * @param array $newData The updated data for the vehicle model.
+     * @return void
+     */
+    function logVehicleModelChanges(User $user, array $oldData, array $newData): void
+    {
+        $changes = [];
 
+        foreach ($newData as $key => $value) {
+            if ($value !== $oldData[$key]) {
+                $changes[$key] = [
+                    'old' => $oldData[$key],
+                    'new' => $value,
+                ];
+            }
+        }
 
+        if (!empty($changes)) {
+            Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::VEHICLE, LogActionsEnum::EDIT, json_encode($changes));
+        }
+    }
 }

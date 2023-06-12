@@ -635,6 +635,276 @@
                     }
                 ]
             }
+        },
+        "/api/v1/vehicle": {
+            "put": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "update a new vehicle",
+                "description": "update vehicle record",
+                "operationId": "01c90cd07392e89001ffc53fa92d813c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateVehicleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Vehicle"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Store a new vehicle",
+                "description": "Create a new vehicle record",
+                "operationId": "24896df2f902c580f204053ef1b9b7c9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreVehicleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Vehicle"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Delete the user's vehicle",
+                "description": "Deletes the vehicle associated with the authenticated user.",
+                "operationId": "deleteVehicle",
+                "responses": {
+                    "200": {
+                        "description": "Vehicle deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vehicle deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "vehicle": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Vehicle already exists."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vehicle not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vehicle not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/vehicle/my": {
+            "get": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Get user's vehicle details",
+                "description": "Returns the details of the vehicle associated with the authenticated user",
+                "operationId": "78c93a727f393a9bcf07aa640c3452e0",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Vehicle"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/vehicle/types": {
+            "get": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Get vehicle types",
+                "description": "Returns a list of vehicle types",
+                "operationId": "ed308ca1a61e35125f41b4108bca4cc0",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "example": "motor"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -862,6 +1132,90 @@
                 },
                 "type": "object"
             },
+            "StoreVehicleRequest": {
+                "title": "Store Vehicle Request",
+                "description": "Request body for storing a new vehicle",
+                "required": [
+                    "type",
+                    "brand",
+                    "pelak",
+                    "color",
+                    "model"
+                ],
+                "properties": {
+                    "type": {
+                        "description": "The type of the vehicle (MOTOR or CAR)",
+                        "type": "string",
+                        "enum": [
+                            "MOTOR",
+                            "CAR"
+                        ]
+                    },
+                    "brand": {
+                        "description": "The brand of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "pelak": {
+                        "description": "The pelak of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "color": {
+                        "description": "The color of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "model": {
+                        "description": "The model of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateVehicleRequest": {
+                "title": "update Vehicle Request",
+                "description": "Request body for updateting a vehicle",
+                "required": [
+                    "type",
+                    "brand",
+                    "pelak",
+                    "color",
+                    "model"
+                ],
+                "properties": {
+                    "type": {
+                        "description": "The type of the vehicle (MOTOR or CAR)",
+                        "type": "string",
+                        "enum": [
+                            "MOTOR",
+                            "CAR"
+                        ]
+                    },
+                    "brand": {
+                        "description": "The brand of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "pelak": {
+                        "description": "The pelak of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "color": {
+                        "description": "The color of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "model": {
+                        "description": "The model of the vehicle",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
             "CoinWallet": {
                 "title": "CoinWallet",
                 "description": "A Coin Wallet object",
@@ -962,6 +1316,50 @@
                     },
                     "coinWallet": {
                         "$ref": "#/components/schemas/CoinWallet"
+                    },
+                    "vehicle": {
+                        "$ref": "#/components/schemas/Vehicle"
+                    }
+                },
+                "type": "object"
+            },
+            "Vehicle": {
+                "title": "Vehicle",
+                "description": "Vehicle model",
+                "properties": {
+                    "id": {
+                        "description": "ID of the vehicle",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "description": "ID of the user who owns the vehicle",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "type": {
+                        "description": "Type of the vehicle",
+                        "type": "string",
+                        "enum": [
+                            "MOTOR",
+                            "CAR"
+                        ]
+                    },
+                    "brand": {
+                        "description": "Brand of the vehicle",
+                        "type": "string"
+                    },
+                    "pelak": {
+                        "description": "License plate number of the vehicle",
+                        "type": "string"
+                    },
+                    "color": {
+                        "description": "Color of the vehicle",
+                        "type": "string"
+                    },
+                    "model": {
+                        "description": "Model of the vehicle",
+                        "type": "string"
                     }
                 },
                 "type": "object"

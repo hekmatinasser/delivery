@@ -28,12 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    Route::prefix('vehicle')->controller(VehicleController::class)->group(function () {
-        Route::post('types', 'types');
-        Route::post('my', 'my');
-        Route::post('store', 'store');
-        Route::post('update', 'update');
-        Route::post('delete', 'delete');
+    Route::prefix('v1/vehicle')->controller(VehicleController::class)->group(function () {
+        Route::post('', 'store');
+        Route::put('', 'update');
+        Route::delete('', 'delete');
+
+        Route::get('types', 'types');
+        Route::get('my', 'my');
     });
 
 

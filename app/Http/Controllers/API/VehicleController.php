@@ -2,101 +2,264 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\LogActionsEnum;
+use App\Enums\LogModelsEnum;
+use App\Enums\LogUserTypesEnum;
 use App\Models\Log;
 use App\Models\Vehicle;
 use App\Models\VerifyCode;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Requests\Vehicle\StoreVehicleRequest;
+use App\Http\Requests\Vehicle\UpdateVehicleRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 
 class VehicleController extends BaseController
 {
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/vehicle",
+     *     summary="Store a new vehicle",
+     *     description="Create a new vehicle record",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/StoreVehicleRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Vehicle")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable entity",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
+     */
+    public function store(StoreVehicleRequest $request)
+    {
+        $user = User::find(Auth::id());
+        $user->load('vehicle');
+        if ($user->vehicle) {
+            return $this->sendError('وسیله نقلیه قبلا ایجاد شده است.', ['error' => ['vehicle' => 'وسیله نقلیه قبلا ایجاد شده است.']], 422);
+        }
+        $input = $request->all();
+        $input['user_id'] = $user->id;
+        $vehicle = Vehicle::create($input);
+
+        Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::ADD, json_encode($vehicle));
+
+        $user->status = 0;
+        $user->save();
+
+        return $this->sendResponse($vehicle, ".وسیله نقلیه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/vehicle",
+     *     summary="update a new vehicle",
+     *     description="update vehicle record",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateVehicleRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Vehicle")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable entity",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
+     */
+    public function update(UpdateVehicleRequest $request)
+    {
+        $user = User::find(Auth::id());
+        $input = $request->all();
+        $vehicle = Vehicle::where('user_id', Auth::id())->first();
+        if ($vehicle) {
+            $oldData = $vehicle->toArray();
+            $vehicle->update($input);
+            $newData = $vehicle->toArray();
+
+            (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
+
+            $user->status = 0;
+            $user->save();
+        } else
+            return $this->sendError('', 'وسیله نقلیه یافت نشد', 404);
+
+        return $this->sendResponse($vehicle, ".وسیله نقلیه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/vehicle",
+     *     summary="Delete the user's vehicle",
+     *     description="Deletes the vehicle associated with the authenticated user.",
+     *     operationId="deleteVehicle",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vehicle deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Vehicle deleted successfully"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="The given data was invalid."
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="vehicle",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="string",
+     *                         example="Vehicle already exists."
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated."
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vehicle not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Vehicle not found."
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function delete(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $user->load('vehicle');
+        $vehicle = $user->vehicle;
+        if ($vehicle) {
+            $vehicle->delete();
+            Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::DELETE, json_encode($vehicle));
+            return $this->sendResponse('', 'وسیله نقلیه با موفقیت حذف شد');
+        } else
+            return $this->sendError('وسیله نقلیه پیدا نشده.', '', 404);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/vehicle/my",
+     *     summary="Get user's vehicle details",
+     *     description="Returns the details of the vehicle associated with the authenticated user",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Vehicle")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
+    public function my(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $user->load('vehicle');
+        Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::VEHICLE, LogActionsEnum::VIEW_DETAILS);
+        return $this->sendResponse($user->vehicle, Lang::get('http-statuses.200'));
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/vehicle/types",
+     *     summary="Get vehicle types",
+     *     description="Returns a list of vehicle types",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="string",
+     *                 example="motor"
+     *             ),
+     *             @OA\Items(
+     *                 type="string",
+     *                 example="car"
+     *             )
+     *         )
+     *     ),
+     * )
+     */
     public function types()
     {
         $v = new Vehicle();
-        return $this->sendResponse($v->types(), 'Vehicle Types');
+        return $this->sendResponse($v->types(), Lang::get('http-statuses.200'));
     }
-    public function my(Request $request)
-    {
-        $user = Auth::user();
-        $all = [];
-        foreach (Vehicle::where('user_id' , $user->id)->get()as $index => $item) {
-            $all[$index]['type'] = $item->types($item->type);
-            $all[$index]['brand'] = $item->brand;
-            $all[$index]['pelak'] = $item->pelak;
-            $all[$index]['color'] = $item->color;
-            $all[$index]['model'] = $item->model;
-        }
-        Log::store(0, $user->id, 'Vehicle', 1);
-        return $this->sendResponse($all, 'All Vehicle');
-    }
-
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'type' => 'required|max:255',
-            'brand' => 'required|max:255',
-            'pelak' => 'required|max:255',
-            'color' => 'required|max:255',
-            'model' => 'required|max:255',
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        $input = $request->all();
-        Vehicle::create($input);
-        Log::store(0, Auth::user()->id, 'Vehicle', 0);
-
-        return $this->sendResponse('', 'وسیله نقلیه با موفقیت ایجاد شد');
-    }
-
-    public function update(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'vehicleID' => 'required',
-            'type' => 'required|max:255',
-            'brand' => 'required|max:255',
-            'pelak' => 'required|max:255',
-            'color' => 'required|max:255',
-            'model' => 'required|max:255',
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        $input = $request->all();
-        $vehicle = Vehicle::where('id', $request->vehicleID)->where('user_id' , Auth::user()->id)->first();
-        if($vehicle)
-            $vehicle->update($input);
-        else
-            return $this->sendError('Error.', 'وسیله نقلیه یافت نشد');
-
-        Log::store(0, Auth::user()->id, 'Vehicle', 2);
-        return $this->sendResponse('', 'بروزرسانی با موفقیت انجام شد');
-    }
-
-    public function delete(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'vehicleID' => 'required',
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        $vehicle = Vehicle::where('id', $request->vehicleID)->where('user_id' , Auth::user()->id)->first();
-        if($vehicle) {
-            $vehicle->delete();
-            Log::store(0, Auth::user()->id, 'Vehicle', 3);
-            return $this->sendResponse('', 'وسیله نقلیه با موفقیت حذف شد');
-        }
-        else
-            return $this->sendError('Error.', 'وسیله نقلیه یافت نشد');
-    }
-
-
 }

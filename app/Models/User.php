@@ -120,6 +120,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's vehicle.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="vehicle",
+     *     type="object",
+     *     ref="#/components/schemas/Vehicle"
+     * )
+     */
+    public function vehicle()
+    {
+        return $this->hasOne(Vehicle::class);
+    }
+
+    /**
      * Find a user by mobile number.
      *
      * @param string $mobile The user's mobile number
