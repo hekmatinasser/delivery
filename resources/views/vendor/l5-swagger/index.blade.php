@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-@if (env('APP_ENV') != 'production')
+@if (env('APP_ENV') == 'production')
 <head>
     <meta charset="UTF-8">
     <title>{{config('l5-swagger.documentations.'.$documentation.'.api.title')}}</title>
@@ -75,5 +75,7 @@
     }
 </script>
 </body>
+@else
+{{env('APP_ENV')}}
 @endif
 </html>
