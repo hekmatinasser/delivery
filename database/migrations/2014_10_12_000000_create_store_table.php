@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('postCode')->nullable();
             $table->integer('phone')->nullable();
             $table->string('name')->nullable();
-            $table->string('lot')->nullable();
-            $table->string('lang')->nullable();
+            $table->decimal('lat')->nullable();
+            $table->decimal('lang')->nullable();
             $table->timestamps();
         });
 

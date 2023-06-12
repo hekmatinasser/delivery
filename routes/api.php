@@ -5,6 +5,7 @@ use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\TransactionController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
@@ -33,18 +34,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('', 'update');
         Route::delete('', 'delete');
 
-        Route::get('types', 'types');
         Route::get('my', 'my');
+
+        Route::get('types', 'types');
     });
 
 
-    Route::prefix('vehicle')->controller(VehicleController::class)->group(function () {
-        Route::post('areaTypes', 'areaTypes');
-        Route::post('categories', 'categories');
-        Route::post('my', 'my');
-        Route::post('store', 'store');
-        Route::post('update', 'update');
-        Route::post('delete', 'delete');
+    Route::prefix('v1/store')->controller(StoreController::class)->group(function () {
+        Route::post('', 'store');
+        Route::put('', 'update');
+        Route::delete('', 'delete');
+
+        Route::get('my', 'my');
+
+        Route::get('areaTypes', 'areaTypes');
+        Route::get('categories', 'categories');
     });
 
 

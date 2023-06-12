@@ -12,4 +12,5 @@ enum LogModelsEnum: string
     case  LOGOUT = 'Logout';
     case USER = 'User';
     case VEHICLE = 'Vehicle';
+    case STORE = 'Store';
 }

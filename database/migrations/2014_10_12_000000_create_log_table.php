@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('model')->nullable();
             $table->string('action')->nullable();
-            $table->string('title')->nullable();
+            $table->text('title')->nullable();
             $table->integer('item_id')->nullable();
             $table->timestamps();
         });

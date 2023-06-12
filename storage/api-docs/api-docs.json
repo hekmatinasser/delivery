@@ -495,6 +495,312 @@
                 }
             }
         },
+        "/api/v1/store": {
+            "put": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Update a store",
+                "operationId": "4e863ed58fe7f45632abc471ddfff471",
+                "requestBody": {
+                    "description": "Store data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Store"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Create a new store",
+                "description": "Creates a new store for the authenticated user.",
+                "operationId": "createStore",
+                "requestBody": {
+                    "description": "Store data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Store"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Store already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Store already exists."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Delete the user's store",
+                "description": "Deletes the store associated with the authenticated user.",
+                "operationId": "deleteStore",
+                "responses": {
+                    "200": {
+                        "description": "Store deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Store deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Store not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Store not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/my": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Get user's store details",
+                "description": "Returns the details of the store associated with the authenticated user",
+                "operationId": "1bea017187973c6b88a7f2fe115ada86",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/areaTypes": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Get area types",
+                "description": "Returns a list of store area types",
+                "operationId": "a93b4f216b6c0eb8df92db145f486071",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "example": "rent"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/categories": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Get store categories",
+                "description": "Returns a list of store category",
+                "operationId": "f9b2c932484118d27b594c387cb04207",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "title": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user": {
             "get": {
                 "tags": [
@@ -745,6 +1051,22 @@
                                 }
                             }
                         }
+                    },
+                    "409": {
+                        "description": "Vehicle already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vehicle already exists."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -770,34 +1092,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Vehicle deleted successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The given data was invalid."
-                                        },
-                                        "errors": {
-                                            "properties": {
-                                                "vehicle": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "Vehicle already exists."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1090,6 +1384,132 @@
                 },
                 "type": "object"
             },
+            "StoreStoreRequest": {
+                "title": "StoreStoreRequest",
+                "description": "Store Store Request Body",
+                "required": [
+                    "category_id",
+                    "areaType",
+                    "name",
+                    "address",
+                    "postCode",
+                    "phone",
+                    "lat",
+                    "lang"
+                ],
+                "properties": {
+                    "category_id": {
+                        "description": "Category ID",
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "areaType": {
+                        "description": "Area Type",
+                        "type": "string",
+                        "enum": [
+                            "RENT",
+                            "OWNERSHIP"
+                        ],
+                        "example": "RENT"
+                    },
+                    "name": {
+                        "description": "Name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "address": {
+                        "description": "Address",
+                        "type": "string",
+                        "example": "123 Main St"
+                    },
+                    "postCode": {
+                        "description": "Post Code",
+                        "type": "integer",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Phone",
+                        "type": "integer",
+                        "example": "1234567890"
+                    },
+                    "lat": {
+                        "description": "Latitude",
+                        "type": "number",
+                        "format": "desimal",
+                        "example": "40.7128"
+                    },
+                    "lang": {
+                        "description": "Longitude",
+                        "type": "number",
+                        "format": "desimal",
+                        "example": "-74.0060"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateStoreRequest": {
+                "title": "UpdateStoreRequest",
+                "description": "Updtae Store Request Body",
+                "required": [
+                    "category_id",
+                    "areaType",
+                    "name",
+                    "address",
+                    "postCode",
+                    "phone",
+                    "lat",
+                    "lang"
+                ],
+                "properties": {
+                    "category_id": {
+                        "description": "Category ID",
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "areaType": {
+                        "description": "Area Type",
+                        "type": "string",
+                        "enum": [
+                            "RENT",
+                            "PEROPERTY"
+                        ],
+                        "example": "RENT"
+                    },
+                    "name": {
+                        "description": "Name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "address": {
+                        "description": "Address",
+                        "type": "string",
+                        "example": "123 Main St"
+                    },
+                    "postCode": {
+                        "description": "Post Code",
+                        "type": "integer",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Phone",
+                        "type": "integer",
+                        "example": "1234567890"
+                    },
+                    "lat": {
+                        "description": "Latitude",
+                        "type": "number",
+                        "format": "desimal",
+                        "example": "40.7128"
+                    },
+                    "lang": {
+                        "description": "Longitude",
+                        "type": "number",
+                        "format": "desimal",
+                        "example": "-74.0060"
+                    }
+                },
+                "type": "object"
+            },
             "UpdateProfileRequest": {
                 "properties": {
                     "name": {
@@ -1154,22 +1574,22 @@
                     "brand": {
                         "description": "The brand of the vehicle",
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 150
                     },
                     "pelak": {
                         "description": "The pelak of the vehicle",
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 50
                     },
                     "color": {
                         "description": "The color of the vehicle",
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 50
                     },
                     "model": {
                         "description": "The model of the vehicle",
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 150
                     }
                 },
                 "type": "object"
@@ -1241,6 +1661,66 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Store": {
+                "title": "store",
+                "description": "Store model",
+                "properties": {
+                    "id": {
+                        "description": "ID of the store",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "description": "ID of the user who owns the store",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category_id": {
+                        "description": "ID of the category",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category": {
+                        "description": "The store's category",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "The store's name",
+                        "type": "string"
+                    },
+                    "postCode": {
+                        "description": "The store's postal code",
+                        "type": "string"
+                    },
+                    "address": {
+                        "description": "The store's address",
+                        "type": "string"
+                    },
+                    "areaType": {
+                        "description": "area type of the store",
+                        "type": "string",
+                        "enum": [
+                            "RENT",
+                            "PROPERTY"
+                        ]
+                    },
+                    "phone": {
+                        "description": "The store's phone number",
+                        "type": "string"
+                    },
+                    "lat": {
+                        "description": "The store's Latitude",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "lang": {
+                        "description": "The store's Longitude",
+                        "type": "number",
+                        "format": "float"
                     }
                 },
                 "type": "object"
@@ -1319,6 +1799,9 @@
                     },
                     "vehicle": {
                         "$ref": "#/components/schemas/Vehicle"
+                    },
+                    "store": {
+                        "$ref": "#/components/schemas/Store"
                     }
                 },
                 "type": "object"

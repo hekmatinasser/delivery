@@ -136,6 +136,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's store.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @OA\Property(
+     *     property="store",
+     *     type="object",
+     *     ref="#/components/schemas/Store"
+     * )
+     */
+    public function store()
+    {
+        return $this->hasOne(Store::class)->with(['category']);
+    }
+
+    /**
      * Find a user by mobile number.
      *
      * @param string $mobile The user's mobile number

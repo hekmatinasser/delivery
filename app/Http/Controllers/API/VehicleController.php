@@ -50,6 +50,18 @@ class VehicleController extends BaseController
      *         response=422,
      *         description="Unprocessable entity",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Vehicle already exists",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Vehicle already exists."
+     *             )
+     *         )
      *     )
      * )
      */
@@ -58,7 +70,7 @@ class VehicleController extends BaseController
         $user = User::find(Auth::id());
         $user->load('vehicle');
         if ($user->vehicle) {
-            return $this->sendError('وسیله نقلیه قبلا ایجاد شده است.', ['error' => ['vehicle' => 'وسیله نقلیه قبلا ایجاد شده است.']], 422);
+            return $this->sendError('وسیله نقلیه قبلا ایجاد شده است.', ['error' => ['vehicle' => 'وسیله نقلیه قبلا ایجاد شده است.']], 409);
         }
         $input = $request->all();
         $input['user_id'] = $user->id;
@@ -141,30 +153,6 @@ class VehicleController extends BaseController
      *                 property="message",
      *                 type="string",
      *                 example="Vehicle deleted successfully"
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 example="The given data was invalid."
-     *             ),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="vehicle",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="string",
-     *                         example="Vehicle already exists."
-     *                     )
-     *                 )
      *             )
      *         )
      *     ),

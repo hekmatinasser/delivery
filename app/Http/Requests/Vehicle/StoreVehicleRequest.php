@@ -28,25 +28,25 @@ use Illuminate\Support\Facades\Auth;
  *         property="brand",
  *         type="string",
  *         description="The brand of the vehicle",
- *         maxLength=255
+ *         maxLength=150
  *     ),
  *     @OA\Property(
  *         property="pelak",
  *         type="string",
  *         description="The pelak of the vehicle",
- *         maxLength=255
+ *         maxLength=50
  *     ),
  *     @OA\Property(
  *         property="color",
  *         type="string",
  *         description="The color of the vehicle",
- *         maxLength=255
+ *         maxLength=50
  *     ),
  *     @OA\Property(
  *         property="model",
  *         type="string",
  *         description="The model of the vehicle",
- *         maxLength=255
+ *         maxLength=150
  *     )
  * )
  */
@@ -69,10 +69,10 @@ class StoreVehicleRequest extends FormRequest
     {
         return [
             'type' => 'required|in:MOTOR,CAR',
-            'brand' => 'required|max:255',
-            'pelak' => 'required|max:255',
-            'color' => 'required|max:255',
-            'model' => 'required|max:255',
+            'brand' => 'required|max:150',
+            'pelak' => 'required|max:50',
+            'color' => 'required|max:50',
+            'model' => 'required|max:150',
         ];
     }
 
