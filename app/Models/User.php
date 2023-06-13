@@ -8,6 +8,7 @@ use App\Enums\LogActionsEnum;
 use App\Enums\LogModelsEnum;
 use App\Enums\LogUserTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -29,7 +30,7 @@ use Laravel\Sanctum\HasApiTokens;
  *     @OA\Property(property="address", type="string", description="The user's address"),
  *     @OA\Property(property="postCode", type="string", description="The user's postal code"),
  *     @OA\Property(property="phone", type="string", description="The user's phone number"),
- *     @OA\Property(property="userType", type="string", description="The user's type (0 => seller or 1 => delivery)"),
+ *     @OA\Property(property="userType", type="string", description="The user's type (0 => customer or 2 => admin)"),
  *     @OA\Property(property="created_at", type="string", format="date-time", description="The date/time the user was created"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", description="The date/time the user was last updated"),
  * )
@@ -37,7 +38,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -62,8 +63,8 @@ class User extends Authenticatable
     public function userTypes()
     {
         return [
-            0 => 'seller',
-            1 => 'delivery',
+            0 => 'customer',
+            1 => 'admin',
         ];
     }
 

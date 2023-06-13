@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->string('model')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
     }

@@ -23,12 +23,13 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('postCode')->nullable();
             $table->string('phone')->nullable();
-            $table->string('userType')->nullable();
+            $table->string('userType')->nullable()->default(0);
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

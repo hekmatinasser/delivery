@@ -15,12 +15,17 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        \App\Models\User::factory()->create([
+            'id' => '1',
+            'mobile' => '09000000000',
+            'status' => '1',
+            'userType' => '1'
+        ]);
+
 
         $this->call([
+            RoleTableSeeder::class,
+            PermissionTableSeeder::class,
             WalletTransactionReasonSeeder::class,
             CoinWalletTransactionReasonSeeder::class,
             StoreCategorySeeder::class
