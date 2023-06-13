@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use DragonCode\Support\Facades\Http\Url;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if(!$this->app->environment('local')) {
-            Url::forceScheme('https');
+            \URL::forceScheme('https');
         }
     }
 }
