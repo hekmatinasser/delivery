@@ -40,7 +40,7 @@ class UserController extends BaseController
     {
         $user = Auth::user();
         $user = User::find($user->id);
-        $user->load(['wallet', 'coinWallet','vehicle']);
+        $user->load(['wallet', 'coinWallet', 'vehicle', 'store']);
 
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::USER, LogActionsEnum::VIEW_DETAILS);
         return $this->sendResponse($user, Lang::get('http-statuses.200'));

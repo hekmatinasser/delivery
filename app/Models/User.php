@@ -88,6 +88,20 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function abilites()
+    {
+        return $this->belongsToMany(Role::class)
+        ->join('permission_role', 'permission_role.role_id', 'roles.id')
+        ->join('permissions', 'permissions.id', 'permission_role.permission_id')
+        ->select('permissions.name');
+    }
+
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)->with('permissions');
+    }
+
     /**
      * Get the user's wallet.
      *

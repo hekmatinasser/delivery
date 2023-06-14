@@ -17,9 +17,21 @@ class PermissionTableSeeder extends Seeder
         $permission = [
             [
                 'id' => '1',
-                'name' => 'user-create',
-                'display_name' => 'اضافه کردن کاربر جدید',
-                'description' => 'اضافه کردن کاربر جدید'
+                'name' => 'user-modify',
+                'display_name' => 'مدیریت کاربران',
+                'description' => 'مدیریت کاربران'
+            ],
+            [
+                'id' => '2',
+                'name' => 'store-modify',
+                'display_name' => 'مدیریت مغازه ها',
+                'description' => 'مدیریت مغازه ها '
+            ],
+            [
+                'id' => '3',
+                'name' => 'vehicle-modify',
+                'display_name' => 'مدیریت پیک ها',
+                'description' => 'مدیریت پیک ها'
             ],
         ];
 
@@ -29,6 +41,8 @@ class PermissionTableSeeder extends Seeder
             Permission::create($value);
         }
 
-        PermissionRole::create(['role_id' =>1,'permission_id' =>1]);
+        PermissionRole::create(['role_id' => 1, 'permission_id' => 1]);
+        PermissionRole::create(['role_id' => 1, 'permission_id' => 2]);
+        PermissionRole::create(['role_id' => 1, 'permission_id' => 3]);
     }
 }

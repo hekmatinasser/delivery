@@ -1778,7 +1778,7 @@
                         "type": "string"
                     },
                     "userType": {
-                        "description": "The user's type (0 => seller or 1 => delivery)",
+                        "description": "The user's type (0 => customer or 2 => admin)",
                         "type": "string"
                     },
                     "created_at": {
