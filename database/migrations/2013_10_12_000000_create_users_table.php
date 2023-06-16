@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('mobile', 11)->unique();
             $table->string('nationalCode')->nullable();
             $table->string('nationalPhoto')->nullable();
-            $table->integer('status')->default("0")->unsigned();
+            $table->integer('status')->default("0");
             $table->integer('unValidCodeCount')->unsigned()->default("1");
             $table->string('address')->nullable();
             $table->string('postCode')->nullable();

@@ -8,14 +8,19 @@ use App\Enums\LogUserTypesEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CreateEmployeeRequest;
 use App\Http\Requests\Admin\CreateStoreRequest;
+use App\Http\Requests\Admin\CreateVehicleRequest;
 use App\Http\Requests\Admin\GetEmployeesRequest;
 use App\Http\Requests\Admin\GetStoresRequest;
+use App\Http\Requests\Admin\GetVehicleRequest;
+use App\Http\Requests\Admin\GetVehiclesRequest;
 use App\Http\Requests\Admin\UpdateStoreRequest;
+use App\Http\Requests\Admin\UpdateVehicleRequest;
 use App\Models\Log;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Store;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Models\VerifyCode;
 use Exception;
 use Illuminate\Http\Request;
@@ -523,7 +528,6 @@ class AdminController extends BaseController
         return $this->sendResponse($user, ".مغازه با موفقیت انجام شد");
     }
 
-
     /**
      * @OA\Get(
      *     path="/api/v1/admin/store",
@@ -901,6 +905,495 @@ class AdminController extends BaseController
         $user = $this->getStore($request, $storeId);
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::DELETE, $user);
+
+        return $user->delete();
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/vehicle",
+     *     summary="Create a new vehicle",
+     *     description="Creates a new vehicle with the given information",
+     *     operationId="createUserVehicle",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\RequestBody(
+     *             @OA\MediaType(
+     *                      mediaType="multipart/form-data",
+     *                      @OA\Schema(
+     *                      @OA\Property(property="name", type="string", maxLength=70),
+     *                      @OA\Property(property="family", type="string", maxLength=70),
+     *                      @OA\Property(property="mobile", type="string", format="mobile", example="09123456789"),
+     *                      @OA\Property(property="password", type="string", example="newPassword"),
+     *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
+     *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
+     *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
+     *                      @OA\Property(property="address", type="string", maxLength=255),
+     *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
+     *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
+     *     @OA\Property(
+     *         property="type",
+     *         type="string",
+     *         description="The type of the vehicle (MOTOR or CAR)",
+     *         enum={"MOTOR", "CAR"}
+     *     ),
+     *     @OA\Property(
+     *         property="brand",
+     *         type="string",
+     *         description="The brand of the vehicle",
+     *         maxLength=150
+     *     ),
+     *     @OA\Property(
+     *         property="pelak",
+     *         type="string",
+     *         description="The pelak of the vehicle",
+     *         maxLength=50
+     *     ),
+     *     @OA\Property(
+     *         property="color",
+     *         type="string",
+     *         description="The color of the vehicle",
+     *         maxLength=50
+     *     ),
+     *     @OA\Property(
+     *         property="model",
+     *         type="string",
+     *         description="The model of the vehicle",
+     *         maxLength=150
+     *     )
+     *                 )
+     *             )
+     *     ),
+
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function createVehicle(CreateVehicleRequest $request)
+    {
+        if ($request->nationalCode)
+            if (!checkNationalcode($request->nationalCode))
+                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+
+        $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
+
+
+        $inputUser['userType'] = '0';
+        $inputUser['password'] =  bcrypt($request->password);
+
+        if ($request->hasFile('nationalPhoto')) {
+            $path = $request->file('nationalPhoto')->store('national_photos');
+            $inputUser['nationalPhoto'] = $path;
+        }
+
+        DB::beginTransaction();
+        $user = User::create($inputUser);
+        $user->wallet()->create();
+        $user->coinWallet()->create();
+
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::ADD, json_encode($user));
+
+        $input = $request->only(['model', 'type', 'brand', 'pelak', 'color']);
+        $input['user_id'] = $user->id;
+        $vehicle = Vehicle::create($input);
+
+        Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::ADD, json_encode($vehicle));
+        $user->load('vehicle', 'wallet', 'coinWallet');
+        DB::commit();
+
+        return $this->sendResponse($user, ".مغازه با موفقیت انجام شد");
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/vehicle",
+     *     summary="Get all Vehicles",
+     *     description="Retrieve a paginated list of all Vehicles.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="The number of Vehicles to return per page (default 10).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="The page number to return (default 1).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=1
+     *         )
+     *     ),
+
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function getVehicles(GetVehiclesRequest $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_ALL);
+        return User::with('vehicle')->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/vehicle/{vehicleId}",
+     *     summary="Get vehicle",
+     *     description="Get the profile information of a specific vehicle.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="vehicleId",
+     *         in="path",
+     *         description="The ID of the vehicle to get.",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function getVehicle(Request $request, $vehicleId)
+    {
+        $user = User::with('vehicle')->whereHas('vehicle', function ($query) use ($vehicleId) {
+            $query->where('id', $vehicleId);
+        })->firstOrFail();
+
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_PROFILE, $user);
+        return $user;
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/vehicle/{vehicleId}/update",
+     *     summary="Update vehicle",
+     *     description="Update the profile and vehicle information of a specific vehicle.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="vehicleId",
+     *         in="path",
+     *         description="The ID of the vehicle to update.",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *             @OA\MediaType(
+     *                      mediaType="multipart/form-data",
+     *                      @OA\Schema(
+     *                      @OA\Property(property="name", type="string", maxLength=70),
+     *                      @OA\Property(property="family", type="string", maxLength=70),
+     *                      @OA\Property(property="mobile", type="string", format="mobile", example="09123456789"),
+     *                      @OA\Property(property="password", type="string", example="newPassword"),
+     *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
+     *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
+     *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
+     *                      @OA\Property(property="address", type="string", maxLength=255),
+     *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
+     *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
+     *     @OA\Property(
+     *         property="type",
+     *         type="string",
+     *         description="The type of the vehicle (MOTOR or CAR)",
+     *         enum={"MOTOR", "CAR"}
+     *     ),
+     *     @OA\Property(
+     *         property="brand",
+     *         type="string",
+     *         description="The brand of the vehicle",
+     *         maxLength=150
+     *     ),
+     *     @OA\Property(
+     *         property="pelak",
+     *         type="string",
+     *         description="The pelak of the vehicle",
+     *         maxLength=50
+     *     ),
+     *     @OA\Property(
+     *         property="color",
+     *         type="string",
+     *         description="The color of the vehicle",
+     *         maxLength=50
+     *     ),
+     *     @OA\Property(
+     *         property="model",
+     *         type="string",
+     *         description="The model of the vehicle",
+     *         maxLength=150
+     *     )
+     *                 )
+     *             )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function updateVehicle(UpdateVehicleRequest $request, $vehicleId)
+    {
+        if ($request->nationalCode)
+            if (!checkNationalcode($request->nationalCode))
+                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+
+        $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
+
+        if ($request->password)
+            $inputUser['password'] =  bcrypt($request->password);
+
+        if ($request->hasFile('nationalPhoto')) {
+            $path = $request->file('nationalPhoto')->store('national_photos');
+            $inputUser['nationalPhoto'] = $path;
+        }
+
+        $user = $this->getVehicle($request, $vehicleId);
+
+        $request->validate([
+            'mobile' => 'unique:users,mobile,' . $user->id
+        ]);
+
+        DB::beginTransaction();
+
+        $oldData = $user->toArray();
+        $user->update($inputUser);
+        $newData = $user->toArray();
+
+        (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
+
+
+        $vehicle = $user->vehicle;
+
+        if ($vehicle) {
+            $oldData = $vehicle->toArray();
+            $data = $request->only(['model', 'type', 'brand', 'pelak', 'color']);
+
+            $vehicle->update([
+                'model' => $data['model'],
+                'type' => $data['type'],
+                'brand' => $data['brand'],
+                'pelak' => $data['pelak'],
+                'color' => $data['color'],
+            ]);
+            $newData = $vehicle->toArray();
+
+            (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
+        }
+
+        $user->load('vehicle', 'wallet', 'coinWallet');
+        DB::commit();
+
+        return $this->sendResponse($user, ".پیک با موفقیت انجام شد");
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/admin/vehicle/{vehicleId}",
+     *     summary="Delete vehicle by ID",
+     *     description="Deletes a single vehicle by ID",
+     *     operationId="deleteVehicleById",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="vehicleId",
+     *         in="path",
+     *         description="ID of vehicle to delete",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid ID supplied"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="vehicle not found"
+     *     )
+     * )
+     */
+    public function deleteVehicle(Request $request, $vehicleId)
+    {
+        $user = $this->getVehicle($request, $vehicleId);
+
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::DELETE, $user);
 
         return $user->delete();
     }

@@ -1175,6 +1175,762 @@
                 ]
             }
         },
+        "/api/v1/admin/vehicle": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get all Vehicles",
+                "description": "Retrieve a paginated list of all Vehicles.",
+                "operationId": "1fde9b4da6d1f7110a1b2882e408b5e7",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of Vehicles to return per page (default 10).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return (default 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new vehicle",
+                "description": "Creates a new vehicle with the given information",
+                "operationId": "createUserVehicle",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "type": {
+                                        "description": "The type of the vehicle (MOTOR or CAR)",
+                                        "type": "string",
+                                        "enum": [
+                                            "MOTOR",
+                                            "CAR"
+                                        ]
+                                    },
+                                    "brand": {
+                                        "description": "The brand of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "pelak": {
+                                        "description": "The pelak of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "color": {
+                                        "description": "The color of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "model": {
+                                        "description": "The model of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle/{vehicleId}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get vehicle",
+                "description": "Get the profile information of a specific vehicle.",
+                "operationId": "2103968b4db0780175db5d1cbe638752",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "The ID of the vehicle to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete vehicle by ID",
+                "description": "Deletes a single vehicle by ID",
+                "operationId": "deleteVehicleById",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "ID of vehicle to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "vehicle not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle/{vehicleId}/update": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update vehicle",
+                "description": "Update the profile and vehicle information of a specific vehicle.",
+                "operationId": "f7ee406ab0f0e0faa62485f434bd28f2",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "The ID of the vehicle to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "type": {
+                                        "description": "The type of the vehicle (MOTOR or CAR)",
+                                        "type": "string",
+                                        "enum": [
+                                            "MOTOR",
+                                            "CAR"
+                                        ]
+                                    },
+                                    "brand": {
+                                        "description": "The brand of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "pelak": {
+                                        "description": "The pelak of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "color": {
+                                        "description": "The color of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "model": {
+                                        "description": "The model of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/roles": {
             "get": {
                 "tags": [

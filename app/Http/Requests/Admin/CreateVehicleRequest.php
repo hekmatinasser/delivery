@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class CreateStoreRequest extends FormRequest
+class CreateVehicleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,14 +33,11 @@ class CreateStoreRequest extends FormRequest
             'postCode' => 'nullable|digits:10|numeric',
             'phone' => 'nullable|numeric',
             'status' => 'nullable|in:1,0,-1,-2',
-            'storeCategory_id' => 'required|numeric|exists:store_category,id',
-            'storeAreaType' => 'required|in:RENT,OWNERSHIP',
-            'storeName' => 'required|max:255',
-            'storeAddress' => 'required|max:255',
-            'storePostCode' => 'required|digits:10|numeric',
-            'storePhone' => 'required|numeric',
-            'storeLat' => 'required|numeric',
-            'storeLang' => 'required|numeric',
+            'type' => 'required|in:MOTOR,CAR',
+            'brand' => 'required|max:150',
+            'pelak' => 'required|max:50',
+            'color' => 'required|max:50',
+            'model' => 'required|max:150',
         ];
     }
 
@@ -52,14 +49,13 @@ class CreateStoreRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'type' => 'نوع وسیله نقلیه',
+            'brand' => 'برند',
+            'pelak' => 'شماره پلاک',
+            'color' => 'رنگ وسیله نقلیه',
+            'model' => 'سال ساخت',
             'nationalPhoto' => 'تصویر کارت ملی',
             'postCode' => 'کد پستی',
-            'storeCategory_id' => 'صنف فعالیت',
-            'storeAreaType' => 'نوع ملک',
-            'storePhone' => 'تلفن ثابت مغازه',
-            'storePostCode' => 'کد پستی مغازه',
-            'storeLat' => 'طول جغرافیایی',
-            'storeLang' => 'عرض جغرافیایی',
             'nationalCode' => 'کد ملی',
         ];
     }
