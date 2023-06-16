@@ -141,7 +141,7 @@ class Store extends Model
         }
 
         if (!empty($changes)) {
-            Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::STORE, LogActionsEnum::EDIT, json_encode($changes));
+            Log::store($user->userType == '0' ? LogUserTypesEnum::USER : LogUserTypesEnum::ADMIN, $user->id, LogModelsEnum::STORE, LogActionsEnum::EDIT, json_encode($changes));
         }
     }
 

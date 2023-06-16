@@ -40,16 +40,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('store')->group(function () {
             Route::post('', 'createStore')->middleware(['ability:user-modify']);
             Route::get('', 'getStores')->middleware(['ability:user-modify']);
-            Route::get('{store_id}', 'getStore')->middleware(['ability:user-modify']);
-            Route::put('{store_id}/update', 'updateStore')->middleware(['ability:user-modify']);
-            Route::delete('{store_id}/delete', 'deleteStore')->middleware(['ability:user-modify']);
+            Route::get('{storeId}', 'getStore')->middleware(['ability:user-modify']);
+            Route::post('{storeId}/update', 'updateStore')->middleware(['ability:user-modify']);
+            Route::delete('{storeId}', 'deleteStore')->middleware(['ability:user-modify']);
         });
         Route::prefix('vehicle')->group(function () {
             Route::post('', 'createVehicle')->middleware(['ability:user-modify']);
             Route::get('', 'getVehicles')->middleware(['ability:user-modify']);
             Route::get('{vehicle_id}', 'getVehicle')->middleware(['ability:user-modify']);
-            Route::put('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
-            Route::delete('{vehicle_id}/delete', 'deleteVehicle')->middleware(['ability:user-modify']);
+            Route::post('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
+            Route::delete('{vehicle_id}', 'deleteVehicle')->middleware(['ability:user-modify']);
         });
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });

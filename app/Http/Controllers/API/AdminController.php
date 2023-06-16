@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CreateEmployeeRequest;
 use App\Http\Requests\Admin\CreateStoreRequest;
 use App\Http\Requests\Admin\GetEmployeesRequest;
+use App\Http\Requests\Admin\GetStoresRequest;
+use App\Http\Requests\Admin\UpdateStoreRequest;
 use App\Models\Log;
 use App\Models\Role;
 use App\Models\RoleUser;
@@ -20,6 +22,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminController extends BaseController
 {
@@ -110,6 +115,26 @@ class AdminController extends BaseController
      *     description="Returns a paginated list of employees with their roles",
      *     tags={"Admin"},
      *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="The number of stores to return per page (default 10).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="The page number to return (default 1).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=1
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -460,10 +485,6 @@ class AdminController extends BaseController
             if (!checkNationalcode($request->nationalCode))
                 return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
-        if ($request->nationalCode)
-            if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
-
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
 
@@ -500,6 +521,388 @@ class AdminController extends BaseController
         DB::commit();
 
         return $this->sendResponse($user, ".مغازه با موفقیت انجام شد");
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/store",
+     *     summary="Get all stores",
+     *     description="Retrieve a paginated list of all stores.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="The number of stores to return per page (default 10).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="The page number to return (default 1).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=1
+     *         )
+     *     ),
+
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function getStores(GetStoresRequest $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::SHOW_ALL);
+        return User::with('store')->whereHas('store')->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/store/{storeId}",
+     *     summary="Get store",
+     *     description="Get the profile information of a specific store.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="storeId",
+     *         in="path",
+     *         description="The ID of the store to get.",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function getStore(Request $request, $storeId)
+    {
+        $user = User::with('store')->whereHas('store', function ($query) use ($storeId) {
+            $query->where('id', $storeId);
+        })->firstOrFail();
+
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::SHOW_PROFILE, $user);
+        return $user;
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/store/{storeId}/update",
+     *     summary="Update store",
+     *     description="Update the profile and store information of a specific store.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="storeId",
+     *         in="path",
+     *         description="The ID of the store to update.",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *             @OA\MediaType(
+     *                      mediaType="multipart/form-data",
+     *                      @OA\Schema(
+     *                      @OA\Property(property="name", type="string", maxLength=70),
+     *                      @OA\Property(property="family", type="string", maxLength=70),
+     *                      @OA\Property(property="mobile", type="string", format="mobile", example="09123456789"),
+     *                      @OA\Property(property="password", type="string", example="newPassword"),
+     *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
+     *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
+     *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
+     *                      @OA\Property(property="address", type="string", maxLength=255),
+     *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
+     *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
+     *     @OA\Property(
+     *         property="storeCategory_id",
+     *         description="Category ID",
+     *         type="integer",
+     *         example="1"
+     *     ),
+     *     @OA\Property(
+     *         property="storeAreaType",
+     *         description="Area Type",
+     *         type="string",
+     *         enum={"RENT", "OWNERSHIP"},
+     *         example="RENT"
+     *     ),
+     *     @OA\Property(
+     *         property="storeName",
+     *         description="Name",
+     *         type="string",
+     *         example="John Doe"
+     *     ),
+     *     @OA\Property(
+     *         property="storeAddress",
+     *         description="Address",
+     *         type="string",
+     *         example="123 Main St"
+     *     ),
+     *     @OA\Property(
+     *         property="storePostCode",
+     *         description="Post Code",
+     *         type="integer",
+     *         example="1234567890"
+     *     ),
+     *     @OA\Property(
+     *         property="storePhone",
+     *         description="Phone",
+     *         type="integer",
+     *         example="1234567890"
+     *     ),
+     *     @OA\Property(
+     *         property="storeLat",
+     *         description="Latitude",
+     *         type="number",
+     *         format="desimal",
+     *         example="40.7128"
+     *     ),
+     *     @OA\Property(
+     *         property="storeLang",
+     *         description="Longitude",
+     *         type="number",
+     *         format="desimal",
+     *         example="-74.0060"
+     *     ),
+     *                 )
+     *             )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function updateStore(UpdateStoreRequest $request, $storeId)
+    {
+        if ($request->nationalCode)
+            if (!checkNationalcode($request->nationalCode))
+                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+
+        $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
+
+        if ($request->password)
+            $inputUser['password'] =  bcrypt($request->password);
+
+        if ($request->hasFile('nationalPhoto')) {
+            $path = $request->file('nationalPhoto')->store('national_photos');
+            $inputUser['nationalPhoto'] = $path;
+        }
+
+        $user = $this->getStore($request, $storeId);
+
+        // if (Validator::make($inputUser, ['mobile' => ])->failed()) {
+        //     return $this->sendError('شماره همراه قبلا انتخاب شده است.', ['error' => ['mobile' => 'شماره همراه قبلا انتخاب شده است.']], 422);
+        // }
+        $request->validate([
+            'mobile' => 'unique:users,mobile,' . $user->id
+        ]);
+
+        DB::beginTransaction();
+
+        $oldData = $user->toArray();
+        $user->update($inputUser);
+        $newData = $user->toArray();
+
+        (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
+
+
+        $store = $user->store;
+
+        if ($store) {
+            $oldData = $store->toArray();
+            $data = $request->only(['storeCategory_id', 'storeAreaType', 'storeName', 'storePostCode', 'storePhone', 'storeLat', 'storeLang']);
+
+            $store->update([
+                'category_id' => $data['storeCategory_id'],
+                'areaType' => $data['storeAreaType'],
+                'name' => $data['storeName'],
+                'postCode' => $data['storePostCode'],
+                'storePhone' => $data['storePhone'],
+                'lat' => $data['storeLat'],
+                'lang' => $data['storeLang'],
+            ]);
+            $newData = $store->toArray();
+
+            (new Store())->logStoreModelChanges($user, $oldData, $newData);
+        }
+
+
+        $user->load('store', 'wallet', 'coinWallet');
+        DB::commit();
+
+        return $this->sendResponse($user, ".مغازه با موفقیت انجام شد");
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/admin/store/{storeId}",
+     *     summary="Delete store by ID",
+     *     description="Deletes a single store by ID",
+     *     operationId="deleteStoreById",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="storeId",
+     *         in="path",
+     *         description="ID of store to delete",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid ID supplied"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Store not found"
+     *     )
+     * )
+     */
+    public function deleteStore(Request $request, $storeId)
+    {
+        $user = $this->getStore($request, $storeId);
+
+        Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::DELETE, $user);
+
+        return $user->delete();
     }
 
     /**

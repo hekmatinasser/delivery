@@ -91,9 +91,9 @@ class User extends Authenticatable
     public function abilites()
     {
         return $this->belongsToMany(Role::class)
-        ->join('permission_role', 'permission_role.role_id', 'roles.id')
-        ->join('permissions', 'permissions.id', 'permission_role.permission_id')
-        ->select('permissions.name');
+            ->join('permission_role', 'permission_role.role_id', 'roles.id')
+            ->join('permissions', 'permissions.id', 'permission_role.permission_id')
+            ->select('permissions.name');
     }
 
 
@@ -219,7 +219,7 @@ class User extends Authenticatable
         }
 
         if (!empty($changes)) {
-            Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::USER, LogActionsEnum::EDIT, json_encode($changes));
+            Log::store($user->userType == '0' ? LogUserTypesEnum::USER : LogUserTypesEnum::ADMIN, $user->id, LogModelsEnum::USER, LogActionsEnum::EDIT, json_encode($changes));
         }
     }
 }
