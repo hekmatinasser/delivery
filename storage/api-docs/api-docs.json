@@ -6,6 +6,655 @@
     },
     "paths": {
         "/api": {},
+        "/api/v1/admin/employee": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get a list of employees",
+                "description": "Returns a paginated list of employees with their roles",
+                "operationId": "885bbdb1eeb01da9dd0e3b794251ddba",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "description": "The current page number",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "first_page_url": {
+                                            "description": "The URL for the first page of results",
+                                            "type": "string"
+                                        },
+                                        "from": {
+                                            "description": "The index of the first item in the current page of results",
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "description": "The total number of pages of results",
+                                            "type": "integer"
+                                        },
+                                        "last_page_url": {
+                                            "description": "The URL for the last page of results",
+                                            "type": "string"
+                                        },
+                                        "next_page_url": {
+                                            "description": "The URL for the next page of results",
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "description": "The URL path for the current page of results",
+                                            "type": "string"
+                                        },
+                                        "per_page": {
+                                            "description": "The number of results per page",
+                                            "type": "integer"
+                                        },
+                                        "prev_page_url": {
+                                            "description": "The URL for the previous page of results",
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "description": "The index of the last item in the current page of results",
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "description": "The total number of items in the result set",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new employee",
+                "description": "Creates a new employee with the given information",
+                "operationId": "createEmployee",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateEmployeeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/employee/{employeeId}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get employee by ID",
+                "description": "Returns a single employee by ID",
+                "operationId": "getEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to return",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update employee by ID",
+                "description": "Updates a single employee by ID",
+                "operationId": "updateEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Employee object that needs to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEmployeesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete employee by ID",
+                "description": "Deletes a single employee by ID",
+                "operationId": "deleteEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/store": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new store",
+                "description": "Creates a new store with the given information",
+                "operationId": "createUserStore",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "storeCategory_id": {
+                                        "description": "Category ID",
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "storeAreaType": {
+                                        "description": "Area Type",
+                                        "type": "string",
+                                        "enum": [
+                                            "RENT",
+                                            "OWNERSHIP"
+                                        ],
+                                        "example": "RENT"
+                                    },
+                                    "storeName": {
+                                        "description": "Name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "storeAddress": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "storePostCode": {
+                                        "description": "Post Code",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storePhone": {
+                                        "description": "Phone",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storeLat": {
+                                        "description": "Latitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "40.7128"
+                                    },
+                                    "storeLang": {
+                                        "description": "Longitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "-74.0060"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get all roles",
+                "description": "Returns all roles",
+                "operationId": "getRoles",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "admin"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Administrator role"
+                                            },
+                                            "display_name": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [
@@ -1265,6 +1914,143 @@
                             }
                         },
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateEmployeeRequest": {
+                "title": "Create Employee Request",
+                "description": "Create Employee Request body data",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Employee's name",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "family": {
+                        "description": "Employee's family name",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "mobile": {
+                        "description": "Employee's mobile number",
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "password": {
+                        "description": "Employee's password",
+                        "type": "string",
+                        "example": "newPassword"
+                    },
+                    "nationalCode": {
+                        "description": "Employee's national code",
+                        "type": "string",
+                        "example": "0012345678"
+                    },
+                    "address": {
+                        "description": "Employee's address",
+                        "type": "string",
+                        "example": "123 Main St, Anytown, USA"
+                    },
+                    "postCode": {
+                        "description": "Employee's postal code",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Employee's phone number",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "role": {
+                        "description": "Employee's role",
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "status": {
+                        "description": "Employee's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                        "type": "integer",
+                        "example": "0"
+                    }
+                },
+                "type": "object"
+            },
+            "GetEmployeesRequest": {
+                "title": "Get Employees Request",
+                "description": "Request body data for retrieving a paginated list of employees",
+                "properties": {
+                    "page": {
+                        "description": "The page number to retrieve, defaults to 1",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "description": "The number of results per page, must be one of: 5, 10, 15, 20",
+                        "type": "integer",
+                        "example": 10
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateEmployeesRequest": {
+                "title": "Update Employee Request",
+                "description": "Update Employee Request body data",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Employee's name",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "family": {
+                        "description": "Employee's family name",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "mobile": {
+                        "description": "Employee's mobile number",
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "password": {
+                        "description": "Employee's password",
+                        "type": "string",
+                        "example": "newPassword"
+                    },
+                    "nationalCode": {
+                        "description": "Employee's national code",
+                        "type": "string",
+                        "example": "0012345678"
+                    },
+                    "address": {
+                        "description": "Employee's address",
+                        "type": "string",
+                        "example": "123 Main St, Anytown, USA"
+                    },
+                    "postCode": {
+                        "description": "Employee's postal code",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Employee's phone number",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "role": {
+                        "description": "Employee's role",
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "status": {
+                        "description": "Employee's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                        "type": "integer",
+                        "example": "0"
                     }
                 },
                 "type": "object"

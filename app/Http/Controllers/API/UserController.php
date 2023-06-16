@@ -104,7 +104,7 @@ class UserController extends BaseController
             if ($user->nationalPhoto) {
                 Storage::delete($user->nationalPhoto);
             }
-            $path = $request->file('nationalPhoto')->store('natinal_photos');
+            $path = $request->file('nationalPhoto')->store('national_photos');
 
             $input['nationalPhoto'] = $path;
         }

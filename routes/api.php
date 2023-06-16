@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
@@ -26,6 +27,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('v1/user')->controller(UserController::class)->group(function () {
         Route::get('', 'profile');
         Route::post('', 'update');
+    });
+
+    Route::prefix('v1/admin')->controller(AdminController::class)->group(function () {
+        Route::prefix('employee')->group(function () {
+            Route::post('', 'createEmployee')->middleware(['ability:user-modify']);
+            Route::get('', 'getEmployees')->middleware(['ability:user-modify']);
+            Route::get('{employeeId}', 'getEmployee')->middleware(['ability:user-modify']);
+            Route::put('{employee_id}', 'updateEmployee')->middleware(['ability:user-modify']);
+            Route::delete('{employee_id}', 'deleteEmployee')->middleware(['ability:user-modify']);
+        });
+        Route::prefix('store')->group(function () {
+            Route::post('', 'createStore')->middleware(['ability:user-modify']);
+            Route::get('', 'getStores')->middleware(['ability:user-modify']);
+            Route::get('{store_id}', 'getStore')->middleware(['ability:user-modify']);
+            Route::put('{store_id}/update', 'updateStore')->middleware(['ability:user-modify']);
+            Route::delete('{store_id}/delete', 'deleteStore')->middleware(['ability:user-modify']);
+        });
+        Route::prefix('vehicle')->group(function () {
+            Route::post('', 'createVehicle')->middleware(['ability:user-modify']);
+            Route::get('', 'getVehicles')->middleware(['ability:user-modify']);
+            Route::get('{vehicle_id}', 'getVehicle')->middleware(['ability:user-modify']);
+            Route::put('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
+            Route::delete('{vehicle_id}/delete', 'deleteVehicle')->middleware(['ability:user-modify']);
+        });
+        Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
 
