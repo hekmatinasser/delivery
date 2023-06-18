@@ -36,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/transaction', [WalletController::class, 'storeTransaction'])->name('store-transaction');
             Route::post('/buy-coin', [WalletController::class, 'buyCoin'])->name('buy-coin');
             Route::post('/increase/online', [WalletController::class, 'increaseWalletOnline'])->name('increase-online');
+
+
+            Route::get('/reasons', [WalletController::class, 'getReasons'])->name('reasons');
         });
 
 

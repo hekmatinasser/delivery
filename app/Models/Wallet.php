@@ -22,7 +22,7 @@ class Wallet extends Model
 
     protected $fillable = [
         'user_id',
-        'ammount'
+        'amount'
     ];
 
     protected $guarded = [];

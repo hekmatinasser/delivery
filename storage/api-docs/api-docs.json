@@ -3226,10 +3226,47 @@
                 ]
             }
         },
+        "/api/v1/user/wallet/reasons": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get all wallet transaction reasons",
+                "description": "Returns a list of all wallet transaction reasons",
+                "operationId": "757622244ee52d6cfc58857d074d78ec",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user/wallet": {
             "get": {
                 "tags": [
-                    "User"
+                    "Wallet"
                 ],
                 "summary": "Get user's wallet",
                 "description": "Returns the current user's wallet",
@@ -3251,6 +3288,64 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet/transaction": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Create a new wallet transaction",
+                "description": "Creates a new wallet transaction for the current user",
+                "operationId": "storeTransaction",
+                "requestBody": {
+                    "description": "Wallet transaction data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreWalletTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
                                 }
                             }
                         }
@@ -3832,6 +3927,40 @@
                         "description": "The model of the vehicle",
                         "type": "string",
                         "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "StoreWalletTransactionRequest": {
+                "title": "StoreWalletTransactionRequest",
+                "description": "Store wallet transaction request body data",
+                "required": [
+                    "action",
+                    "amount",
+                    "reason_code"
+                ],
+                "properties": {
+                    "action": {
+                        "description": "The action to perform on the wallet balance",
+                        "type": "string",
+                        "enum": [
+                            "increase",
+                            "decrease"
+                        ]
+                    },
+                    "amount": {
+                        "description": "The amount to add or subtract from the wallet balance",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason_code": {
+                        "description": "The reason code for the wallet transaction",
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "description": {
+                        "description": "An optional description for the wallet transaction",
+                        "type": "string"
                     }
                 },
                 "type": "object"

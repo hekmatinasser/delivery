@@ -23,6 +23,33 @@ class WalletController extends BaseController
 {
     use FileHandler;
 
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/user/wallet/reasons",
+     *     summary="Get all wallet transaction reasons",
+     *     description="Returns a list of all wallet transaction reasons",
+     *     tags={"Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     * )
+     */
+    public function getReasons()
+    {
+        $reasons = WalletTransactionReason::all();
+
+        return $this->sendResponse($reasons, Lang::get('http-statuses.200'));
+    }
+
     /**
      * Show wallet detail
      *
@@ -33,7 +60,7 @@ class WalletController extends BaseController
      *     summary="Get user's wallet",
      *     description="Returns the current user's wallet",
      *     operationId="getWallet",
-     *     tags={"User"},
+     *     tags={"Wallet"},
      *     security={ {"sanctum": {} }},
      *     @OA\Response(
      *         response=200,
@@ -60,8 +87,84 @@ class WalletController extends BaseController
      *
      * @param StoreWalletTransactionRequest $request
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Post(
+     *     path="/api/v1/user/wallet/transaction",
+     *     summary="Create a new wallet transaction",
+     *     description="Creates a new wallet transaction for the current user",
+     *     operationId="storeTransaction",
+     *     tags={"Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Wallet transaction data",
+     *         @OA\JsonContent(ref="#/components/schemas/StoreWalletTransactionRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function storeTransaction(StoreWalletTransactionRequest $request)
+    {
+        $user = Auth::user();
+        $changer = $user;
+        $wallet = $user->wallet;
+
+        // گرفتن این ریزن از کاربر میتونه باگ ایجاد کنه!!
+        $reason_id = WalletTransactionReason::whereCode($request->reason_code)->first()->id;
+
+        $newAmount = $wallet->amount;
+        switch ($request->action) {
+            case 'increase':
+                $newAmount = $wallet->amount + $request->amount;
+                break;
+            case 'decrease':
+                $newAmount = $wallet->amount - $request->amount;
+                if ($newAmount < 0) {
+                    return $this->sendError('مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد', ['errors' => ['amount' => 'مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد']], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+                break;
+        }
+
+        $wallet->update(['amount' => $newAmount]);
+        $wallet = $wallet->fresh();
+
+        unset($request['user_id']);
+        unset($request['reason_code']);
+        unset($request['image']);
+        $input = $request->all();
+        $input['user_id'] = $user->id;
+        $input['final_amount'] = $newAmount;
+        $input['reason_id'] = $reason_id;
+        $input['changer_id'] = $changer->id;
+
+        $transaction = WalletTransaction::query()->create($input);
+
+
+        return $this->sendResponse(compact('wallet'), 'تراکنش با موفقیت انجام شد');
+    }
+
+
+    /**
+     * Insert New transaction for wallet
+     *
+     * @param StoreWalletTransactionRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeTransaction2(StoreWalletTransactionRequest $request)
     {
         $validated = $request->validated();
         if (!empty($validated['user_id'])) {
