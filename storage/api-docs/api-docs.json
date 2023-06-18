@@ -3349,6 +3349,84 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet/buy-coin": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Buy coin",
+                "description": "Buy coins using wallet balance",
+                "operationId": "6bf771cc010abc8286b0b6b655e3c00d",
+                "requestBody": {
+                    "description": "Buy coin request body",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BuyCoinRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -3927,6 +4005,21 @@
                         "description": "The model of the vehicle",
                         "type": "string",
                         "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "BuyCoinRequest": {
+                "title": "BuyCoinRequest",
+                "description": "The amount of coin to buy",
+                "required": [
+                    "action"
+                ],
+                "properties": {
+                    "amount": {
+                        "description": "The amount to add or subtract from the wallet balance",
+                        "type": "number",
+                        "format": "float"
                     }
                 },
                 "type": "object"
