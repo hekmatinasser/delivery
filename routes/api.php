@@ -1,16 +1,17 @@
 <?php
 
-use App\Http\Controllers\API\AdminController;
-use App\Http\Controllers\Api\CoinSettingController;
-use App\Http\Controllers\Api\InterNeighborhoodFareController;
-use App\Http\Controllers\Api\NeighborhoodController;
-use App\Http\Controllers\API\RegisterController;
-use App\Http\Controllers\API\StoreController;
-use App\Http\Controllers\API\TransactionController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\Api\ActiveTripController;
+use App\Http\Controllers\Api\CoinSettingController;
+use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Api\InterNeighborhoodFareController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -134,3 +135,8 @@ Route::post('/saveCoinSetting', [CoinSettingController::class, 'saveCoinSetting'
 //trip Routes
 Route::post('/trip/updateOrCreat', [TripController::class, 'tripUpdateOrCreate']);
 Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges']);
+
+
+//Active Trips routes
+Route::get('/active/trips',[ActiveTripController::class,'index']);
+Route::post('/activeTrip/updateOrCreate',[ActiveTripController::class,'updateOrCreate']);
