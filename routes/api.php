@@ -9,6 +9,7 @@ use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Api\InterNeighborhoodFareController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -123,5 +124,11 @@ Route::any('/coin-wallet/buy-coin/payment/verify', [\App\Http\Controllers\API\Co
 
 
 
-//Neighborhood Resource route (middlewares Defined in NeighborhoodController Constrator)
+//Neighborhood Resource routes (middlewares Defined in NeighborhoodController's constractor)
 Route::apiResource('neighborhood',NeighborhoodController::class);
+
+
+//Inter Neighborhood Fare routes
+Route::post('/calculatingInterNeighborhoodFare',[InterNeighborhoodFareController::class,'calculatingInterNeighborhoodFare'])->middleware('auth:sanctom');
+Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}',[InterNeighborhoodFareController::class,'editInterNeighborhoodFare'])->middleware('auth:sanctom');
+Route::get('/getAll/interNeighborhoodFare',[InterNeighborhoodFareController::class,'InterNeighborhoodFare']);
