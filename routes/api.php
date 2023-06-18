@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\Api\CoinSettingController;
 use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
@@ -129,6 +130,10 @@ Route::apiResource('neighborhood',NeighborhoodController::class);
 
 
 //Inter Neighborhood Fare routes
-Route::post('/calculatingInterNeighborhoodFare',[InterNeighborhoodFareController::class,'calculatingInterNeighborhoodFare'])->middleware('auth:sanctom');
-Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}',[InterNeighborhoodFareController::class,'editInterNeighborhoodFare'])->middleware('auth:sanctom');
+Route::post('/calculatingInterNeighborhoodFare',[InterNeighborhoodFareController::class,'calculatingInterNeighborhoodFare'])->middleware('auth:sanctum');
+Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}',[InterNeighborhoodFareController::class,'editInterNeighborhoodFare'])->middleware('auth:sanctum');
 Route::get('/getAll/interNeighborhoodFare',[InterNeighborhoodFareController::class,'InterNeighborhoodFare']);
+
+//Coin Setting Routes
+Route::post('/getCoinSetting',[CoinSettingController::class,'getCoinSetting']);
+Route::post('/saveCoinSetting',[CoinSettingController::class,'saveCoinSetting'])->middleware('auth:sanctum');
