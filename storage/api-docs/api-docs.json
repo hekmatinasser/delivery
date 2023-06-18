@@ -1995,6 +1995,43 @@
                 ]
             }
         },
+        "/api/v1/user/coin-wallet": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user's coin wallet",
+                "description": "Returns the current user's coin wallet",
+                "operationId": "getCoinWallet",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [

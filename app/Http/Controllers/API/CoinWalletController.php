@@ -17,21 +17,42 @@ use App\Payment\Gateways\Zarinpal\ZarinPal;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 
 class CoinWalletController extends BaseController
 {
     protected $coinPrice = 100;
+
     /**
      * Show coin wallet detail
      *
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Get(
+     *     path="/api/v1/user/coin-wallet",
+     *     summary="Get user's coin wallet",
+     *     description="Returns the current user's coin wallet",
+     *     operationId="getCoinWallet",
+     *     tags={"User"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
      */
     public function show()
     {
         $user = Auth::user();
         $wallet = $user->coinWallet;
 
-        return $this->sendResponse($wallet);
+        return $this->sendResponse($wallet, Lang::get('http-statuses.200'));
     }
 
     /**
@@ -81,7 +102,7 @@ class CoinWalletController extends BaseController
 
         $transaction = CoinWalletTransaction::query()->create($validated);
 
-        if(!empty($request->image)) {
+        if (!empty($request->image)) {
             $path = $this->uploadNewTransactionImage($request->image, $transaction);
             $transaction->update(['image_path' => $path]);
         }
@@ -195,8 +216,7 @@ class CoinWalletController extends BaseController
         if (!empty($request->Authority)) {
             // zarinpal gateway
             return $this->verifyBuyCoinPaymentHandler('zarinpal', $request->Authority);
-
-        } else if(!is_null($request->ResCode)) {
+        } else if (!is_null($request->ResCode)) {
             // mellat gateway
             $resCode = $request->ResCode;
             $refID = $request->RefId;
