@@ -3435,6 +3435,90 @@
                     }
                 ]
             }
+        },
+        "/api/wallet/increase-online": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Increase wallet balance through online payment",
+                "description": "Increase wallet with online gateway",
+                "operationId": "fce78241366bee48cfb7cb9ddda7810a",
+                "requestBody": {
+                    "description": "Payment request body",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "gateway": {
+                                        "description": "Payment gateway",
+                                        "type": "string",
+                                        "enum": [
+                                            "zarinpal",
+                                            "mellat"
+                                        ],
+                                        "example": "zarinpal"
+                                    },
+                                    "amount": {
+                                        "description": "Amount to be paid",
+                                        "type": "number",
+                                        "example": "100000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {

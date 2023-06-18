@@ -243,6 +243,41 @@ class WalletController extends BaseController
      * @param Request $request
      * @return Response
      * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     *  * @OA\Post(
+     *     path="/api/wallet/increase-online",
+     *     summary="Increase wallet balance through online payment",
+     *     tags={"Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Payment request body",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="gateway", type="string", enum={"zarinpal", "mellat"}, example="zarinpal", description="Payment gateway"),
+     *             @OA\Property(property="amount", type="number", example="100000", description="Amount to be paid")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function increaseWalletOnline(Request $request)
     {
