@@ -3188,6 +3188,43 @@
                     }
                 ]
             }
+        },
+        "/api/v1/user/wallet": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user's wallet",
+                "description": "Returns the current user's wallet",
+                "operationId": "getWallet",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {

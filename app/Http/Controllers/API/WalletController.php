@@ -17,21 +17,42 @@ use App\Traits\FileHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 
 class WalletController extends BaseController
 {
     use FileHandler;
+
     /**
      * Show wallet detail
      *
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Get(
+     *     path="/api/v1/user/wallet",
+     *     summary="Get user's wallet",
+     *     description="Returns the current user's wallet",
+     *     operationId="getWallet",
+     *     tags={"User"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
      */
     public function show()
     {
         $user = Auth::user();
         $wallet = $user->wallet;
 
-        return $this->sendResponse(compact('wallet'));
+        return $this->sendResponse($wallet, Lang::get('http-statuses.200'));
     }
 
     /**
@@ -81,7 +102,7 @@ class WalletController extends BaseController
 
         $transaction = WalletTransaction::query()->create($validated);
 
-        if(!empty($request->image)) {
+        if (!empty($request->image)) {
             $path = $this->uploadNewTransactionImage($request->image, $transaction);
             $transaction->update(['image_path' => $path]);
         }
@@ -221,8 +242,7 @@ class WalletController extends BaseController
         if (!empty($request->Authority)) {
             // zarinpal gateway
             return $this->verifyIncreaseWalletPaymentHanlder('zarinpal', $request->Authority);
-
-        } else if(!is_null($request->ResCode)) {
+        } else if (!is_null($request->ResCode)) {
             // mellat gateway
             $resCode = $request->ResCode;
             $refID = $request->RefId;
