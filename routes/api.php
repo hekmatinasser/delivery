@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ActiveTripController;
 use App\Http\Controllers\Api\CoinSettingController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Api\TripFeedBackController;
 use App\Http\Controllers\Api\InterNeighborhoodFareController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
@@ -140,3 +141,8 @@ Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges'])
 //Active Trips routes
 Route::get('/active/trips',[ActiveTripController::class,'index']);
 Route::post('/activeTrip/updateOrCreate',[ActiveTripController::class,'updateOrCreate']);
+
+
+//TripFeedBack Routes
+Route::post('/getTrip/feedbacks/',[TripFeedBackController::class,'index']);
+Route::post('/trip/feedback/updateOrCreate',[TripFeedBackController::class,'updateOrCreate'])->middleware('auth:sanctum');
