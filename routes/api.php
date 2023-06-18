@@ -14,6 +14,7 @@ use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\Api\NeighborhoodController;
 use App\Http\Controllers\Api\TripFeedBackController;
 use App\Http\Controllers\Api\InterNeighborhoodFareController;
+use App\Http\Controllers\Api\VehicleConstraintContoller;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -149,7 +150,11 @@ Route::post('/getTrip/feedbacks/',[TripFeedBackController::class,'index']);
 Route::post('/trip/feedback/updateOrCreate',[TripFeedBackController::class,'updateOrCreate'])->middleware('auth:sanctum');
 
 
-//Constrint Routes
+//Constraint Routes
 Route::get('/getActiveConstraints',[ConstraintController::class,'getActiveConstraints'])->middleware('auth:sanctum');
 Route::post('/applyConstraint',[ConstraintController::class,'applyConstraint'])->middleware('auth:sanctum');
 Route::post('/Constraint/changeStatus',[ConstraintController::class,'changeStatus'])->middleware('auth:sanctum');
+
+
+//vehicle constrait routes
+Route::post('/applyVehicleConstraint',[VehicleConstraintContoller::class,'applyVehicleConstraint']);
