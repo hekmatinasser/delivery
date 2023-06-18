@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\API\AdminController;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\StoreController;
+use App\Http\Controllers\API\VehicleController;
+use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\Api\NeighborhoodController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -119,3 +120,8 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 
 Route::any('/wallet/increase/payment/verify', [\App\Http\Controllers\API\WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [\App\Http\Controllers\API\CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
+
+
+
+//Neighborhood Resource route (middlewares Defined in NeighborhoodController Constrator)
+Route::apiResource('neighborhood',NeighborhoodController::class);
