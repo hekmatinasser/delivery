@@ -1,16 +1,16 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\Api\CoinSettingController;
-use App\Http\Controllers\API\StoreController;
-use App\Http\Controllers\API\VehicleController;
-use App\Http\Controllers\API\RegisterController;
-use App\Http\Controllers\API\TransactionController;
-use App\Http\Controllers\Api\NeighborhoodController;
 use App\Http\Controllers\Api\InterNeighborhoodFareController;
+use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\StoreController;
+use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\VehicleController;
+use Illuminate\Support\Facades\Route;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -57,7 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
-
     Route::prefix('v1/vehicle')->controller(VehicleController::class)->group(function () {
         Route::post('', 'store');
         Route::put('', 'update');
@@ -67,7 +66,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('types', 'types');
     });
-
 
     Route::prefix('v1/store')->controller(StoreController::class)->group(function () {
         Route::post('', 'store');
@@ -80,11 +78,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('categories', 'categories');
     });
 
-
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
         Route::post('store', 'store');
     });
-
 
     // Route::resource('products', ProductController::class);
 
@@ -123,17 +119,18 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 Route::any('/wallet/increase/payment/verify', [\App\Http\Controllers\API\WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [\App\Http\Controllers\API\CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
 
-
-
 //Neighborhood Resource routes (middlewares Defined in NeighborhoodController's constractor)
-Route::apiResource('neighborhood',NeighborhoodController::class);
-
+Route::apiResource('neighborhood', NeighborhoodController::class);
 
 //Inter Neighborhood Fare routes
-Route::post('/calculatingInterNeighborhoodFare',[InterNeighborhoodFareController::class,'calculatingInterNeighborhoodFare'])->middleware('auth:sanctum');
-Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}',[InterNeighborhoodFareController::class,'editInterNeighborhoodFare'])->middleware('auth:sanctum');
-Route::get('/getAll/interNeighborhoodFare',[InterNeighborhoodFareController::class,'InterNeighborhoodFare']);
+Route::post('/calculatingInterNeighborhoodFare', [InterNeighborhoodFareController::class, 'calculatingInterNeighborhoodFare'])->middleware('auth:sanctum');
+Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}', [InterNeighborhoodFareController::class, 'editInterNeighborhoodFare'])->middleware('auth:sanctum');
+Route::get('/getAll/interNeighborhoodFare', [InterNeighborhoodFareController::class, 'InterNeighborhoodFare']);
 
 //Coin Setting Routes
-Route::post('/getCoinSetting',[CoinSettingController::class,'getCoinSetting']);
-Route::post('/saveCoinSetting',[CoinSettingController::class,'saveCoinSetting'])->middleware('auth:sanctum');
+Route::post('/getCoinSetting', [CoinSettingController::class, 'getCoinSetting']);
+Route::post('/saveCoinSetting', [CoinSettingController::class, 'saveCoinSetting'])->middleware('auth:sanctum');
+
+//trip Routes
+Route::post('/trip/updateOrCreat', [TripController::class, 'tripUpdateOrCreate']);
+Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges']);
