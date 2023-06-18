@@ -8,6 +8,7 @@ use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\Api\ActiveTripController;
+use App\Http\Controllers\Api\ConstraintController;
 use App\Http\Controllers\Api\CoinSettingController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\Api\NeighborhoodController;
@@ -146,3 +147,9 @@ Route::post('/activeTrip/updateOrCreate',[ActiveTripController::class,'updateOrC
 //TripFeedBack Routes
 Route::post('/getTrip/feedbacks/',[TripFeedBackController::class,'index']);
 Route::post('/trip/feedback/updateOrCreate',[TripFeedBackController::class,'updateOrCreate'])->middleware('auth:sanctum');
+
+
+//Constrint Routes
+Route::get('/getActiveConstraints',[ConstraintController::class,'getActiveConstraints'])->middleware('auth:sanctum');
+Route::post('/applyConstraint',[ConstraintController::class,'applyConstraint'])->middleware('auth:sanctum');
+Route::post('/Constraint/changeStatus',[ConstraintController::class,'changeStatus'])->middleware('auth:sanctum');

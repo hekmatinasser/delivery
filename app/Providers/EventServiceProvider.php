@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Constraint;
 use App\Models\InterNeighborhoodFare;
 use App\Models\TripChange;
+use App\Observers\ConstraintObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use App\Observers\InterNeighborhoodFareObserver;
@@ -31,6 +33,7 @@ class EventServiceProvider extends ServiceProvider
     {
         InterNeighborhoodFare::observe(InterNeighborhoodFareObserver::class);
         TripChange::observe(TripObserver::class);
+        Constraint::observe(ConstraintObserver::class);
     }
 
     /**
