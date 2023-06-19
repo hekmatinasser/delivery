@@ -173,6 +173,47 @@ class CoinWalletController extends BaseController
      *
      * @param Request $request
      * @return Response
+     *
+       * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/travel-transaction",
+     *     summary="Store Travel Transaction",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     description="Store Travel Transaction and update user's coin wallet balance",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Store Travel Transaction Request body data",
+     *         @OA\JsonContent(
+     *             required={"travel_id"},
+     *             @OA\Property(
+     *                 property="travel_id",
+     *                 description="ID of the travel",
+     *                 type="integer",
+     *                 example=1
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function storeTravelTransaction(Request $request)
     {

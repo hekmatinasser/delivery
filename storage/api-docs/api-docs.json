@@ -2136,6 +2136,84 @@
                 ]
             }
         },
+        "/api/v1/user/coin-wallet/travel-transaction": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Store Travel Transaction",
+                "description": "Store Travel Transaction and update user's coin wallet balance",
+                "operationId": "0aa152980c25abc89b50386b7be7064c",
+                "requestBody": {
+                    "description": "Store Travel Transaction Request body data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "travel_id"
+                                ],
+                                "properties": {
+                                    "travel_id": {
+                                        "description": "ID of the travel",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [
