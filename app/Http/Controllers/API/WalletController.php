@@ -254,7 +254,7 @@ class WalletController extends BaseController
      * @throws \GuzzleHttp\Exception\GuzzleException
      *
      *  * @OA\Post(
-     *     path="/api/wallet/increase-online",
+     *     path="/api/v1/user/wallet/increase/online",
      *     summary="Increase wallet balance through online payment",
      *     tags={"Wallet"},
      *     security={ {"sanctum": {} }},

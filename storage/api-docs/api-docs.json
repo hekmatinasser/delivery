@@ -3436,14 +3436,14 @@
                 ]
             }
         },
-        "/api/wallet/increase-online": {
+        "/api/v1/user/wallet/increase/online": {
             "post": {
                 "tags": [
                     "Wallet"
                 ],
                 "summary": "Increase wallet balance through online payment",
                 "description": "Increase wallet with online gateway",
-                "operationId": "fce78241366bee48cfb7cb9ddda7810a",
+                "operationId": "183591204bfe5fde3f3ee752a4393cd6",
                 "requestBody": {
                     "description": "Payment request body",
                     "required": true,
