@@ -19,6 +19,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 
 class WalletController extends BaseController
@@ -131,6 +132,8 @@ class WalletController extends BaseController
             $response = $this->addTransaction($request, $user, $user->id);
             return $this->sendResponse($response['wallet'], 'تراکنش با موفقیت انجام شد');
         } catch (Exception $e) {
+            if ($e->getCode() == 500)
+                return $this->sendError($e->getMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
             return $this->sendError($e->getMessage(), ['errors' => ['amount' => $e->getMessage()]], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -176,7 +179,7 @@ class WalletController extends BaseController
      */
     public function buyCoin(BuyCoinRequest $request)
     {
-        $coinPrice = 100000; // each coin price
+        $coinPrice = 100; // each coin price 10,000 IRT
 
         $user = Auth::user();
         $wallet = $user->wallet;
@@ -188,51 +191,57 @@ class WalletController extends BaseController
         }
 
         if ($request->amount < $coinPrice) {
-            $message = 'مبلغ وارد شده کمتر از هزینه یک سکه است، هزینه هر سکه' . $coinPrice . ' تومان است';
+            $message = 'مبلغ وارد شده کمتر از هزینه یک سکه است، هزینه هر سکه ' . $coinPrice . ' هزار تومان است';
             return $this->sendError($message, ['errors' => ['amount' => $message]], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         // convert input amount to coins
-        $coins = round($request->amount / $coinPrice);
-        $newCoins = $coinWallet->coins + $coins;
-        $newAmount = $wallet->amount - $request->amount;
+        $coins = intVal($request->amount / $coinPrice);
+        // $newCoins = $coinWallet->coins + $coins;
+        // $newAmount = $wallet->amount - ($coins * $coinPrice);
 
-        $coinWallet->update(['coins' => $newCoins]);
-        // $wallet->update(['amount' => $newAmount]);
-
-        $coinWallet = $coinWallet->fresh();
-        // $wallet = $wallet->fresh();
-
-        // insert wallet transaction for buy coin
-
+        DB::beginTransaction();
         try {
-            $res = $this->addTransaction([
-                'amount' => $request->amount,
-                'action' => 'decrease',
-                'final_amount' => $newAmount,
-                'reason_id' => WalletTransactionReason::query()->whereCode(21)->first()->id,
-                'changer_id' => $user->id
-            ], $user, $user->id);
-            $walletTransaction = $res['walletTransaction'];
+            // insert wallet transaction for buy coin
+            try {
+                $res = $this->addTransaction([
+                    'amount' => ($coins * $coinPrice),
+                    'action' => 'decrease',
+                    'reason_code' => 21,
+                ], $user, $user->id);
+
+                $walletTransaction = $res['transaction'];
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->sendError($e->getMessage(), ['errors' => [$e->getMessage()]], $e->getCode());
+            }
+
+            // insert coin wallet transaction for buy coin
+
+            try {
+                $res = $this->addWalletTransaction([
+                    'amount' => $coins,
+                    'action' => 'increase',
+                    'reason_code' => 11,
+                    'wallet_transaction_id' => $walletTransaction->id
+                ], $user, $user->id);
+
+                $coinWalletTransaction = $res['coinWalletTransaction'];
+                $coinWallet = $res['coinWallet'];
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->sendError($e->getMessage(), ['errors' => [$e->getMessage()]], $e->getCode());
+            }
+
+            // add coin wallet transaction id to wallet transaction
+            $walletTransaction->update([
+                'coin_wallet_transaction_id' => $coinWalletTransaction->id
+            ]);
+            DB::commit();
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), ['errors' => ['amount' => $e->getMessage()]], Response::HTTP_BAD_REQUEST);
+            DB::rollBack();
+            return $this->sendError($e->getMessage(), Lang::get('http_statuses.500'), 500);
         }
-
-        // insert coin wallet transaction for buy coin
-        $coinWalletTransaction = CoinWalletTransaction::query()->create([
-            'user_id' => $user->id,
-            'coins' => $coins,
-            'action' => 'increase',
-            'final_coins' => $newCoins,
-            'reason_id' => CoinWalletTransactionReason::query()->whereCode(11)->first()->id,
-            'changer_id' => $user->id,
-            'wallet_transaction_id' => $walletTransaction->id
-        ]);
-
-        // add coin wallet transaction id to wallet transaction
-        $walletTransaction->update([
-            'coin_wallet_transaction_id' => $coinWalletTransaction->id
-        ]);
 
         return $this->sendResponse(compact('wallet', 'coinWallet'), 'تراکنش با موفقیت انجام شد');
     }
@@ -479,41 +488,89 @@ class WalletController extends BaseController
 
     protected function addTransaction($request, $user, $changerId)
     {
-        $wallet = $user->wallet;
-        // گرفتن این ریزن از کاربر میتونه باگ ایجاد کنه!!
-        $reason_id = WalletTransactionReason::whereCode($request->reason_code)->first()->id;
-
-        $newAmount = $wallet->amount;
-        switch ($request->action) {
-            case 'increase':
-                $newAmount = $wallet->amount + $request->amount;
-                break;
-            case 'decrease':
-                $newAmount = $wallet->amount - $request->amount;
-                if ($newAmount < 0) {
-                    throw new Exception('مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد');
-                }
-                break;
+        try {
+            DB::beginTransaction();
+            $wallet = $user->wallet;
+            $reason_id =  WalletTransactionReason::whereCode($request['reason_code'])->first()->id;
+            $newAmount = $wallet->amount;
+            switch ($request['action']) {
+                case 'increase':
+                    $newAmount = $wallet->amount + $request['amount'];
+                    break;
+                case 'decrease':
+                    $newAmount = $wallet->amount - $request['amount'];
+                    if ($newAmount < 0) {
+                        throw new Exception('مقدار مبلغ وارد شده بیشتر از موجودی کیف پول میباشد', Response::HTTP_BAD_REQUEST);
+                    }
+                    break;
+                default:
+                    throw new Exception('ّInput Error', Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $wallet->update(['amount' => $newAmount]);
+            $wallet = $wallet->fresh();
+            $input['user_id'] = $user->id;
+            $input['final_amount'] = $newAmount;
+            $input['reason_id'] = $reason_id;
+            $input['changer_id'] = $changerId;
+            $input['amount'] = $request['amount'];
+            if (!empty($request['description'])) {
+                $input['description'] = $request['description'];
+            }
+            $transaction = WalletTransaction::query()->create($input);
+            if (!empty($request['image'])) {
+                $path = $this->uploadNewTransactionImage($request['image'], $transaction);
+                $transaction->update(['image_path' => $path]);
+            }
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception($e->getMessage(), $e->getCode());
         }
+        return compact('wallet', 'transaction');
+    }
 
-        $wallet->update(['amount' => $newAmount]);
-        $wallet = $wallet->fresh();
-        unset($request['user_id']);
-        unset($request['reason_code']);
-        unset($request['image']);
-        $input = $request->all();
-        $input['user_id'] = $user->id;
-        $input['final_amount'] = $newAmount;
-        $input['reason_id'] = $reason_id;
-        $input['changer_id'] = $changerId;
 
-        $transaction = WalletTransaction::query()->create($input);
+    protected function addWalletTransaction($request, $user, $changerId)
+    {
+        try {
+            DB::beginTransaction();
+            $coinWallet = $user->coinWallet;
+            $reason_id =  CoinWalletTransactionReason::query()->whereCode($request['reason_code'])->first()->id;
+            $newCoins = $coinWallet->coins;
 
-        if (!empty($request->image)) {
-            $path = $this->uploadNewTransactionImage($request->image, $transaction);
-            $transaction->update(['image_path' => $path]);
+            switch ($request['action']) {
+                case 'increase':
+                    $newCoins = $coinWallet->coins + $request['amount'];
+                    break;
+                case 'decrease':
+                    $newCoins = $coinWallet->coins - $request['amount'];
+                    if ($newCoins < 0) {
+                        throw new Exception('مقدار سکه وارد شده بیشتر از موجودی سکه میباشد', Response::HTTP_BAD_REQUEST);
+                    }
+                    break;
+                default:
+                    throw new Exception('ّInput Error', Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $coinWallet->update(['coins' => $newCoins]);
+            $coinWallet = $coinWallet->fresh();
+
+            $coinWalletTransaction = CoinWalletTransaction::query()->create([
+                'user_id' => $user->id,
+                'coins' => $request['amount'],
+                'action' => $request['action'],
+                'final_coins' => $newCoins,
+                'reason_id' => $reason_id,
+                'changer_id' => $changerId,
+            ]);
+
+            if (!empty($request['wallet_transaction_id'])) {
+                $coinWalletTransaction->update(['wallet_transaction_id' => $request['wallet_transaction_id']]);
+            }
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception($e->getMessage(), $e->getCode());
         }
-
-        return [$wallet, $transaction];
+        return compact('coinWallet', 'coinWalletTransaction');
     }
 }

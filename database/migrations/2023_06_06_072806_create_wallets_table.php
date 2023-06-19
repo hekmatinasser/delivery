@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->integer('amount')->default(0);
+            $table->bigInteger('amount')->default(0);
             $table->timestamps();
         });
     }

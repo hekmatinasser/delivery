@@ -17,10 +17,10 @@ class WalletFactory extends Factory
      */
     public function definition(): array
     {
-        $user = User::factory()->create();
+        // $user = User::factory()->create();
         return [
-            'user_id' => $user->id,
-            'amount' => rand(0, 200000)
+            'user_id' => 1,
+            'amount' => rand(0, 200)
         ];
     }
 }
