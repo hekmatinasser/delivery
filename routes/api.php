@@ -47,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/transaction', [CoinWalletController::class, 'storeTransaction'])->name('store-transaction');
             Route::post('/travel-transaction', [CoinWalletController::class, 'storeTravelTransaction'])->name('store-travel-transaction');
             Route::post('/buy-coin/online', [CoinWalletController::class, 'buyCoinOnline'])->name('buy-coin-online');
+
+
+            Route::get('/reasons', [CoinWalletController::class, 'getReasons'])->name('reasons');
         });
     });
 

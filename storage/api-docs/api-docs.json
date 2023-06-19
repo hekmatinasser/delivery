@@ -1995,10 +1995,47 @@
                 ]
             }
         },
+        "/api/v1/user/coin-wallet/reasons": {
+            "get": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Get all coin wallet transaction reasons",
+                "description": "Returns a list of all wallet transaction reasons",
+                "operationId": "bd0dd3c6bac40b34f3a62c18958ea923",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user/coin-wallet": {
             "get": {
                 "tags": [
-                    "User"
+                    "Coin Wallet"
                 ],
                 "summary": "Get user's coin wallet",
                 "description": "Returns the current user's coin wallet",
@@ -2020,6 +2057,73 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet/transaction": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Store a new coin wallet transaction",
+                "description": "Store a new coin wallet transaction",
+                "operationId": "2c45615260277c3942d37d0f1e16f60a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCoinWalletTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
                                 }
                             }
                         }
@@ -3837,6 +3941,40 @@
                     "password": {
                         "type": "string",
                         "example": "MyNewPassword123"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreCoinWalletTransactionRequest": {
+                "title": "StoreCoinWalletTransactionRequest",
+                "description": "Store Coin Wallet Transaction Request body data",
+                "required": [
+                    "action",
+                    "coins",
+                    "reason_code"
+                ],
+                "properties": {
+                    "action": {
+                        "description": "Action to perform on the coin wallet balance",
+                        "type": "string",
+                        "enum": [
+                            "increase",
+                            "decrease"
+                        ]
+                    },
+                    "coins": {
+                        "description": "Amount of coins to perform the action on",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason_code": {
+                        "description": "Reason code for the coin wallet transaction",
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "description": {
+                        "description": "Description of the coin wallet transaction",
+                        "type": "string"
                     }
                 },
                 "type": "object"

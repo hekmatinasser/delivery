@@ -23,6 +23,33 @@ class CoinWalletController extends BaseController
 {
     protected $coinPrice = 100;
 
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/user/coin-wallet/reasons",
+     *     summary="Get all coin wallet transaction reasons",
+     *     description="Returns a list of all wallet transaction reasons",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     * )
+     */
+    public function getReasons()
+    {
+        $reasons = CoinWalletTransactionReason::all();
+
+        return $this->sendResponse($reasons, Lang::get('http-statuses.200'));
+    }
+
     /**
      * Show coin wallet detail
      *
@@ -33,7 +60,7 @@ class CoinWalletController extends BaseController
      *     summary="Get user's coin wallet",
      *     description="Returns the current user's coin wallet",
      *     operationId="getCoinWallet",
-     *     tags={"User"},
+     *     tags={"Coin Wallet"},
      *     security={ {"sanctum": {} }},
      *     @OA\Response(
      *         response=200,
@@ -60,17 +87,46 @@ class CoinWalletController extends BaseController
      *
      * @param StoreCoinWalletTransactionRequest $request
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/transaction",
+     *     summary="Store a new coin wallet transaction",
+     *     description="Store a new coin wallet transaction",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/StoreCoinWalletTransactionRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function storeTransaction(StoreCoinWalletTransactionRequest $request)
     {
         $validated = $request->validated();
-        if (!empty($validated['user_id'])) {
-            $user = User::find($validated['user_id']);
-            $changer = Auth::user();
-        } else {
-            $user = Auth::user();
-            $changer = $user;
-        }
+
+        $user = Auth::user();
+        $changer = $user;
+
         $wallet = $user->coinWallet;
 
         $reason_id = CoinWalletTransactionReason::whereCode($validated['reason_code'])->first()->id;
@@ -83,7 +139,8 @@ class CoinWalletController extends BaseController
             case 'decrease':
                 $newCoins = $wallet->coins - $validated['coins'];
                 if ($newCoins < 0) {
-                    return $this->sendError('مقدار سکه وارد شده بیشتر از موجودی کیف سکه میباشد', [], Response::HTTP_UNPROCESSABLE_ENTITY);
+                    $message = 'مقدار سکه وارد شده بیشتر از موجودی کیف سکه میباشد';
+                    return $this->sendError($message, ['errors' => ['coins' => $message]], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 break;
         }
