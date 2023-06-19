@@ -17,21 +17,69 @@ use App\Payment\Gateways\Zarinpal\ZarinPal;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 
 class CoinWalletController extends BaseController
 {
     protected $coinPrice = 100;
+
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/user/coin-wallet/reasons",
+     *     summary="Get all coin wallet transaction reasons",
+     *     description="Returns a list of all wallet transaction reasons",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     * )
+     */
+    public function getReasons()
+    {
+        $reasons = CoinWalletTransactionReason::all();
+
+        return $this->sendResponse($reasons, Lang::get('http-statuses.200'));
+    }
+
     /**
      * Show coin wallet detail
      *
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Get(
+     *     path="/api/v1/user/coin-wallet",
+     *     summary="Get user's coin wallet",
+     *     description="Returns the current user's coin wallet",
+     *     operationId="getCoinWallet",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
      */
     public function show()
     {
         $user = Auth::user();
         $wallet = $user->coinWallet;
 
-        return $this->sendResponse($wallet);
+        return $this->sendResponse($wallet, Lang::get('http-statuses.200'));
     }
 
     /**
@@ -39,17 +87,46 @@ class CoinWalletController extends BaseController
      *
      * @param StoreCoinWalletTransactionRequest $request
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/transaction",
+     *     summary="Store a new coin wallet transaction",
+     *     description="Store a new coin wallet transaction",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/StoreCoinWalletTransactionRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function storeTransaction(StoreCoinWalletTransactionRequest $request)
     {
         $validated = $request->validated();
-        if (!empty($validated['user_id'])) {
-            $user = User::find($validated['user_id']);
-            $changer = Auth::user();
-        } else {
-            $user = Auth::user();
-            $changer = $user;
-        }
+
+        $user = Auth::user();
+        $changer = $user;
+
         $wallet = $user->coinWallet;
 
         $reason_id = CoinWalletTransactionReason::whereCode($validated['reason_code'])->first()->id;
@@ -62,7 +139,8 @@ class CoinWalletController extends BaseController
             case 'decrease':
                 $newCoins = $wallet->coins - $validated['coins'];
                 if ($newCoins < 0) {
-                    return $this->sendError('مقدار سکه وارد شده بیشتر از موجودی کیف سکه میباشد', [], Response::HTTP_UNPROCESSABLE_ENTITY);
+                    $message = 'مقدار سکه وارد شده بیشتر از موجودی کیف سکه میباشد';
+                    return $this->sendError($message, ['errors' => ['coins' => $message]], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 break;
         }
@@ -81,7 +159,7 @@ class CoinWalletController extends BaseController
 
         $transaction = CoinWalletTransaction::query()->create($validated);
 
-        if(!empty($request->image)) {
+        if (!empty($request->image)) {
             $path = $this->uploadNewTransactionImage($request->image, $transaction);
             $transaction->update(['image_path' => $path]);
         }
@@ -95,6 +173,47 @@ class CoinWalletController extends BaseController
      *
      * @param Request $request
      * @return Response
+     *
+     * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/travel-transaction",
+     *     summary="Store Travel Transaction",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     description="Store Travel Transaction and update user's coin wallet balance",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Store Travel Transaction Request body data",
+     *         @OA\JsonContent(
+     *             required={"travel_id"},
+     *             @OA\Property(
+     *                 property="travel_id",
+     *                 description="ID of the travel",
+     *                 type="integer",
+     *                 example=1
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function storeTravelTransaction(Request $request)
     {
@@ -189,14 +308,61 @@ class CoinWalletController extends BaseController
      * @param Request $request
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+
+     * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/buy-coin/online",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     summary="Buy Coin Online",
+     *     description="Buy coins online using available payment gateways",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Buy Coin Request body data",
+     *         @OA\JsonContent(
+     *             required={"gateway", "coins"},
+     *             @OA\Property(
+     *                 property="gateway",
+     *                 description="Payment gateway name",
+     *                 type="string",
+     *                 enum={"zarinpal", "mellat"}
+     *             ),
+     *             @OA\Property(
+     *                 property="coins",
+     *                 description="Number of coins to buy",
+     *                 type="integer",
+     *                 example=10
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function verifyBuyCoinPayment(Request $request)
     {
         if (!empty($request->Authority)) {
             // zarinpal gateway
             return $this->verifyBuyCoinPaymentHandler('zarinpal', $request->Authority);
-
-        } else if(!is_null($request->ResCode)) {
+        } else if (!is_null($request->ResCode)) {
             // mellat gateway
             $resCode = $request->ResCode;
             $refID = $request->RefId;

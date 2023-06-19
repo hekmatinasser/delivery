@@ -8,7 +8,7 @@ use App\Enums\LogUserTypesEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @OA\Schema(
@@ -81,7 +81,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Store extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'store';
     protected $fillable = [
@@ -141,7 +141,7 @@ class Store extends Model
         }
 
         if (!empty($changes)) {
-            Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::STORE, LogActionsEnum::EDIT, json_encode($changes));
+            Log::store($user->userType == '0' ? LogUserTypesEnum::USER : LogUserTypesEnum::ADMIN, $user->id, LogModelsEnum::STORE, LogActionsEnum::EDIT, json_encode($changes));
         }
     }
 

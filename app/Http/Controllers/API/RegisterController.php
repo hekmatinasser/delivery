@@ -250,7 +250,13 @@ class RegisterController extends BaseController
 
         VerifyCode::where('mobile', $user->mobile)->delete();
 
-        $success['token'] =  $user->createToken('client')->plainTextToken;
+        $pluck = collect(Auth::user()->abilites)->pluck('name');
+        $abilities = $pluck->all();
+        $tokenName = 'client';
+        if (count($abilities)) {
+            $tokenName = 'admin';
+        }
+        $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
         $success['name'] =  $user->name;
         $success['family'] =  $user->family;
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
@@ -323,7 +329,13 @@ class RegisterController extends BaseController
         // TODO CHECK if validation Logger is available
         $user = (new User())->findByMobile($request->mobile);
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
-            $success['token'] =  $user->createToken('client')->plainTextToken;
+            $pluck = collect(Auth::user()->abilites)->pluck('name');
+            $abilities = $pluck->all();
+            $tokenName = 'client';
+            if (count($abilities)) {
+                $tokenName = 'admin';
+            }
+            $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
             $success['name'] =  $user->name;
             $success['family'] =  $user->family;
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);

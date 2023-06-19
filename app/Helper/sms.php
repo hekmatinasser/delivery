@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Log;
 
 function verifySMS($number, $code)
 {
-    if (env('APP_ENV') == 'local') return false;
+    if (config('app.env') == 'local') return false;
     $userName = env('SMS_PANEL_USERNAME', 'username');
     $password = env('SMS_PANEL_USERNAME', 'password');
     $fromNumber = env('SMS_PANEL_USERNAME', '1000000');

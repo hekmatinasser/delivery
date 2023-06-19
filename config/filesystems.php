@@ -44,9 +44,15 @@ return [
             'throw' => false,
         ],
 
-        'natinal_photos' => [
+        'national_photos' => [
             'driver' => 'local',
-            'root' => storage_path('app/images/natinal_photos'),
+            'root' => storage_path('app/images/national_photos'),
+            'throw' => false,
+        ],
+
+        'transaction_photos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/images/transaction_photos'),
             'throw' => false,
         ],
 

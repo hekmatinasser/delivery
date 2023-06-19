@@ -6,6 +6,2301 @@
     },
     "paths": {
         "/api": {},
+        "/api/v1/admin/employee": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get a list of employees",
+                "description": "Returns a paginated list of employees with their roles",
+                "operationId": "885bbdb1eeb01da9dd0e3b794251ddba",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of stores to return per page (default 10).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return (default 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "description": "The current page number",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "first_page_url": {
+                                            "description": "The URL for the first page of results",
+                                            "type": "string"
+                                        },
+                                        "from": {
+                                            "description": "The index of the first item in the current page of results",
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "description": "The total number of pages of results",
+                                            "type": "integer"
+                                        },
+                                        "last_page_url": {
+                                            "description": "The URL for the last page of results",
+                                            "type": "string"
+                                        },
+                                        "next_page_url": {
+                                            "description": "The URL for the next page of results",
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "description": "The URL path for the current page of results",
+                                            "type": "string"
+                                        },
+                                        "per_page": {
+                                            "description": "The number of results per page",
+                                            "type": "integer"
+                                        },
+                                        "prev_page_url": {
+                                            "description": "The URL for the previous page of results",
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "description": "The index of the last item in the current page of results",
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "description": "The total number of items in the result set",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new employee",
+                "description": "Creates a new employee with the given information",
+                "operationId": "createEmployee",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateEmployeeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/employee/{employeeId}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get employee by ID",
+                "description": "Returns a single employee by ID",
+                "operationId": "getEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to return",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update employee by ID",
+                "description": "Updates a single employee by ID",
+                "operationId": "updateEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Employee object that needs to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEmployeesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete employee by ID",
+                "description": "Deletes a single employee by ID",
+                "operationId": "deleteEmployeeById",
+                "parameters": [
+                    {
+                        "name": "employeeId",
+                        "in": "path",
+                        "description": "ID of employee to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/store": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get all stores",
+                "description": "Retrieve a paginated list of all stores.",
+                "operationId": "3b53855546b859f5582ec8889ce82108",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of stores to return per page (default 10).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return (default 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new store",
+                "description": "Creates a new store with the given information",
+                "operationId": "createUserStore",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "storeCategory_id": {
+                                        "description": "Category ID",
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "storeAreaType": {
+                                        "description": "Area Type",
+                                        "type": "string",
+                                        "enum": [
+                                            "RENT",
+                                            "OWNERSHIP"
+                                        ],
+                                        "example": "RENT"
+                                    },
+                                    "storeName": {
+                                        "description": "Name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "storeAddress": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "storePostCode": {
+                                        "description": "Post Code",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storePhone": {
+                                        "description": "Phone",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storeLat": {
+                                        "description": "Latitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "40.7128"
+                                    },
+                                    "storeLang": {
+                                        "description": "Longitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "-74.0060"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/store/{storeId}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get store",
+                "description": "Get the profile information of a specific store.",
+                "operationId": "e609989295b856b1076405e8c0bf9eba",
+                "parameters": [
+                    {
+                        "name": "storeId",
+                        "in": "path",
+                        "description": "The ID of the store to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete store by ID",
+                "description": "Deletes a single store by ID",
+                "operationId": "deleteStoreById",
+                "parameters": [
+                    {
+                        "name": "storeId",
+                        "in": "path",
+                        "description": "ID of store to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Store not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/store/{storeId}/update": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update store",
+                "description": "Update the profile and store information of a specific store.",
+                "operationId": "c58978c8b331888334085567c5fa02e9",
+                "parameters": [
+                    {
+                        "name": "storeId",
+                        "in": "path",
+                        "description": "The ID of the store to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "storeCategory_id": {
+                                        "description": "Category ID",
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "storeAreaType": {
+                                        "description": "Area Type",
+                                        "type": "string",
+                                        "enum": [
+                                            "RENT",
+                                            "OWNERSHIP"
+                                        ],
+                                        "example": "RENT"
+                                    },
+                                    "storeName": {
+                                        "description": "Name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "storeAddress": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "storePostCode": {
+                                        "description": "Post Code",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storePhone": {
+                                        "description": "Phone",
+                                        "type": "integer",
+                                        "example": "1234567890"
+                                    },
+                                    "storeLat": {
+                                        "description": "Latitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "40.7128"
+                                    },
+                                    "storeLang": {
+                                        "description": "Longitude",
+                                        "type": "number",
+                                        "format": "desimal",
+                                        "example": "-74.0060"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get all Vehicles",
+                "description": "Retrieve a paginated list of all Vehicles.",
+                "operationId": "1fde9b4da6d1f7110a1b2882e408b5e7",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of Vehicles to return per page (default 10).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return (default 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create a new vehicle",
+                "description": "Creates a new vehicle with the given information",
+                "operationId": "createUserVehicle",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "type": {
+                                        "description": "The type of the vehicle (MOTOR or CAR)",
+                                        "type": "string",
+                                        "enum": [
+                                            "MOTOR",
+                                            "CAR"
+                                        ]
+                                    },
+                                    "brand": {
+                                        "description": "The brand of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "pelak": {
+                                        "description": "The pelak of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "color": {
+                                        "description": "The color of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "model": {
+                                        "description": "The model of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle/{vehicleId}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get vehicle",
+                "description": "Get the profile information of a specific vehicle.",
+                "operationId": "2103968b4db0780175db5d1cbe638752",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "The ID of the vehicle to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete vehicle by ID",
+                "description": "Deletes a single vehicle by ID",
+                "operationId": "deleteVehicleById",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "ID of vehicle to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "vehicle not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle/{vehicleId}/update": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update vehicle",
+                "description": "Update the profile and vehicle information of a specific vehicle.",
+                "operationId": "f7ee406ab0f0e0faa62485f434bd28f2",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "The ID of the vehicle to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "maxLength": 70
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "format": "mobile",
+                                        "example": "09123456789"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newPassword"
+                                    },
+                                    "status": {
+                                        "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "nationalCode": {
+                                        "type": "string",
+                                        "format": "nationalCode",
+                                        "example": "0123456789"
+                                    },
+                                    "nationalPhoto": {
+                                        "description": "The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000).",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "postCode": {
+                                        "type": "string",
+                                        "format": "postCode",
+                                        "example": "1234567890"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "1234567890"
+                                    },
+                                    "type": {
+                                        "description": "The type of the vehicle (MOTOR or CAR)",
+                                        "type": "string",
+                                        "enum": [
+                                            "MOTOR",
+                                            "CAR"
+                                        ]
+                                    },
+                                    "brand": {
+                                        "description": "The brand of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "pelak": {
+                                        "description": "The pelak of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "color": {
+                                        "description": "The color of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "model": {
+                                        "description": "The model of the vehicle",
+                                        "type": "string",
+                                        "maxLength": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get all roles",
+                "description": "Returns all roles",
+                "operationId": "getRoles",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "admin"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Administrator role"
+                                            },
+                                            "display_name": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet/reasons": {
+            "get": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Get all coin wallet transaction reasons",
+                "description": "Returns a list of all wallet transaction reasons",
+                "operationId": "bd0dd3c6bac40b34f3a62c18958ea923",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet": {
+            "get": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Get user's coin wallet",
+                "description": "Returns the current user's coin wallet",
+                "operationId": "getCoinWallet",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet/transaction": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Store a new coin wallet transaction",
+                "description": "Store a new coin wallet transaction",
+                "operationId": "2c45615260277c3942d37d0f1e16f60a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCoinWalletTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet/travel-transaction": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Store Travel Transaction",
+                "description": "Store Travel Transaction and update user's coin wallet balance",
+                "operationId": "0aa152980c25abc89b50386b7be7064c",
+                "requestBody": {
+                    "description": "Store Travel Transaction Request body data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "travel_id"
+                                ],
+                                "properties": {
+                                    "travel_id": {
+                                        "description": "ID of the travel",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/coin-wallet/buy-coin/online": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Buy Coin Online",
+                "description": "Buy coins online using available payment gateways",
+                "operationId": "f3ea3bac2d577f1c022aed4a9339cdd3",
+                "requestBody": {
+                    "description": "Buy Coin Request body data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gateway",
+                                    "coins"
+                                ],
+                                "properties": {
+                                    "gateway": {
+                                        "description": "Payment gateway name",
+                                        "type": "string",
+                                        "enum": [
+                                            "zarinpal",
+                                            "mellat"
+                                        ]
+                                    },
+                                    "coins": {
+                                        "description": "Number of coins to buy",
+                                        "type": "integer",
+                                        "example": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [
@@ -1199,6 +3494,300 @@
                     }
                 ]
             }
+        },
+        "/api/v1/user/wallet/reasons": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get all wallet transaction reasons",
+                "description": "Returns a list of all wallet transaction reasons",
+                "operationId": "757622244ee52d6cfc58857d074d78ec",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get user's wallet",
+                "description": "Returns the current user's wallet",
+                "operationId": "getWallet",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet/transaction": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Create a new wallet transaction",
+                "description": "Creates a new wallet transaction for the current user",
+                "operationId": "storeTransaction",
+                "requestBody": {
+                    "description": "Wallet transaction data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreWalletTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet/buy-coin": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Buy coin",
+                "description": "Buy coins using wallet balance",
+                "operationId": "6bf771cc010abc8286b0b6b655e3c00d",
+                "requestBody": {
+                    "description": "Buy coin request body",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BuyCoinRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user/wallet/increase/online": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Increase wallet balance through online payment",
+                "description": "Increase wallet with online gateway",
+                "operationId": "183591204bfe5fde3f3ee752a4393cd6",
+                "requestBody": {
+                    "description": "Payment request body",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "gateway": {
+                                        "description": "Payment gateway",
+                                        "type": "string",
+                                        "enum": [
+                                            "zarinpal",
+                                            "mellat"
+                                        ],
+                                        "example": "zarinpal"
+                                    },
+                                    "amount": {
+                                        "description": "Amount to be paid",
+                                        "type": "number",
+                                        "example": "100000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1265,6 +3854,143 @@
                             }
                         },
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateEmployeeRequest": {
+                "title": "Create Employee Request",
+                "description": "Create Employee Request body data",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Employee's name",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "family": {
+                        "description": "Employee's family name",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "mobile": {
+                        "description": "Employee's mobile number",
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "password": {
+                        "description": "Employee's password",
+                        "type": "string",
+                        "example": "newPassword"
+                    },
+                    "nationalCode": {
+                        "description": "Employee's national code",
+                        "type": "string",
+                        "example": "0012345678"
+                    },
+                    "address": {
+                        "description": "Employee's address",
+                        "type": "string",
+                        "example": "123 Main St, Anytown, USA"
+                    },
+                    "postCode": {
+                        "description": "Employee's postal code",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Employee's phone number",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "role": {
+                        "description": "Employee's role",
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "status": {
+                        "description": "Employee's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                        "type": "integer",
+                        "example": "0"
+                    }
+                },
+                "type": "object"
+            },
+            "GetEmployeesRequest": {
+                "title": "Get Employees Request",
+                "description": "Request body data for retrieving a paginated list of employees",
+                "properties": {
+                    "page": {
+                        "description": "The page number to retrieve, defaults to 1",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "description": "The number of results per page, must be one of: 5, 10, 15, 20",
+                        "type": "integer",
+                        "example": 10
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateEmployeesRequest": {
+                "title": "Update Employee Request",
+                "description": "Update Employee Request body data",
+                "required": [
+                    "mobile"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Employee's name",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "family": {
+                        "description": "Employee's family name",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "mobile": {
+                        "description": "Employee's mobile number",
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "password": {
+                        "description": "Employee's password",
+                        "type": "string",
+                        "example": "newPassword"
+                    },
+                    "nationalCode": {
+                        "description": "Employee's national code",
+                        "type": "string",
+                        "example": "0012345678"
+                    },
+                    "address": {
+                        "description": "Employee's address",
+                        "type": "string",
+                        "example": "123 Main St, Anytown, USA"
+                    },
+                    "postCode": {
+                        "description": "Employee's postal code",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "phone": {
+                        "description": "Employee's phone number",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "role": {
+                        "description": "Employee's role",
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "status": {
+                        "description": "Employee's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
+                        "type": "integer",
+                        "example": "0"
                     }
                 },
                 "type": "object"
@@ -1380,6 +4106,40 @@
                     "password": {
                         "type": "string",
                         "example": "MyNewPassword123"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreCoinWalletTransactionRequest": {
+                "title": "StoreCoinWalletTransactionRequest",
+                "description": "Store Coin Wallet Transaction Request body data",
+                "required": [
+                    "action",
+                    "coins",
+                    "reason_code"
+                ],
+                "properties": {
+                    "action": {
+                        "description": "Action to perform on the coin wallet balance",
+                        "type": "string",
+                        "enum": [
+                            "increase",
+                            "decrease"
+                        ]
+                    },
+                    "coins": {
+                        "description": "Amount of coins to perform the action on",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason_code": {
+                        "description": "Reason code for the coin wallet transaction",
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "description": {
+                        "description": "Description of the coin wallet transaction",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -1636,6 +4396,55 @@
                 },
                 "type": "object"
             },
+            "BuyCoinRequest": {
+                "title": "BuyCoinRequest",
+                "description": "The amount of coin to buy",
+                "required": [
+                    "action"
+                ],
+                "properties": {
+                    "amount": {
+                        "description": "The amount to add or subtract from the wallet balance",
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreWalletTransactionRequest": {
+                "title": "StoreWalletTransactionRequest",
+                "description": "Store wallet transaction request body data",
+                "required": [
+                    "action",
+                    "amount",
+                    "reason_code"
+                ],
+                "properties": {
+                    "action": {
+                        "description": "The action to perform on the wallet balance",
+                        "type": "string",
+                        "enum": [
+                            "increase",
+                            "decrease"
+                        ]
+                    },
+                    "amount": {
+                        "description": "The amount to add or subtract from the wallet balance",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason_code": {
+                        "description": "The reason code for the wallet transaction",
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "description": {
+                        "description": "An optional description for the wallet transaction",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "CoinWallet": {
                 "title": "CoinWallet",
                 "description": "A Coin Wallet object",
@@ -1778,7 +4587,7 @@
                         "type": "string"
                     },
                     "userType": {
-                        "description": "The user's type (0 => seller or 1 => delivery)",
+                        "description": "The user's type (0 => customer or 2 => admin)",
                         "type": "string"
                     },
                     "created_at": {

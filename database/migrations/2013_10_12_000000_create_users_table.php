@@ -18,17 +18,18 @@ return new class extends Migration
             $table->string('mobile', 11)->unique();
             $table->string('nationalCode')->nullable();
             $table->string('nationalPhoto')->nullable();
-            $table->integer('status')->default("0")->unsigned();
+            $table->integer('status')->default("0");
             $table->integer('unValidCodeCount')->unsigned()->default("1");
             $table->string('address')->nullable();
             $table->string('postCode')->nullable();
             $table->string('phone')->nullable();
-            $table->string('userType')->nullable();
+            $table->string('userType')->nullable()->default(0);
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

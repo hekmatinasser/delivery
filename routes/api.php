@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\CoinWalletController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
@@ -7,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\API\WalletController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -26,6 +29,53 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('v1/user')->controller(UserController::class)->group(function () {
         Route::get('', 'profile');
         Route::post('', 'update');
+
+
+        Route::prefix('wallet')->as('wallet::')->group(function () {
+            Route::get('', [WalletController::class, 'show'])->name('show');
+            Route::post('/transaction', [WalletController::class, 'storeTransaction'])->name('store-transaction');
+            Route::post('/buy-coin', [WalletController::class, 'buyCoin'])->name('buy-coin');
+            Route::post('/increase/online', [WalletController::class, 'increaseWalletOnline'])->name('increase-online');
+
+
+            Route::get('/reasons', [WalletController::class, 'getReasons'])->name('reasons');
+        });
+
+
+        Route::prefix('coin-wallet')->as('coin-wallet::')->group(function () {
+            Route::get('', [CoinWalletController::class, 'show'])->name('show');
+            Route::post('/transaction', [CoinWalletController::class, 'storeTransaction'])->name('store-transaction');
+            Route::post('/travel-transaction', [CoinWalletController::class, 'storeTravelTransaction'])->name('store-travel-transaction');
+            Route::post('/buy-coin/online', [CoinWalletController::class, 'buyCoinOnline'])->name('buy-coin-online');
+
+
+            Route::get('/reasons', [CoinWalletController::class, 'getReasons'])->name('reasons');
+        });
+    });
+
+    Route::prefix('v1/admin')->controller(AdminController::class)->group(function () {
+        Route::prefix('employee')->group(function () {
+            Route::post('', 'createEmployee')->middleware(['ability:user-modify']);
+            Route::get('', 'getEmployees')->middleware(['ability:user-modify']);
+            Route::get('{employeeId}', 'getEmployee')->middleware(['ability:user-modify']);
+            Route::put('{employee_id}', 'updateEmployee')->middleware(['ability:user-modify']);
+            Route::delete('{employee_id}', 'deleteEmployee')->middleware(['ability:user-modify']);
+        });
+        Route::prefix('store')->group(function () {
+            Route::post('', 'createStore')->middleware(['ability:user-modify']);
+            Route::get('', 'getStores')->middleware(['ability:user-modify']);
+            Route::get('{storeId}', 'getStore')->middleware(['ability:user-modify']);
+            Route::post('{storeId}/update', 'updateStore')->middleware(['ability:user-modify']);
+            Route::delete('{storeId}', 'deleteStore')->middleware(['ability:user-modify']);
+        });
+        Route::prefix('vehicle')->group(function () {
+            Route::post('', 'createVehicle')->middleware(['ability:user-modify']);
+            Route::get('', 'getVehicles')->middleware(['ability:user-modify']);
+            Route::get('{vehicle_id}', 'getVehicle')->middleware(['ability:user-modify']);
+            Route::post('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
+            Route::delete('{vehicle_id}', 'deleteVehicle')->middleware(['ability:user-modify']);
+        });
+        Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
 
@@ -54,23 +104,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
         Route::post('store', 'store');
-    });
-
-
-    // Route::resource('products', ProductController::class);
-
-    Route::prefix('wallet')->as('wallet::')->group(function () {
-        Route::get('/show', [\App\Http\Controllers\API\WalletController::class, 'show'])->name('show');
-        Route::post('/transaction', [\App\Http\Controllers\API\WalletController::class, 'storeTransaction'])->name('store-transaction');
-        Route::post('/buy-coin', [\App\Http\Controllers\API\WalletController::class, 'buyCoin'])->name('buy-coin');
-        Route::post('/increase/online', [\App\Http\Controllers\API\WalletController::class, 'increaseWalletOnline'])->name('increase-online');
-    });
-
-    Route::prefix('coin-wallet')->as('coin-wallet::')->group(function () {
-        Route::get('/show', [\App\Http\Controllers\API\CoinWalletController::class, 'show'])->name('show');
-        Route::post('/transaction', [\App\Http\Controllers\API\CoinWalletController::class, 'storeTransaction'])->name('store-transaction');
-        Route::post('/travel-transaction', [\App\Http\Controllers\API\CoinWalletController::class, 'storeTravelTransaction'])->name('store-travel-transaction');
-        Route::post('/buy-coin/online', [\App\Http\Controllers\API\CoinWalletController::class, 'buyCoinOnline'])->name('buy-coin-online');
     });
 
     Route::get('/images/download/{image_path}', function ($image_path) {
