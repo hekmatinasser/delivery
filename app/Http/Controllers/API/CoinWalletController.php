@@ -174,7 +174,7 @@ class CoinWalletController extends BaseController
      * @param Request $request
      * @return Response
      *
-       * @OA\Post(
+     * @OA\Post(
      *     path="/api/v1/user/coin-wallet/travel-transaction",
      *     summary="Store Travel Transaction",
      *     tags={"Coin Wallet"},
@@ -308,6 +308,54 @@ class CoinWalletController extends BaseController
      * @param Request $request
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+
+     * @OA\Post(
+     *     path="/api/v1/user/coin-wallet/buy-coin/online",
+     *     tags={"Coin Wallet"},
+     *     security={ {"sanctum": {} }},
+     *     summary="Buy Coin Online",
+     *     description="Buy coins online using available payment gateways",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Buy Coin Request body data",
+     *         @OA\JsonContent(
+     *             required={"gateway", "coins"},
+     *             @OA\Property(
+     *                 property="gateway",
+     *                 description="Payment gateway name",
+     *                 type="string",
+     *                 enum={"zarinpal", "mellat"}
+     *             ),
+     *             @OA\Property(
+     *                 property="coins",
+     *                 description="Number of coins to buy",
+     *                 type="integer",
+     *                 example=10
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/SuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     )
+     * )
      */
     public function verifyBuyCoinPayment(Request $request)
     {

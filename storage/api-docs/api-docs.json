@@ -2214,6 +2214,93 @@
                 ]
             }
         },
+        "/api/v1/user/coin-wallet/buy-coin/online": {
+            "post": {
+                "tags": [
+                    "Coin Wallet"
+                ],
+                "summary": "Buy Coin Online",
+                "description": "Buy coins online using available payment gateways",
+                "operationId": "f3ea3bac2d577f1c022aed4a9339cdd3",
+                "requestBody": {
+                    "description": "Buy Coin Request body data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gateway",
+                                    "coins"
+                                ],
+                                "properties": {
+                                    "gateway": {
+                                        "description": "Payment gateway name",
+                                        "type": "string",
+                                        "enum": [
+                                            "zarinpal",
+                                            "mellat"
+                                        ]
+                                    },
+                                    "coins": {
+                                        "description": "Number of coins to buy",
+                                        "type": "integer",
+                                        "example": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [
