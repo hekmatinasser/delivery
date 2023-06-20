@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\API;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\VehicleConstraint;
 use App\Http\Controllers\Controller;
 
-class VehicleConstraintContoller extends Controller
+class VehicleConstraintController extends Controller
 {
     public function applyVehicleConstraint(Request $request){
 

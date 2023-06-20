@@ -3,21 +3,21 @@
 use App\Http\Controllers\API\CoinWalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\API\TripController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
-use App\Http\Controllers\Api\ActiveTripController;
+use App\Http\Controllers\API\ActiveTripController;
 use App\Http\Controllers\Api\ConstraintController;
 use App\Http\Controllers\Api\CoinSettingController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\WalletController;
-use App\Http\Controllers\Api\NeighborhoodController;
-use App\Http\Controllers\Api\TripFeedBackController;
-use App\Http\Controllers\Api\InterNeighborhoodFareController;
-use App\Http\Controllers\Api\VehicleConstraintContoller;
+use App\Http\Controllers\API\NeighborhoodController;
+use App\Http\Controllers\API\TripFeedBackController;
+use App\Http\Controllers\API\InterNeighborhoodFareController;
+use App\Http\Controllers\API\VehicleConstraintController;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -166,4 +166,4 @@ Route::post('/Constraint/changeStatus',[ConstraintController::class,'changeStatu
 
 
 //vehicle constrait routes
-Route::post('/applyVehicleConstraint',[VehicleConstraintContoller::class,'applyVehicleConstraint']);
+Route::post('/applyVehicleConstraint',[VehicleConstraintController::class,'applyVehicleConstraint']);

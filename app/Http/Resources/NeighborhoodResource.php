@@ -22,7 +22,7 @@ class NeighborhoodResource extends JsonResource
             'code'=>$this->code,
             'status'=>$this->status,
             'created_at'=>Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
-            'updated_at'=>Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),,
+            'updated_at'=>Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
         ];
     }
 }
