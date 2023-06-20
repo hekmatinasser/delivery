@@ -10,8 +10,8 @@ use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ActiveTripController;
-use App\Http\Controllers\Api\ConstraintController;
-use App\Http\Controllers\Api\CoinSettingController;
+use App\Http\Controllers\API\ConstraintController;
+use App\Http\Controllers\API\CoinSettingController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\WalletController;
 use App\Http\Controllers\API\NeighborhoodController;
@@ -83,6 +83,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
             Route::delete('{vehicle_id}', 'deleteVehicle')->middleware(['ability:user-modify']);
         });
+
+        Route::prefix('neighborhood')->controller(NeighborhoodController::class)->group(function () {
+            Route::post('', 'store')->middleware(['ability:neighborhood-modify']);
+            Route::put('{neighborhood_id}', 'update')->middleware(['ability:neighborhood-modify']);
+            Route::delete('{neighborhood_id}', 'destroy')->middleware(['ability:neighborhood-modify']);
+        });
+
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
@@ -107,8 +114,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('categories', 'categories');
     });
 
-    //Neighborhood Resource routes (middlewares Defined in NeighborhoodController's constractor)
-    Route::apiResource('neighborhood', NeighborhoodController::class);
+    Route::prefix('v1/neighborhood')->controller(NeighborhoodController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('{neighborhood_id}', 'show')->name('show');
+    });
 
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
         Route::post('store', 'store');
@@ -116,7 +125,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/images/download/{image_path}', function ($image_path) {
         $image = public_path() . '/' . str_replace('&&', '/', $image_path);
-
         return \Illuminate\Support\Facades\Response::download($image);
     });
 });

@@ -2301,6 +2301,304 @@
                 ]
             }
         },
+        "/api/v1/neighborhood": {
+            "get": {
+                "tags": [
+                    "Neighborhood"
+                ],
+                "summary": "Get a list of neighborhoods",
+                "operationId": "95eaeb460707e09b8fecaab7c3524ea3",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of stores to return per page (default 10).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return (default 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/neighborhood": {
+            "post": {
+                "tags": [
+                    "Neighborhood"
+                ],
+                "summary": "Create a new neighborhood",
+                "operationId": "954d4cba8279559f33c3120b6b5a2d1d",
+                "requestBody": {
+                    "description": "Neighborhood object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateNeighborhoodRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Neighborhood created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NeighborhoodResource"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/neighborhood/{neighborhood_id}": {
+            "put": {
+                "tags": [
+                    "Neighborhood"
+                ],
+                "summary": "Update a neighborhood",
+                "operationId": "3b8bbd4488593b0c228b077f5b6d2125",
+                "parameters": [
+                    {
+                        "name": "neighborhood_id",
+                        "in": "path",
+                        "description": "ID of the neighborhood to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Neighborhood object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateNeighborhoodRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Neighborhood created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NeighborhoodResource"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Neighborhood not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Neighborhood"
+                ],
+                "summary": "Delete a neighborhood",
+                "operationId": "b90f9217afe5a2d981e1f797a2134f7e",
+                "parameters": [
+                    {
+                        "name": "neighborhood_id",
+                        "in": "path",
+                        "description": "ID of the neighborhood to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Neighborhood created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NeighborhoodResource"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Neighborhood not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "tags": [
@@ -3918,6 +4216,37 @@
                 },
                 "type": "object"
             },
+            "CreateNeighborhoodRequest": {
+                "required": [
+                    "name",
+                    "code",
+                    "status"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 25,
+                        "minLength": 5,
+                        "example": "Example Name"
+                    },
+                    "code": {
+                        "type": "string",
+                        "maxLength": 25,
+                        "minLength": 5,
+                        "example": "Example Code"
+                    },
+                    "status": {
+                        "description": "0 => inactive, 1=> active",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
             "GetEmployeesRequest": {
                 "title": "Get Employees Request",
                 "description": "Request body data for retrieving a paginated list of employees",
@@ -3991,6 +4320,36 @@
                         "description": "Employee's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
                         "type": "integer",
                         "example": "0"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateNeighborhoodRequest": {
+                "required": [
+                    "name",
+                    "code",
+                    "status"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 25,
+                        "minLength": 5,
+                        "example": "Example Name"
+                    },
+                    "code": {
+                        "type": "string",
+                        "maxLength": 25,
+                        "minLength": 5,
+                        "example": "Example Code"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": 1
                     }
                 },
                 "type": "object"
@@ -4440,6 +4799,41 @@
                     },
                     "description": {
                         "description": "An optional description for the wallet transaction",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "NeighborhoodResource": {
+                "title": "NeighborhoodResource",
+                "description": "Neighborhood resource",
+                "properties": {
+                    "user": {
+                        "description": "The name of the user who created the neighborhood",
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "description": "The email of the user who created the neighborhood",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "The name of the neighborhood",
+                        "type": "string"
+                    },
+                    "code": {
+                        "description": "The code of the neighborhood",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "The status of the neighborhood",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "description": "The date and time when the neighborhood was created",
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "description": "The date and time when the neighborhood was last updated",
                         "type": "string"
                     }
                 },

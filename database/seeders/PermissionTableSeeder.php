@@ -33,6 +33,12 @@ class PermissionTableSeeder extends Seeder
                 'display_name' => 'مدیریت پیک ها',
                 'description' => 'مدیریت پیک ها'
             ],
+            [
+                'id' => '4',
+                'name' => 'neighborhood-modify',
+                'display_name' => 'مدیریت محله ها',
+                'description' => 'مدیریت محله ها'
+            ],
         ];
 
 
@@ -44,5 +50,6 @@ class PermissionTableSeeder extends Seeder
         PermissionRole::create(['role_id' => 1, 'permission_id' => 1]);
         PermissionRole::create(['role_id' => 1, 'permission_id' => 2]);
         PermissionRole::create(['role_id' => 1, 'permission_id' => 3]);
+        PermissionRole::create(['role_id' => 1, 'permission_id' => 4]);
     }
 }
