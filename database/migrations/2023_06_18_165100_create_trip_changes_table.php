@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trip_changes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('trip_id')->constrained();
-            $table->foreignId('user_id')->constrained();
+            $table->increments('id');
+            $table->unsignedInteger('trip_id');
+            $table->foreign('trip_id')->references('id')->on('trips');
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->bigInteger('trip_code');
             $table->text('description')->nullable();
             $table->text('changes')->nullable();

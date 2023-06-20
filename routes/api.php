@@ -107,6 +107,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('categories', 'categories');
     });
 
+    //Neighborhood Resource routes (middlewares Defined in NeighborhoodController's constractor)
+    Route::apiResource('neighborhood', NeighborhoodController::class);
+
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
         Route::post('store', 'store');
     });
@@ -132,9 +135,6 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 Route::any('/wallet/increase/payment/verify', [WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
 
-//Neighborhood Resource routes (middlewares Defined in NeighborhoodController's constractor)
-Route::apiResource('neighborhood', NeighborhoodController::class);
-
 //Inter Neighborhood Fare routes
 Route::post('/calculatingInterNeighborhoodFare', [InterNeighborhoodFareController::class, 'calculatingInterNeighborhoodFare'])->middleware('auth:sanctum');
 Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}', [InterNeighborhoodFareController::class, 'editInterNeighborhoodFare'])->middleware('auth:sanctum');
@@ -150,20 +150,20 @@ Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges'])
 
 
 //Active Trips routes
-Route::get('/active/trips',[ActiveTripController::class,'index']);
-Route::post('/activeTrip/updateOrCreate',[ActiveTripController::class,'updateOrCreate']);
+Route::get('/active/trips', [ActiveTripController::class, 'index']);
+Route::post('/activeTrip/updateOrCreate', [ActiveTripController::class, 'updateOrCreate']);
 
 
 //TripFeedBack Routes
-Route::post('/getTrip/feedbacks/',[TripFeedBackController::class,'index']);
-Route::post('/trip/feedback/updateOrCreate',[TripFeedBackController::class,'updateOrCreate'])->middleware('auth:sanctum');
+Route::post('/getTrip/feedbacks/', [TripFeedBackController::class, 'index']);
+Route::post('/trip/feedback/updateOrCreate', [TripFeedBackController::class, 'updateOrCreate'])->middleware('auth:sanctum');
 
 
 //Constraint Routes
-Route::get('/getActiveConstraints',[ConstraintController::class,'getActiveConstraints'])->middleware('auth:sanctum');
-Route::post('/applyConstraint',[ConstraintController::class,'applyConstraint'])->middleware('auth:sanctum');
-Route::post('/Constraint/changeStatus',[ConstraintController::class,'changeStatus'])->middleware('auth:sanctum');
+Route::get('/getActiveConstraints', [ConstraintController::class, 'getActiveConstraints'])->middleware('auth:sanctum');
+Route::post('/applyConstraint', [ConstraintController::class, 'applyConstraint'])->middleware('auth:sanctum');
+Route::post('/Constraint/changeStatus', [ConstraintController::class, 'changeStatus'])->middleware('auth:sanctum');
 
 
 //vehicle constrait routes
-Route::post('/applyVehicleConstraint',[VehicleConstraintController::class,'applyVehicleConstraint']);
+Route::post('/applyVehicleConstraint', [VehicleConstraintController::class, 'applyVehicleConstraint']);

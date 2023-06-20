@@ -7,21 +7,15 @@ use App\Http\Resources\NeighborhoodResource;
 use App\Models\Neighborhood;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 
-class NeighborhoodController extends Controller
+class NeighborhoodController extends BaseController
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum', ['except' => [
-            'index', 'show',
-        ]]);
-    }
 
     public function index()
     {
         $neighborhoods = NeighborhoodResource::collection(Neighborhood::latest()->get());
-        return response()->json(['neighborhoods', $neighborhoods], 200);
+        return $this->sendResponse(['neighborhoods' => $neighborhoods], Lang::get('http-statuses.200'));
     }
 
     public function store(Request $request)
@@ -35,13 +29,14 @@ class NeighborhoodController extends Controller
         ]);
 
         return response()->json([
-            'status'=>true,
+            'status' => true,
             'Success Message' => 'Neighborhood Created Successfully!'
         ], 200);
     }
 
     public function show(Neighborhood $neighborhood)
-    {   $neighborhood = new NeighborhoodResource($neighborhood);
+    {
+        $neighborhood = new NeighborhoodResource($neighborhood);
         return response()->json(['neighborhood' => $neighborhood], 200);
     }
 
@@ -61,6 +56,5 @@ class NeighborhoodController extends Controller
     {
         $neighborhood->delete();
         return response()->json(['Success Message' => 'Neighborhood Deleted Successfully!'], 200);
-
     }
 }

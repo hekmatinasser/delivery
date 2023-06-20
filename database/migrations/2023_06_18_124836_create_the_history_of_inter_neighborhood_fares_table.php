@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('the_history_of_inter_neighborhood_fares', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('INF_id')->comment('Inter Neighborhood Fare id')->constrained();
+            $table->increments('id');
+            $table->unsignedInteger('INF_id');
+            $table->foreign('INF_id')->references('id')->on('inter_neighborhood_fares');
             $table->dateTime('fare_date');
-            $table->foreignId('user_id')->constrained();
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->string('origin');
             $table->string('destination');
             $table->decimal('fare');

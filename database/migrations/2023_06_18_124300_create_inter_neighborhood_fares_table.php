@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inter_neighborhood_fares', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->string('origin');
             $table->string('destination');
             $table->string('original')->index();

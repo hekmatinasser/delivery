@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
 
             \App\Models\CoinWallet::factory()->create([
                 'user_id' => $user->id,
-                'amount' => 1
+                'coins' => 1
             ]);
         }
 

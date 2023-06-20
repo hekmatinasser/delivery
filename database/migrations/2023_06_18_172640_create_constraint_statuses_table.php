@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('constraint_statuses', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->foreignId('constraint_id');
             $table->string('constraint_code');
-            $table->foreignId('user_id')->nullable()->constrained();
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->datetime('constraint_registration_time');
             $table->text('changes')->nullable();
             $table->text('description')->nullable();

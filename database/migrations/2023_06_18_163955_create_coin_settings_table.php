@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('coin_settings', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->decimal('shop_coin_fee')->nullable();
             $table->decimal('vehicle_coin_fee')->nullable();
             $table->decimal('shop_coin_rial_fee')->nullable();

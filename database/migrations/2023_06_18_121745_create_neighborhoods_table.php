@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('neighborhoods', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->string('name')->unique();
             $table->string('code')->unique();
             $table->boolean('status')->default(0);
