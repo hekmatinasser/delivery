@@ -88,6 +88,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('', 'store')->middleware(['ability:neighborhood-modify']);
             Route::put('{neighborhood_id}', 'update')->middleware(['ability:neighborhood-modify']);
             Route::delete('{neighborhood_id}', 'destroy')->middleware(['ability:neighborhood-modify']);
+            //Inter Neighborhood Fare routes
+            Route::prefix('fare')->controller(InterNeighborhoodFareController::class)->group(function () {
+                Route::post('', [InterNeighborhoodFareController::class, 'calculatingInterNeighborhoodFare']);
+                Route::put('/edit/{interNeighborhoodFare}', [InterNeighborhoodFareController::class, 'editInterNeighborhoodFare']);
+            });
         });
 
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
@@ -117,6 +122,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('v1/neighborhood')->controller(NeighborhoodController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::get('{neighborhood_id}', 'show')->name('show');
+
+        //Inter Neighborhood Fare routes
+        Route::prefix('/fare')->controller(InterNeighborhoodFareController::class)->group(function () {
+            Route::get('calculator', [InterNeighborhoodFareController::class, 'InterNeighborhoodFare']);
+        });
     });
 
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
@@ -143,10 +153,6 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 Route::any('/wallet/increase/payment/verify', [WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
 
-//Inter Neighborhood Fare routes
-Route::post('/calculatingInterNeighborhoodFare', [InterNeighborhoodFareController::class, 'calculatingInterNeighborhoodFare'])->middleware('auth:sanctum');
-Route::put('/edit/interNeighborhoodFare/{interNeighborhoodFare}', [InterNeighborhoodFareController::class, 'editInterNeighborhoodFare'])->middleware('auth:sanctum');
-Route::get('/getAll/interNeighborhoodFare', [InterNeighborhoodFareController::class, 'InterNeighborhoodFare']);
 
 //Coin Setting Routes
 Route::post('/getCoinSetting', [CoinSettingController::class, 'getCoinSetting']);

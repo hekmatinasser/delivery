@@ -18,9 +18,11 @@ return new class extends Migration
             $table->dateTime('fare_date');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('origin');
-            $table->string('destination');
-            $table->decimal('fare');
+            $table->unsignedInteger('origin');
+            $table->foreign('origin')->references('id')->on('neighborhoods');
+            $table->unsignedInteger('destination');
+            $table->foreign('destination')->references('id')->on('neighborhoods');
+            $table->bigInteger('fare');
             $table->text('description')->nullable();
             $table->timestamps();
         });

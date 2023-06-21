@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\CoinWalletTransactionReason;
+use App\Models\Neighborhood;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -39,6 +40,26 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $user->id,
                 'coins' => 1
             ]);
+
+            $neighborhoods = [
+                [
+                    'name' => 'محله اول',
+                    'user_id' => 1,
+                    'code' => 'code__1',
+                    'status' => 1
+                ],
+                [
+                    'name' => 'محله دوم',
+                    'user_id' => 1,
+                    'code' => 'code__2',
+                    'status' => 1
+                ],
+            ];
+
+
+            foreach ($neighborhoods as $key => $value) {
+                Neighborhood::create($value);
+            }
         }
 
         $this->call([

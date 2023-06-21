@@ -15,11 +15,13 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('origin');
-            $table->string('destination');
+            $table->unsignedInteger('origin');
+            $table->foreign('origin')->references('id')->on('neighborhoods');
+            $table->unsignedInteger('destination');
+            $table->foreign('destination')->references('id')->on('neighborhoods');
             $table->string('original')->index();
             $table->string('reverse')->index();
-            $table->decimal('fare', $precision = 10, $scale = 2);
+            $table->bigInteger('fare');
             $table->timestamps();
         });
     }
