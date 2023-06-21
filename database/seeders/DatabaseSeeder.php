@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\CoinSetting;
 use App\Models\CoinWalletTransactionReason;
 use App\Models\Neighborhood;
 use Illuminate\Database\Seeder;
@@ -61,6 +63,14 @@ class DatabaseSeeder extends Seeder
                 Neighborhood::create($value);
             }
         }
+
+        CoinSetting::create([
+            'id' => '1',
+            'shop_coin_fee' => 1,
+            'vehicle_coin_fee' => 1,
+            'shop_coin_rial_fee' => 1,
+            'motor_coin_rial_fee' => 1,
+        ]);
 
         $this->call([
             RoleTableSeeder::class,

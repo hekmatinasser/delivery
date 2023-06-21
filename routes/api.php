@@ -95,6 +95,10 @@ Route::middleware('auth:sanctum')->group(function () {
             });
         });
 
+        Route::prefix('coin-setting')->controller(CoinSettingController::class)->group(function () {
+            Route::put('/', [CoinSettingController::class, 'saveCoinSetting']);
+        });
+
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
@@ -129,6 +133,10 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
+    Route::prefix('v1/coin-setting')->controller(CoinSettingController::class)->group(function () {
+        Route::get('/', [CoinSettingController::class, 'getCoinSetting']);
+    });
+
     Route::prefix('transaction')->controller(TransactionController::class)->group(function () {
         Route::post('store', 'store');
     });
@@ -153,10 +161,6 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 Route::any('/wallet/increase/payment/verify', [WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
 
-
-//Coin Setting Routes
-Route::post('/getCoinSetting', [CoinSettingController::class, 'getCoinSetting']);
-Route::post('/saveCoinSetting', [CoinSettingController::class, 'saveCoinSetting'])->middleware('auth:sanctum');
 
 //trip Routes
 Route::post('/trip/updateOrCreat', [TripController::class, 'tripUpdateOrCreate']);

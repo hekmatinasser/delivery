@@ -1995,6 +1995,110 @@
                 ]
             }
         },
+        "/api/v1/coin-setting": {
+            "get": {
+                "tags": [
+                    "Coin Setting"
+                ],
+                "summary": "Get the coin setting",
+                "description": "Returns the current coin setting",
+                "operationId": "22c02a3889b2569c81c6107d8d20b6f6",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/coin-setting": {
+            "put": {
+                "tags": [
+                    "Coin Setting"
+                ],
+                "summary": "Save the coin setting",
+                "description": "Updates or creates the coin setting",
+                "operationId": "1018940d7fd571f213e1a2924bf09ba0",
+                "requestBody": {
+                    "description": "The new coin setting",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCoinSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "message": "The coin setting has been saved successfully"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user/coin-wallet/reasons": {
             "get": {
                 "tags": [
@@ -4510,6 +4614,47 @@
                         "description": "The fare for the neighborhood IRT",
                         "type": "integer",
                         "example": 12000
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateCoinSettingRequest": {
+                "required": [
+                    "id",
+                    "shop_coin_fee",
+                    "vehicle_coin_fee",
+                    "shop_coin_rial_fee",
+                    "motor_coin_rial_fee"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The setting coin id",
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    "shop_coin_fee": {
+                        "description": "The new fee for shops in coins",
+                        "type": "number",
+                        "format": "integer",
+                        "minimum": "0"
+                    },
+                    "vehicle_coin_fee": {
+                        "description": "The new fee for vehicles in coins",
+                        "type": "number",
+                        "format": "integer",
+                        "minimum": "0"
+                    },
+                    "shop_coin_rial_fee": {
+                        "description": "The new fee for shops in rials",
+                        "type": "number",
+                        "format": "integer",
+                        "minimum": "0"
+                    },
+                    "motor_coin_rial_fee": {
+                        "description": "The new fee for motorbikes in rials",
+                        "type": "number",
+                        "format": "integer",
+                        "minimum": "0"
                     }
                 },
                 "type": "object"
