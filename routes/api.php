@@ -99,6 +99,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/', [CoinSettingController::class, 'saveCoinSetting']);
         });
 
+        Route::prefix('trip')->controller(TripController::class)->middleware(['ability:trip-modify'])->group(function () {
+            Route::post('/', [TripController::class, 'create']);
+            Route::put('/{tripId}', [TripController::class, 'update']);
+            Route::get('/', [TripController::class, 'getAll']);
+            Route::get('/{code}', [TripController::class, 'get']);
+        });
+
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
     });
 
@@ -110,6 +117,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('my', 'my');
 
         Route::get('types', 'types');
+
+
+        Route::prefix('trip')->controller(TripController::class)->group(function () {
+            Route::get('/', [TripController::class, 'index']);
+            Route::get('/my', [TripController::class, 'vehicleTrips']);
+            Route::get('/{code}', [TripController::class, 'details']);
+            Route::post('/{code}/accept', [TripController::class, 'acceptTripByVehicle']);
+            Route::post('/{code}/waiting', [TripController::class, 'waitingToReceiveThePackageByVehicle']);
+            Route::post('/{code}/on-the-way', [TripController::class, 'onTheWayTripByVehicle']);
+            Route::post('/{code}/deliver', [TripController::class, 'deliverTripByVehicle']);
+            Route::post('/{code}/cancel', [TripController::class, 'cancelTripByVehicle']);
+        });
     });
 
     Route::prefix('v1/store')->controller(StoreController::class)->group(function () {
@@ -121,6 +140,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('areaTypes', 'areaTypes');
         Route::get('categories', 'categories');
+
+        Route::prefix('trip')->controller(TripController::class)->group(function () {
+            Route::post('/', [TripController::class, 'createTripWithStore']);
+            Route::put('/{tripId}', [TripController::class, 'update']);
+            Route::get('/', [TripController::class, 'all']);
+            Route::get('/{tripId}', [TripController::class, 'get']);
+        });
     });
 
     Route::prefix('v1/neighborhood')->controller(NeighborhoodController::class)->group(function () {

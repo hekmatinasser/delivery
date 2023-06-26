@@ -45,6 +45,12 @@ class PermissionTableSeeder extends Seeder
                 'display_name' => 'مدیریت تنظیمات سکه ها',
                 'description' => 'مدیریت تنظیمات سکه ها'
             ],
+            [
+                'id' => '6',
+                'name' => 'trip-modify',
+                'display_name' => 'مدیریت سفر ها',
+                'description' => 'مدیریت سفر ها'
+            ],
         ];
 
 
@@ -58,5 +64,6 @@ class PermissionTableSeeder extends Seeder
         PermissionRole::create(['role_id' => 1, 'permission_id' => 3]);
         PermissionRole::create(['role_id' => 1, 'permission_id' => 4]);
         PermissionRole::create(['role_id' => 1, 'permission_id' => 5]);
+        PermissionRole::create(['role_id' => 1, 'permission_id' => 6]);
     }
 }

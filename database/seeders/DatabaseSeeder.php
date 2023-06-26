@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use App\Models\CoinSetting;
 use App\Models\CoinWalletTransactionReason;
 use App\Models\Neighborhood;
+use App\Models\Store;
+use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -79,5 +81,32 @@ class DatabaseSeeder extends Seeder
             CoinWalletTransactionReasonSeeder::class,
             StoreCategorySeeder::class
         ]);
+
+
+
+        $stores = [
+            [
+                'user_id' => 1,
+                'category_id' => 1,
+                'name' => 'store one'
+            ],
+        ];
+        foreach ($stores as $key => $value) {
+            Store::create($value);
+        }
+
+        $vehicles= [
+            [
+                'user_id' => 1,
+                'type' => 0,
+                'brand' => 'honda',
+                'pelak' => '123456',
+                'color' => 'red',
+                'model' => 'cg125'
+            ],
+        ];
+        foreach ($vehicles as $key => $value) {
+            Vehicle::create($value);
+        }
     }
 }

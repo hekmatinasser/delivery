@@ -110,4 +110,10 @@ class Vehicle extends Model
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::VEHICLE, LogActionsEnum::EDIT, json_encode($changes));
         }
     }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->select(['id','name','family']);
+    }
 }

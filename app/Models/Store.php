@@ -149,4 +149,10 @@ class Store extends Model
     {
         return $this->belongsTo(StoreCategory::class, 'category_id')->select(['id', 'title']);
     }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->select(['id','name','family']);
+    }
 }

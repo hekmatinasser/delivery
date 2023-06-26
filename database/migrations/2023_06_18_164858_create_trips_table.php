@@ -14,15 +14,22 @@ return new class extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->increments('id');
             $table->string('trip_code')->unique();
-            $table->string('shop_code');
-            $table->string('vehicle_code')->nullable();
-            $table->string('destination');
+            $table->unsignedInteger('store_id');
+            $table->foreign('store_id')->references('id')->on('store');
+            $table->unsignedInteger('vehicle_id')->nullable();
+            $table->foreign('vehicle_id')->references('id')->on('vehicle');
+            $table->unsignedInteger('origin');
+            $table->foreign('origin')->references('id')->on('neighborhoods');
+            $table->unsignedInteger('destination');
+            $table->foreign('destination')->references('id')->on('neighborhoods');
             $table->dateTime('request_registration_time');
             $table->dateTime('shipment_prepare_time');
-            $table->decimal('trip_rial_fare');
+            $table->dateTime('arrive_time')->nullable();
+            $table->dateTime('deliver_time')->nullable();
+            $table->decimal('trip_rial_fare')->nullable();
             $table->integer('status');
-            $table->string('customer_name');
-            $table->string('customer_phone');
+            $table->string('customer_name')->nullable();
+            $table->string('customer_phone')->nullable();
             $table->text('description')->nullable();
             $table->text('manager_description')->nullable();
             $table->timestamps();
