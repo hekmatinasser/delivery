@@ -41,6 +41,16 @@ class NeighborhoodController extends BaseController
      *             default=1
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         name="origin_neighborhood_id",
+     *         in="query",
+     *         description="Calculate fee from origin neighborhood (default 1).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=1
+     *         )
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Successful operation"
@@ -68,9 +78,15 @@ class NeighborhoodController extends BaseController
 
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $origin = $request->input('origin_neighborhood_id', null);
         $res = Neighborhood::with(['user' => function ($query) {
             $query->select('id', 'name', 'family');
-        }])->paginate($perPage, ['*'], 'page', $page);
+        }])
+            ->with(['fee' => function ($query) use ($origin) {
+                $query->where('origin', '=', $origin);
+            }])
+            ->paginate($perPage, ['*'], 'page', $page);
+
         // $res['data'] = NeighborhoodResource::collection(($res['data']));
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
