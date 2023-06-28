@@ -106,10 +106,19 @@ class TripController extends BaseController
 
     /**
      * @OA\Put(
-     *     path="/api/v1/admin/trip",
+     *     path="/api/v1/admin/trip/{code}",
      *     summary="Update a new trip",
      *     tags={"Trip"},
      *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="path",
+     *         description="The code of the trip",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/UpdateTripRequest")
@@ -156,18 +165,17 @@ class TripController extends BaseController
      *         ),
      * ))
      */
-    public function update(UpdateTripRequest $request, $tripId)
+    public function update(UpdateTripRequest $request, $code)
     {
+        $trip = Trip::where('trip_code', '=', $code)->firstOrFail();
         $trip =
             Trip::updateOrCreate(
-                ['id' => $tripId],
+                ['id' => $trip->id],
                 [
-                    'trip_code' => $this->generateUniqueCode(),
                     'store_id' => $request->store_id,
                     'vehicle_id' => $request->vehicle_id,
                     'origin' => $request->origin_id,
                     'destination' => $request->destination_id,
-                    'request_registration_time' => Carbon::now()->format('Y-m-d H:i:s'),
                     'shipment_prepare_time' => Carbon::parse($request->shipment_prepare_time)->format('Y-m-d H:i:s'),
                     'deliver_time' => strlen($request->deliver_time) ? Carbon::parse($request->deliver_time)->format('Y-m-d H:i:s') : null,
                     'arrive_time' => strlen($request->arrive_time) ? Carbon::parse($request->arrive_time)->format('Y-m-d H:i:s') : null,

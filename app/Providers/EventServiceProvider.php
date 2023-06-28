@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Constraint;
 use App\Models\InterNeighborhoodFare;
+use App\Models\Trip;
 use App\Models\TripChange;
 use App\Models\VehicleConstraint;
 use App\Observers\ConstraintObserver;
@@ -34,9 +35,9 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         InterNeighborhoodFare::observe(InterNeighborhoodFareObserver::class);
-        TripChange::observe(TripObserver::class);
         Constraint::observe(ConstraintObserver::class);
         VehicleConstraint::observe(VehicleConstraintObserver::class);
+        Trip::observe(TripObserver::class);
     }
 
     /**

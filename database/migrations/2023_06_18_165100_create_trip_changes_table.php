@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('trip_id')->references('id')->on('trips');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->bigInteger('trip_code');
+            $table->string('trip_code');
             $table->text('description')->nullable();
             $table->text('changes')->nullable();
             $table->dateTime('status_determining_time');

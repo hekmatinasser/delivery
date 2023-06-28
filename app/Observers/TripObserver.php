@@ -17,13 +17,13 @@ class TripObserver
         TripChange::create([
             'trip_id' => $trip->id,
             'user_id' => auth()->user()->id,
-            'trip_code'=>$trip->trip_code,
+            'trip_code' => $trip->trip_code,
             'description' => "The Trip Created!",
 
-            'changes' => [
+            'changes' => json_encode([
                 'before' => Arr::except(array_diff($trip->getOriginal(), $trip->getAttributes()), 'updated_at'),
                 'after' => Arr::except($trip->getChanges(), 'updated_at'),
-            ],
+            ]),
             'status_determining_time' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
     }
@@ -36,12 +36,12 @@ class TripObserver
         TripChange::create([
             'trip_id' => $trip->id,
             'user_id' => auth()->user()->id,
-            'trip_code'=>$trip->trip_code,
+            'trip_code' => $trip->trip_code,
             'description' => "The Trip Status changed!",
-            'changes' => [
+            'changes' => json_encode([
                 'before' => Arr::except(array_diff($trip->getOriginal(), $trip->getAttributes()), 'updated_at'),
                 'after' => Arr::except($trip->getChanges(), 'updated_at'),
-            ],
+            ]),
             'status_determining_time' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
     }

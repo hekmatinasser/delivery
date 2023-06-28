@@ -101,7 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('trip')->controller(TripController::class)->middleware(['ability:trip-modify'])->group(function () {
             Route::post('/', [TripController::class, 'create']);
-            Route::put('/{tripId}', [TripController::class, 'update']);
+            Route::put('/{code}', [TripController::class, 'update']);
             Route::get('/', [TripController::class, 'getAll']);
             Route::get('/{code}', [TripController::class, 'get']);
         });
