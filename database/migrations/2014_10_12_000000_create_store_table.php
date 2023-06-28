@@ -24,11 +24,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->decimal('lat')->nullable();
             $table->decimal('lang')->nullable();
+            $table->unsignedInteger('neighborhood_id');
+            $table->foreign('neighborhood_id')->references('id')->on('neighborhoods');
             $table->timestamps();
             $table->softDeletes();
         });
-
-
     }
 
     /**

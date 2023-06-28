@@ -45,6 +45,21 @@ class DatabaseSeeder extends Seeder
                 'coins' => 1
             ]);
 
+            $userStore = \App\Models\User::factory()->create([
+                'mobile' => '09000000001',
+                'status' => '1',
+                'userType' => '1'
+            ]);
+
+            \App\Models\Wallet::factory()->create([
+                'user_id' => $userStore->id,
+                'amount' => 0
+            ]);
+
+            \App\Models\CoinWallet::factory()->create([
+                'user_id' => $user->id,
+                'coins' => 0
+            ]);
             $neighborhoods = [
                 [
                     'name' => 'محله اول',
@@ -88,6 +103,7 @@ class DatabaseSeeder extends Seeder
             [
                 'user_id' => 1,
                 'category_id' => 1,
+                'neighborhood_id' => 1,
                 'name' => 'store one'
             ],
         ];
@@ -95,7 +111,7 @@ class DatabaseSeeder extends Seeder
             Store::create($value);
         }
 
-        $vehicles= [
+        $vehicles = [
             [
                 'user_id' => 1,
                 'type' => 0,

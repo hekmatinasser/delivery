@@ -87,6 +87,7 @@ class Store extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'neighborhood_id',
         'name',
         'address',
         'postCode',
@@ -150,9 +151,13 @@ class Store extends Model
         return $this->belongsTo(StoreCategory::class, 'category_id')->select(['id', 'title']);
     }
 
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class, 'neighborhood_id')->select(['id', 'name', 'code', 'description']);
+    }
 
     public function user()
     {
-        return $this->belongsTo(User::class)->select(['id','name','family']);
+        return $this->belongsTo(User::class)->select(['id', 'name', 'family']);
     }
 }

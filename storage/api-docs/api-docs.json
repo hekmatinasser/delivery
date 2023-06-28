@@ -5887,6 +5887,7 @@
                 "description": "Store Store Request Body",
                 "required": [
                     "category_id",
+                    "neighborhood_id",
                     "areaType",
                     "name",
                     "address",
@@ -5898,6 +5899,11 @@
                 "properties": {
                     "category_id": {
                         "description": "Category ID",
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "neighborhood_id": {
+                        "description": "Neighborhood ID",
                         "type": "integer",
                         "example": "1"
                     },

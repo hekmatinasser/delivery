@@ -163,7 +163,7 @@ class User extends Authenticatable
      */
     public function store()
     {
-        return $this->hasOne(Store::class)->with(['category']);
+        return $this->hasOne(Store::class)->with(['category', 'neighborhood']);
     }
 
     /**

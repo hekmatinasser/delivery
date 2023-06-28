@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
  *     type="object",
  *     required={
  *         "category_id",
+ *         "neighborhood_id",
  *         "areaType",
  *         "name",
  *         "address",
@@ -23,6 +24,12 @@ use Illuminate\Support\Facades\Auth;
  *     @OA\Property(
  *         property="category_id",
  *         description="Category ID",
+ *         type="integer",
+ *         example="1"
+ *     ),
+ *     @OA\Property(
+ *         property="neighborhood_id",
+ *         description="Neighborhood ID",
  *         type="integer",
  *         example="1"
  *     ),
@@ -92,6 +99,7 @@ class StoreStoreRequest extends FormRequest
     {
         return [
             'category_id' => 'required|numeric|exists:store_category,id',
+            'neighborhood_id' => 'required|numeric|exists:neighborhoods,id',
             'areaType' => 'required|in:RENT,OWNERSHIP',
             'name' => 'required|max:255',
             'address' => 'required|max:255',

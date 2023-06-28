@@ -77,6 +77,8 @@ class StoreController extends BaseController
         $input = $request->all();
         $input['user_id'] = $user->id;
         $store = Store::create($input);
+        $store->load('category');
+        $store->load('neighborhood');
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::ADD, json_encode($store));
 
@@ -134,6 +136,10 @@ class StoreController extends BaseController
             $user->save();
         } else
             return $this->sendError('', 'مغازه یافت نشد', 404);
+
+
+        $store->load('category');
+        $store->load('neighborhood');
 
         return $this->sendResponse($store, ".مغازه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
     }
