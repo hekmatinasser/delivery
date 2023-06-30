@@ -24,7 +24,7 @@ class GetNeighborhoodFareRequest extends FormRequest
     {
         return [
             'origin' => 'required|integer|exists:neighborhoods,id',
-            'destination' => 'required|integer|exists:neighborhoods,id|different:origin',
+            'destination' => 'required|integer|exists:neighborhoods,id',
         ];
     }
     /**
