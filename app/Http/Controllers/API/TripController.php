@@ -21,9 +21,72 @@ use Illuminate\Support\Facades\Lang;
 
 class TripController extends BaseController
 {
-    public function tripGetChanges($trip_id)
+    /**
+     *
+     * @OA\Get(
+     *     path="/api/v1/admin/trip/{tripId}/changes",
+     *     tags={"Trip"},
+     *     security={ {"sanctum": {} }},
+     *     summary="Get a list of trips",
+     *     @OA\Parameter(
+     *         name="tripId",
+     *         in="path",
+     *         description="The Id of the trip",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="The number of trips to return per page (default 10).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="The page number to return (default 1).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             default=1
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Successful operation"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),)
+     * )
+     */
+    public function tripChanges($request, $tripId)
     {
-        $tripChanges = TripChangesResource::collection(TripChange::where('trip_id', $trip_id)->latest()->get());
+        $tripChanges = TripChangesResource::collection(TripChange::where('trip_id', $tripId)->latest()->get());
         return $tripChanges;
     }
 
@@ -1128,7 +1191,7 @@ class TripController extends BaseController
         return $this->sendResponse($trip, Lang::get('http-statuses.200'));
     }
 
-        /**
+    /**
      * @OA\Get(
      *     path="/api/v1/store/trip/my",
      *     summary="Get a list of trips with a store assigned",

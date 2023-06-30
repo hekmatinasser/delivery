@@ -104,6 +104,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{code}', [TripController::class, 'update']);
             Route::get('/', [TripController::class, 'getAll']);
             Route::get('/{code}', [TripController::class, 'get']);
+            Route::get('/{tripId}/changes', [TripController::class, 'tripChanges']);
         });
 
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
@@ -187,10 +188,6 @@ Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
 
 Route::any('/wallet/increase/payment/verify', [WalletController::class, 'verifyIncreaseWalletPayment'])->name('wallet::increase.verify-payment');
 Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class, 'verifyBuyCoinPayment'])->name('coin-wallet::buy-coin.verify-payment');
-
-
-//trip Routes
-Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges']);
 
 
 //Active Trips routes
