@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->increments('id');
             $table->string('trip_code')->unique();
+            $table->integer('vehicle_type')->default(0);
             $table->unsignedInteger('store_id');
             $table->foreign('store_id')->references('id')->on('store');
             $table->unsignedInteger('vehicle_id')->nullable();
@@ -32,6 +33,7 @@ return new class extends Migration
             $table->string('customer_phone')->nullable();
             $table->text('description')->nullable();
             $table->text('manager_description')->nullable();
+            $table->dateTime('expire');
             $table->timestamps();
         });
     }

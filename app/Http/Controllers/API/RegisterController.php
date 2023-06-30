@@ -121,7 +121,7 @@ class RegisterController extends BaseController
         $user->password = bcrypt($request->password);
         $user->wallet()->create();
         $user->coinWallet()->create();
-        // user->status = 1;
+        $user->status = 1;
         $user->save();
 
         $data['token'] =  $user->createToken('client')->plainTextToken;

@@ -4560,6 +4560,528 @@
                 ]
             }
         },
+        "/api/v1/store/trip": {
+            "post": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Create a new trip with store",
+                "operationId": "e1ed24add160bf15d631017eb8be5662",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTripRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Changes Successfully Stored!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/trip/{code}": {
+            "put": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Update a trip",
+                "operationId": "d2667c3589c58254331ae171b026d0fa",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "The code of the trip",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateStoreTripRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Changes Successfully Updated!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/trip/{code}/cancel": {
+            "put": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Cancel a trip",
+                "operationId": "aec85576f84ca1a6c9c86cff4605838f",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "The code of the trip",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Changes Successfully Updated!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/store/trip/my": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Get a list of trips with a store assigned",
+                "operationId": "be50f840b787a87c5e42415ee1dfb9f6",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter with type : all or delivered or notDelivered or pending",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user": {
             "get": {
                 "tags": [
@@ -5892,6 +6414,53 @@
                 },
                 "type": "object"
             },
+            "CreateTripRequest": {
+                "required": [
+                    "destination_id",
+                    "vehicle_type",
+                    "shipment_prepare_time",
+                    "trip_rial_fare"
+                ],
+                "properties": {
+                    "destination_id": {
+                        "description": "The ID of the destination neighborhood",
+                        "type": "integer"
+                    },
+                    "vehicle_type": {
+                        "description": "0 => MOTOR, 1 => CAR",
+                        "type": "integer"
+                    },
+                    "shipment_prepare_time": {
+                        "description": "The time for shipment preparation",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "trip_rial_fare": {
+                        "description": "The fare for the trip",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "customer_name": {
+                        "description": "The name of the customer",
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "customer_phone": {
+                        "description": "The phone number of the customer",
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "description": {
+                        "description": "The description of the trip",
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "StoreStoreRequest": {
                 "title": "StoreStoreRequest",
                 "description": "Store Store Request Body",
@@ -6020,6 +6589,53 @@
                         "type": "number",
                         "format": "desimal",
                         "example": "-74.0060"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateStoreTripRequest": {
+                "required": [
+                    "destination_id",
+                    "vehicle_type",
+                    "shipment_prepare_time",
+                    "trip_rial_fare"
+                ],
+                "properties": {
+                    "destination_id": {
+                        "description": "The ID of the destination neighborhood",
+                        "type": "integer"
+                    },
+                    "vehicle_type": {
+                        "description": "0 => MOTOR, 1 => CAR",
+                        "type": "integer"
+                    },
+                    "shipment_prepare_time": {
+                        "description": "The time for shipment preparation",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "trip_rial_fare": {
+                        "description": "The fare for the trip",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "customer_name": {
+                        "description": "The name of the customer",
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "customer_phone": {
+                        "description": "The phone number of the customer",
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "description": {
+                        "description": "The description of the trip",
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
                     }
                 },
                 "type": "object"

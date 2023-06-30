@@ -78,7 +78,7 @@ class VehicleController extends BaseController
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::ADD, json_encode($vehicle));
 
-        $user->status = 0;
+        $user->status = 2;
         $user->save();
 
         return $this->sendResponse($vehicle, ".وسیله نقلیه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
@@ -128,7 +128,7 @@ class VehicleController extends BaseController
 
             (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
 
-            $user->status = 0;
+            $user->status = 2;
             $user->save();
         } else
             return $this->sendError('', 'وسیله نقلیه یافت نشد', 404);

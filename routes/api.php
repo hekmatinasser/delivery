@@ -143,9 +143,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('trip')->controller(TripController::class)->group(function () {
             Route::post('/', [TripController::class, 'createTripWithStore']);
-            Route::put('/{tripId}', [TripController::class, 'update']);
-            Route::get('/', [TripController::class, 'all']);
-            Route::get('/{tripId}', [TripController::class, 'get']);
+            Route::put('/{code}', [TripController::class, 'updateTripWithStore']);
+            Route::put('/{code}/cancel', [TripController::class, 'cancelTripWithStore']);
+            Route::get('/my', [TripController::class, 'storeTrips']);
+            Route::get('/{code}', [TripController::class, 'details']);
         });
     });
 
@@ -173,12 +174,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::get('/test', function () {
-    return redirect()->route('payment::mellat.pay', 23);
-    //   $melat = new App\Payment\Gateways\Mellat\Mellat();
-    //   $a =  $melat->verify(['ref_id' => 123]);
-    //   return $a->isOk()? 'yes': 'no';
-});
+// Route::get('/test', function () {
+//     return redirect()->route('payment::mellat.pay', 23);
+//     //   $melat = new App\Payment\Gateways\Mellat\Mellat();
+//     //   $a =  $melat->verify(['ref_id' => 123]);
+//     //   return $a->isOk()? 'yes': 'no';
+// });
 
 Route::get('/payment/mellat/{ref_id}/pay', function ($ref_id) {
     return "<form name='myform' action='" . config('payment.gateways.mellat.pay_url') . "' method='POST'><input type='hidden' id='RefId' name='RefId' value='{$ref_id}'></form><script type='text/javascript'>window.onload = formSubmit; function formSubmit() { document.forms[0].submit(); }</script>";
@@ -189,7 +190,6 @@ Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class,
 
 
 //trip Routes
-Route::post('/trip/updateOrCreat', [TripController::class, 'tripUpdateOrCreate']);
 Route::get('/trip/changes/{trip_id}', [TripController::class, 'tripGetchanges']);
 
 
