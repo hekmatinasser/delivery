@@ -133,6 +133,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{code}/on-the-way', [TripController::class, 'onTheWayTripByVehicle']);
             Route::post('/{code}/deliver', [TripController::class, 'deliverTripByVehicle']);
             Route::post('/{code}/cancel', [TripController::class, 'cancelTripByVehicle']);
+            Route::post('/{code}/feedback', [TripFeedBackController::class, 'createWithVehicle']);
+            Route::put('/{code}/feedback/{id}', [TripFeedBackController::class, 'updateWithVehicle']);
+            Route::get('/{code}/feedback', [TripFeedBackController::class, 'getWithVehicle']);
         });
     });
 
