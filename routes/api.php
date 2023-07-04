@@ -101,10 +101,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('trip')->controller(TripController::class)->middleware(['ability:trip-modify'])->group(function () {
             Route::post('/', [TripController::class, 'create']);
-            Route::put('/{code}', [TripController::class, 'update']);
             Route::get('/', [TripController::class, 'getAll']);
-            Route::get('/{code}', [TripController::class, 'get']);
+            Route::get('/feedbacks', [TripFeedBackController::class, 'index']);
             Route::get('/{tripId}/changes', [TripController::class, 'tripChanges']);
+            Route::get('/{code}/feedbacks', [TripFeedBackController::class, 'get']);
+            Route::post('/{code}/feedbacks', [TripFeedBackController::class, 'create']);
+            Route::put('/{code}/feedbacks/{id}', [TripFeedBackController::class, 'update']);
+            Route::put('/{code}', [TripController::class, 'update']);
+            Route::get('/{code}', [TripController::class, 'get']);
         });
 
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
@@ -148,6 +152,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{code}/cancel', [TripController::class, 'cancelTripWithStore']);
             Route::get('/my', [TripController::class, 'storeTrips']);
             Route::get('/{code}', [TripController::class, 'details']);
+            Route::post('/{code}/feedback', [TripFeedBackController::class, 'createWithStore']);
+            Route::put('/{code}/feedback/{id}', [TripFeedBackController::class, 'updateWithStore']);
+            Route::get('/{code}/feedback', [TripFeedBackController::class, 'getWithStore']);
         });
     });
 
@@ -191,14 +198,8 @@ Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class,
 
 
 //Active Trips routes
-Route::get('/active/trips', [ActiveTripController::class, 'index']);
-Route::post('/activeTrip/updateOrCreate', [ActiveTripController::class, 'updateOrCreate']);
-
-
-//TripFeedBack Routes
-Route::post('/getTrip/feedbacks/', [TripFeedBackController::class, 'index']);
-Route::post('/trip/feedback/updateOrCreate', [TripFeedBackController::class, 'updateOrCreate'])->middleware('auth:sanctum');
-
+// Route::get('/active/trips', [ActiveTripController::class, 'index']);
+// Route::post('/activeTrip/updateOrCreate', [ActiveTripController::class, 'updateOrCreate']);
 
 //Constraint Routes
 Route::get('/getActiveConstraints', [ConstraintController::class, 'getActiveConstraints'])->middleware('auth:sanctum');

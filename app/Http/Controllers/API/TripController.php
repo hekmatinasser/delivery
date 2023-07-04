@@ -84,9 +84,14 @@ class TripController extends BaseController
      *         ),)
      * )
      */
-    public function tripChanges($request, $tripId)
+    public function tripChanges(Request $request, $tripId)
     {
-        $tripChanges = TripChangesResource::collection(TripChange::where('trip_id', $tripId)->latest()->get());
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $tripChanges = TripChange::where('trip_id', $tripId)->paginate($perPage, ['*'], 'page', $page);
+        // return $this->sendResponse($res, Lang::get('http-statuses.200'));
+        // $tripChanges = TripChangesResource::collection(TripChange::
+        // ->latest()->get());
         return $tripChanges;
     }
 
@@ -150,7 +155,7 @@ class TripController extends BaseController
                 [
                     'trip_code' => $this->generateUniqueCode(),
                     'store_id' => $request->store_id,
-                    'vehicle_type' => $vehicle->type,
+                    'vehicle_type' => $vehicle->type == 'MOTOR' ? 0 : 1,
                     'vehicle_id' => $request->vehicle_id,
                     'origin' => $request->origin_id,
                     'destination' => $request->destination_id,
@@ -245,7 +250,7 @@ class TripController extends BaseController
                 [
                     'store_id' => $request->store_id,
                     'vehicle_id' => $request->vehicle_id,
-                    'vehicle_type' => $vehicle->type,
+                    'vehicle_type' => $vehicle->type == 'MOTOR' ? 0 : 1,
                     'origin' => $request->origin_id,
                     'destination' => $request->destination_id,
                     'shipment_prepare_time' => Carbon::parse($request->shipment_prepare_time)->format('Y-m-d H:i:s'),
@@ -265,7 +270,6 @@ class TripController extends BaseController
 
         return $this->sendResponse($trip, Lang::get('http-statuses.200'));
     }
-
 
     /**
      *
@@ -406,7 +410,6 @@ class TripController extends BaseController
 
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
-
 
     /**
      * @OA\Post(
@@ -666,7 +669,6 @@ class TripController extends BaseController
 
         return $this->sendResponse('', Lang::get('http-statuses.200'));
     }
-
 
     /**
      * @OA\Post(

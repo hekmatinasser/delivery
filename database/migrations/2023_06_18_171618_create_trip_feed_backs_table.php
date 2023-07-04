@@ -13,15 +13,12 @@ return new class extends Migration
     {
         Schema::create('trip_feed_backs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('trip_code');
-            $table->string('vehicle_user_code');
-            $table->string('shop_user_code');
-            $table->dateTime('vehicle_feedback_time')->nullable();
-            $table->integer('vehicle_rating')->nullable();
-            $table->text('vehicle_description')->nullable();
-            $table->dateTime('shop_feedback_time')->nullable();
-            $table->integer('shop_rating')->nullable();
-            $table->text('shop_description')->nullable();
+            $table->unsignedInteger('trip_id');
+            $table->foreign('trip_id')->references('id')->on('trips');
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->float('rating');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
