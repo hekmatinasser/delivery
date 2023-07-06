@@ -114,6 +114,13 @@ class Vehicle extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class)->select(['id','name','family']);
+        return $this->belongsTo(User::class)->select(['id', 'name', 'family']);
+    }
+
+    public function neighborhoodsAvailable()
+    {
+        return $this->hasMany(NeighborhoodsAvailable::class)->with('neighborhood', function ($query) {
+            return $query->select(['id', 'code', 'name'])->get();
+        });
     }
 }

@@ -16,6 +16,8 @@ use App\Http\Requests\Admin\GetVehiclesRequest;
 use App\Http\Requests\Admin\UpdateStoreRequest;
 use App\Http\Requests\Admin\UpdateVehicleRequest;
 use App\Models\Log;
+use App\Models\Neighborhood;
+use App\Models\NeighborhoodsAvailable;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Store;
@@ -928,38 +930,47 @@ class AdminController extends BaseController
      *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
      *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
      *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
-     *                      @OA\Property(property="address", type="string", maxLength=255),
+     *                      @OA\Property(property="address", type="string", maxLength=255, example="address"),
      *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
      *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
+     * *     @OA\Property(
+     *         property="neighborhoodAvailable",
+     *         type="array",
+     *         description="Required. Array of neighborhood IDs",
+     *         @OA\Items(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
      *     @OA\Property(
      *         property="type",
      *         type="string",
      *         description="The type of the vehicle (MOTOR or CAR)",
-     *         enum={"MOTOR", "CAR"}
+     *         enum={"MOTOR", "CAR"}, example="MOTOR"
      *     ),
      *     @OA\Property(
      *         property="brand",
      *         type="string",
      *         description="The brand of the vehicle",
-     *         maxLength=150
+     *         maxLength=150, example="brand"
      *     ),
      *     @OA\Property(
      *         property="pelak",
      *         type="string",
      *         description="The pelak of the vehicle",
-     *         maxLength=50
+     *         maxLength=50, example="pelak"
      *     ),
      *     @OA\Property(
      *         property="color",
      *         type="string",
      *         description="The color of the vehicle",
-     *         maxLength=50
+     *         maxLength=50, example="color"
      *     ),
      *     @OA\Property(
      *         property="model",
      *         type="string",
      *         description="The model of the vehicle",
-     *         maxLength=150
+     *         maxLength=150, example="model"
      *     )
      *                 )
      *             )
@@ -1038,6 +1049,22 @@ class AdminController extends BaseController
         $vehicle = Vehicle::create($input);
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::ADD, json_encode($vehicle));
+
+
+        $neighborhoodIds = explode(',', $request->get('neighborhoodAvailable', ''));
+        $neighborhoodIds = Neighborhood::whereIn('id', $neighborhoodIds)->get();
+        $adminId = Auth::id();
+        $available = $neighborhoodIds->map(function ($neighborhood) use ($vehicle, $adminId) {
+            return [
+                'vehicle_id'            => $vehicle->id,
+                'neighborhood_id'         => $neighborhood->id,
+                'user_id'     => $adminId,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        NeighborhoodsAvailable::insert($available->all());
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 
@@ -1222,38 +1249,47 @@ class AdminController extends BaseController
      *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
      *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
      *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
-     *                      @OA\Property(property="address", type="string", maxLength=255),
+     *                      @OA\Property(property="address", type="string", maxLength=255,example="1234567890"),
      *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
      *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
+     *      @OA\Property(
+     *         property="neighborhoodAvailable",
+     *         type="array",
+     *         description="Required. Array of neighborhood IDs",
+     *         @OA\Items(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
      *     @OA\Property(
      *         property="type",
      *         type="string",
      *         description="The type of the vehicle (MOTOR or CAR)",
-     *         enum={"MOTOR", "CAR"}
+     *         enum={"MOTOR", "CAR"},example="CAR"
      *     ),
      *     @OA\Property(
      *         property="brand",
      *         type="string",
      *         description="The brand of the vehicle",
-     *         maxLength=150
+     *         maxLength=150,example="brand1"
      *     ),
      *     @OA\Property(
      *         property="pelak",
      *         type="string",
      *         description="The pelak of the vehicle",
-     *         maxLength=50
+     *         maxLength=50,example="pelak1"
      *     ),
      *     @OA\Property(
      *         property="color",
      *         type="string",
      *         description="The color of the vehicle",
-     *         maxLength=50
+     *         maxLength=50,example="color1"
      *     ),
      *     @OA\Property(
      *         property="model",
      *         type="string",
      *         description="The model of the vehicle",
-     *         maxLength=150
+     *         maxLength=150,example="model1"
      *     )
      *                 )
      *             )
@@ -1332,8 +1368,8 @@ class AdminController extends BaseController
 
         (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
 
-
-        $vehicle = $user->vehicle;
+        $user->load('vehicle');
+         $vehicle = $user->vehicle;
 
         if ($vehicle) {
             $oldData = $vehicle->toArray();
@@ -1351,6 +1387,23 @@ class AdminController extends BaseController
             (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
         }
 
+
+
+        $neighborhoodIds = explode(',', $request->get('neighborhoodAvailable', ''));
+        $neighborhoodIds = Neighborhood::whereIn('id', $neighborhoodIds)->get();
+        $adminId = Auth::id();
+        $available = $neighborhoodIds->map(function ($neighborhood) use ($vehicle, $adminId) {
+            return [
+                'vehicle_id' => $vehicle->id,
+                'neighborhood_id' => $neighborhood->id,
+                'user_id'     => $adminId,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
+        NeighborhoodsAvailable::insert($available->all());
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 

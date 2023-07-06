@@ -38,6 +38,8 @@ class CreateVehicleRequest extends FormRequest
             'pelak' => 'required|max:50',
             'color' => 'required|max:50',
             'model' => 'required|max:150',
+            'neighborhoodAvailable' => 'required',
+            'neighborhoodAvailable.*' => 'integer|exists:neighborhoods,id',
         ];
     }
 

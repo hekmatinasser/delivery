@@ -1369,7 +1369,8 @@
                                     },
                                     "address": {
                                         "type": "string",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "example": "address"
                                     },
                                     "postCode": {
                                         "type": "string",
@@ -1381,33 +1382,46 @@
                                         "format": "phone",
                                         "example": "1234567890"
                                     },
+                                    "neighborhoodAvailable": {
+                                        "description": "Required. Array of neighborhood IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
                                     "type": {
                                         "description": "The type of the vehicle (MOTOR or CAR)",
                                         "type": "string",
                                         "enum": [
                                             "MOTOR",
                                             "CAR"
-                                        ]
+                                        ],
+                                        "example": "MOTOR"
                                     },
                                     "brand": {
                                         "description": "The brand of the vehicle",
                                         "type": "string",
-                                        "maxLength": 150
+                                        "maxLength": 150,
+                                        "example": "brand"
                                     },
                                     "pelak": {
                                         "description": "The pelak of the vehicle",
                                         "type": "string",
-                                        "maxLength": 50
+                                        "maxLength": 50,
+                                        "example": "pelak"
                                     },
                                     "color": {
                                         "description": "The color of the vehicle",
                                         "type": "string",
-                                        "maxLength": 50
+                                        "maxLength": 50,
+                                        "example": "color"
                                     },
                                     "model": {
                                         "description": "The model of the vehicle",
                                         "type": "string",
-                                        "maxLength": 150
+                                        "maxLength": 150,
+                                        "example": "model"
                                     }
                                 },
                                 "type": "object"
@@ -1766,7 +1780,8 @@
                                     },
                                     "address": {
                                         "type": "string",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "example": "1234567890"
                                     },
                                     "postCode": {
                                         "type": "string",
@@ -1778,33 +1793,46 @@
                                         "format": "phone",
                                         "example": "1234567890"
                                     },
+                                    "neighborhoodAvailable": {
+                                        "description": "Required. Array of neighborhood IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
                                     "type": {
                                         "description": "The type of the vehicle (MOTOR or CAR)",
                                         "type": "string",
                                         "enum": [
                                             "MOTOR",
                                             "CAR"
-                                        ]
+                                        ],
+                                        "example": "CAR"
                                     },
                                     "brand": {
                                         "description": "The brand of the vehicle",
                                         "type": "string",
-                                        "maxLength": 150
+                                        "maxLength": 150,
+                                        "example": "brand1"
                                     },
                                     "pelak": {
                                         "description": "The pelak of the vehicle",
                                         "type": "string",
-                                        "maxLength": 50
+                                        "maxLength": 50,
+                                        "example": "pelak1"
                                     },
                                     "color": {
                                         "description": "The color of the vehicle",
                                         "type": "string",
-                                        "maxLength": 50
+                                        "maxLength": 50,
+                                        "example": "color1"
                                     },
                                     "model": {
                                         "description": "The model of the vehicle",
                                         "type": "string",
-                                        "maxLength": 150
+                                        "maxLength": 150,
+                                        "example": "model1"
                                     }
                                 },
                                 "type": "object"
