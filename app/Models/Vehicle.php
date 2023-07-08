@@ -123,4 +123,11 @@ class Vehicle extends Model
             return $query->select(['id', 'code', 'name'])->get();
         });
     }
+
+    public function storesAvailable()
+    {
+        return $this->hasMany(StoreAvailable::class)->with('store', function ($query) {
+            return $query->select(['*'])->get();
+        });
+    }
 }

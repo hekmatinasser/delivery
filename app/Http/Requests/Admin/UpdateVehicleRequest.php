@@ -40,6 +40,8 @@ class UpdateVehicleRequest extends FormRequest
             'model' => 'required|max:150',
             'neighborhoodAvailable' => 'required',
             'neighborhoodAvailable.*' => 'integer|exists:neighborhoods,id',
+            'storeAvailable.*.id' => 'integer|exists:store,id',
+            'storeAvailable.*.expire' => 'nullable|date',
         ];
     }
 
@@ -59,6 +61,8 @@ class UpdateVehicleRequest extends FormRequest
             'nationalPhoto' => 'تصویر کارت ملی',
             'postCode' => 'کد پستی',
             'nationalCode' => 'کد ملی',
+            'neighborhoodAvailable' => 'محله های در دسترس',
+            'storeAvailable' => 'مغازه های در دسترس',
         ];
     }
 }

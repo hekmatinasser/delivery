@@ -21,9 +21,11 @@ use App\Models\NeighborhoodsAvailable;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Store;
+use App\Models\StoreAvailable;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VerifyCode;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +34,7 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Spatie\FlareClient\Http\Exceptions\InvalidData;
 
 class AdminController extends BaseController
 {
@@ -943,6 +946,15 @@ class AdminController extends BaseController
      *         )
      *     ),
      *     @OA\Property(
+     *         property="storeAvailable",
+     *         type="array",
+     *         description="The available stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
      *         property="type",
      *         type="string",
      *         description="The type of the vehicle (MOTOR or CAR)",
@@ -1065,6 +1077,39 @@ class AdminController extends BaseController
         });
 
         NeighborhoodsAvailable::insert($available->all());
+
+
+        $req = '[' . $request->get('storeAvailable', '') . ']';
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $adminId = Auth::id();
+        $parameters = collect(json_decode($req));
+        $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
+            $data =  collect($parameters)->firstWhere('id', $store->id);
+
+            try {
+                // $expire = date('Y-m-d', $data->expire);
+                Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
+
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $adminId,
+                'expire' => $expire,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoreAvailable::insert($available->all());
+
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 
@@ -1148,7 +1193,7 @@ class AdminController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_ALL);
-        return User::with('vehicle')->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
+        return User::whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -1262,6 +1307,15 @@ class AdminController extends BaseController
      *         )
      *     ),
      *     @OA\Property(
+     *         property="storeAvailable",
+     *         type="array",
+     *         description="The available stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
      *         property="type",
      *         type="string",
      *         description="The type of the vehicle (MOTOR or CAR)",
@@ -1369,7 +1423,7 @@ class AdminController extends BaseController
         (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
 
         $user->load('vehicle');
-         $vehicle = $user->vehicle;
+        $vehicle = $user->vehicle;
 
         if ($vehicle) {
             $oldData = $vehicle->toArray();
@@ -1404,6 +1458,42 @@ class AdminController extends BaseController
 
         NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
         NeighborhoodsAvailable::insert($available->all());
+
+
+
+
+
+        $req = '[' . $request->get('storeAvailable', '') . ']';
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $adminId = Auth::id();
+        $parameters = collect(json_decode($req));
+        $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
+            $data =  collect($parameters)->firstWhere('id', $store->id);
+
+            try {
+                // $expire = date('Y-m-d', $data->expire);
+                Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
+
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $adminId,
+                'expire' => $expire,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoreAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
+        StoreAvailable::insert($available->all());
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 
