@@ -138,6 +138,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{code}/feedback/{id}', [TripFeedBackController::class, 'updateWithVehicle']);
             Route::get('/{code}/feedback', [TripFeedBackController::class, 'getWithVehicle']);
         });
+
+        Route::prefix('block')->controller(BlockedController::class)->group(function () {
+            Route::get('/', [BlockedController::class, 'getBlockedStoreWithVehicle']);
+            Route::post('/', [BlockedController::class, 'addBlockedStoreWithVehicle']);
+            Route::delete('/{id}', [BlockedController::class, 'deleteBlockedStoreWithVehicle']);
+        });
     });
 
     Route::prefix('v1/store')->controller(StoreController::class)->group(function () {
