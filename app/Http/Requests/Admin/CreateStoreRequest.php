@@ -34,6 +34,7 @@ class CreateStoreRequest extends FormRequest
             'phone' => 'nullable|numeric',
             'status' => 'nullable|in:1,0,-1,-2',
             'storeCategory_id' => 'required|numeric|exists:store_category,id',
+            'neighborhood_id' => 'required|numeric|exists:neighborhoods,id',
             'storeAreaType' => 'required|in:RENT,OWNERSHIP',
             'storeName' => 'required|max:255',
             'storeAddress' => 'required|max:255',
@@ -61,6 +62,7 @@ class CreateStoreRequest extends FormRequest
             'storeLat' => 'طول جغرافیایی',
             'storeLang' => 'عرض جغرافیایی',
             'nationalCode' => 'کد ملی',
+            'neighborhood_id' => 'محله',
         ];
     }
 }

@@ -43,6 +43,9 @@ class CreateVehicleRequest extends FormRequest
             'storeAvailable' => 'required',
             'storeAvailable.*.id' => 'integer|exists:store,id',
             'storeAvailable.*.expire' => 'nullable|date',
+            'storeBlocked' => 'required',
+            'storeBlocked.*.id' => 'integer|exists:store,id',
+            'storeBlocked.*.expire' => 'nullable|date',
         ];
     }
 
@@ -64,6 +67,7 @@ class CreateVehicleRequest extends FormRequest
             'nationalCode' => 'کد ملی',
             'neighborhoodAvailable' => 'محله های در دسترس',
             'storeAvailable' => 'مغازه های در دسترس',
+            'storeBlocked' => 'مغازه های عدم دسترسی',
         ];
     }
 }

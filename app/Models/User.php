@@ -147,7 +147,7 @@ class User extends Authenticatable
      */
     public function vehicle()
     {
-        return $this->hasOne(Vehicle::class)->with(['neighborhoodsAvailable','storesAvailable']);
+        return $this->hasOne(Vehicle::class)->with(['neighborhoodsAvailable', 'storesAvailable']);
     }
 
     /**

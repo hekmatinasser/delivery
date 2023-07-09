@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 use LaravelLang\Publisher\Constants\Types;
 
 /**
@@ -126,8 +128,26 @@ class Vehicle extends Model
 
     public function storesAvailable()
     {
-        return $this->hasMany(StoreAvailable::class)->with('store', function ($query) {
+        return $this->hasMany(StoreAvailable::class)
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            })
+            ->whereNotIn('store_id', $this->storesBlocked()->pluck('store_id'))
+            ->with('store', function ($query) {
+                return $query->select(['*'])->get();
+            });
+    }
+
+
+    public function storesBlocked()
+    {
+        return $this->hasMany(StoresBlocked::class)->with('store', function ($query) {
             return $query->select(['*'])->get();
-        });
+        })
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            });
     }
 }

@@ -594,6 +594,11 @@
                                         "type": "integer",
                                         "example": "1"
                                     },
+                                    "neighborhood_id": {
+                                        "description": "Neighborhood ID",
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
                                     "storeAreaType": {
                                         "description": "Area Type",
                                         "type": "string",
@@ -1392,6 +1397,22 @@
                                     },
                                     "storeAvailable": {
                                         "description": "The available stores for the vehicle.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "expire": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "storeBlocked": {
+                                        "description": "The blocked stores for the vehicle.",
                                         "type": "array",
                                         "items": {
                                             "properties": {

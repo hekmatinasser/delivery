@@ -22,6 +22,7 @@ use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Store;
 use App\Models\StoreAvailable;
+use App\Models\StoresBlocked;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VerifyCode;
@@ -397,6 +398,12 @@ class AdminController extends BaseController
      *         example="1"
      *     ),
      *     @OA\Property(
+     *         property="neighborhood_id",
+     *         description="Neighborhood ID",
+     *         type="integer",
+     *         example="1"
+     *     ),
+     *     @OA\Property(
      *         property="storeAreaType",
      *         description="Area Type",
      *         type="string",
@@ -523,6 +530,7 @@ class AdminController extends BaseController
             'phone' => $request->storePhone,
             'lat' => $request->storeLat,
             'lang' => $request->storeLang,
+            'neighborhood_id' => $request->neighborhood_id,
         ]);
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::ADD, json_encode($store));
@@ -955,6 +963,15 @@ class AdminController extends BaseController
      *         )
      *     ),
      *     @OA\Property(
+     *         property="storeBlocked",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
      *         property="type",
      *         type="string",
      *         description="The type of the vehicle (MOTOR or CAR)",
@@ -1092,8 +1109,7 @@ class AdminController extends BaseController
             $data =  collect($parameters)->firstWhere('id', $store->id);
 
             try {
-                // $expire = date('Y-m-d', $data->expire);
-                Carbon::parse($data->expire);
+                $expire = Carbon::parse($data->expire);
             } catch (\Exception $e) {
                 $expire = null;
             }
@@ -1109,6 +1125,38 @@ class AdminController extends BaseController
         });
 
         StoreAvailable::insert($available->all());
+
+
+        $req = '[' . $request->get('storeBlocked', '') . ']';
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $adminId = Auth::id();
+        $parameters = collect(json_decode($req));
+        $blocked = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
+            $data =  collect($parameters)->firstWhere('id', $store->id);
+
+            try {
+                $expire = Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
+
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $adminId,
+                'expire' => $expire,
+                'with_admin' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoresBlocked::insert($blocked->all());
 
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
@@ -1193,7 +1241,7 @@ class AdminController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_ALL);
-        return User::whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
+        return User::with('vehicle')->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -1458,10 +1506,6 @@ class AdminController extends BaseController
 
         NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
         NeighborhoodsAvailable::insert($available->all());
-
-
-
-
 
         $req = '[' . $request->get('storeAvailable', '') . ']';
         $parameters = collect(json_decode($req));
