@@ -10,6 +10,7 @@ use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\VehicleController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ActiveTripController;
+use App\Http\Controllers\API\BlockedController;
 use App\Http\Controllers\API\ConstraintController;
 use App\Http\Controllers\API\CoinSettingController;
 use App\Http\Controllers\API\TransactionController;
@@ -158,6 +159,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{code}/feedback', [TripFeedBackController::class, 'createWithStore']);
             Route::put('/{code}/feedback/{id}', [TripFeedBackController::class, 'updateWithStore']);
             Route::get('/{code}/feedback', [TripFeedBackController::class, 'getWithStore']);
+        });
+
+
+        Route::prefix('block')->controller(BlockedController::class)->group(function () {
+            Route::get('/', [BlockedController::class, 'getBlockedVehicleWithStore']);
+            Route::post('/', [BlockedController::class, 'addBlockedVehicleWithStore']);
+            Route::delete('/{id}', [BlockedController::class, 'deleteBlockedVehicleWithStore']);
         });
     });
 

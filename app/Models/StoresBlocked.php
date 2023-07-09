@@ -14,4 +14,9 @@ class StoresBlocked extends Model
     {
         return $this->belongsTo(Store::class)->select(['*']);
     }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class)->select(['*']);
+    }
 }
