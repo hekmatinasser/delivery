@@ -32,7 +32,8 @@ class LoginWithCodeRequest extends FormRequest
     {
         return [
             'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric',
-            'code' => 'required|digits:4|numeric'
+            'code' => 'required|digits:4|numeric',
+            'type'=>'nullable'
         ];
     }
 }

@@ -33,6 +33,7 @@ class LoginWithPasswordRequest extends FormRequest
         return [
             'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric',
             'password' => 'required|min:5',
+            'type' => 'nullable',
         ];
     }
 }

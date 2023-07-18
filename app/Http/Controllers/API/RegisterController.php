@@ -259,6 +259,12 @@ class RegisterController extends BaseController
         $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
         $success['name'] =  $user->name;
         $success['family'] =  $user->family;
+
+        $type = $request->get('type', 0);
+
+        if($type == 1 && $user->userType != 1){
+            return $this->sendError(Lang::get('auth.failed'), '', 403);
+        }
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
         // TODO CLEAR this LOGGER after SECCUSS LOGIN
         return $this->sendResponse($success, Lang::get('auth.done'));
@@ -338,6 +344,12 @@ class RegisterController extends BaseController
             $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
             $success['name'] =  $user->name;
             $success['family'] =  $user->family;
+
+            $type = $request->get('type', 0);
+
+            if($type == 1 && $user->userType != 1){
+                return $this->sendError(Lang::get('auth.failed'), '', 403);
+            }
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
             // TODO CLEAR this LOGGER after SECCUSS LOGIN
             return $this->sendResponse($success, Lang::get('auth.done'));

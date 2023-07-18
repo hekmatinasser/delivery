@@ -25,9 +25,9 @@ use Illuminate\Support\Facades\Log;
 function verifySMS($number, $code)
 {
     if (config('app.env') == 'local') return false;
-    $userName = env('SMS_PANEL_USERNAME', 'username');
-    $password = env('SMS_PANEL_USERNAME', 'password');
-    $fromNumber = env('SMS_PANEL_USERNAME', '1000000');
+    $userName = config('admin.smsPanel.username');
+    $password = config('admin.smsPanel.pass');
+    $fromNumber = config('admin.smsPanel.number');
 
     $toNumbers = $number;
     $messageContent = "کد تایید شما : " . $code;
