@@ -239,6 +239,7 @@ class RegisterController extends BaseController
     {
         // TODO CHECK if validation Logger is available
         $user = (new User())->getUserByActivationCode($request->code);
+        $type = $request->get('type', 0);
 
         if (!$user || $user->mobile != $request->mobile) {
             if (!$user) {
@@ -250,6 +251,10 @@ class RegisterController extends BaseController
 
         VerifyCode::where('mobile', $user->mobile)->delete();
 
+        if($type == 1 && $user->userType != 1){
+            return $this->sendError(Lang::get('auth.failed'), '', 403);
+        }
+
         $pluck = collect(Auth::user()->abilites)->pluck('name');
         $abilities = $pluck->all();
         $tokenName = 'client';
@@ -259,8 +264,6 @@ class RegisterController extends BaseController
         $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
         $success['name'] =  $user->name;
         $success['family'] =  $user->family;
-
-        $type = $request->get('type', 0);
 
         if($type == 1 && $user->userType != 1){
             return $this->sendError(Lang::get('auth.failed'), '', 403);
@@ -334,7 +337,14 @@ class RegisterController extends BaseController
     {
         // TODO CHECK if validation Logger is available
         $user = (new User())->findByMobile($request->mobile);
+        $type = $request->get('type', 0);
+
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
+
+            if($type == 1 && $user->userType != 1){
+                return $this->sendError(Lang::get('auth.failed'), '', 403);
+            }
+
             $pluck = collect(Auth::user()->abilites)->pluck('name');
             $abilities = $pluck->all();
             $tokenName = 'client';
@@ -345,11 +355,7 @@ class RegisterController extends BaseController
             $success['name'] =  $user->name;
             $success['family'] =  $user->family;
 
-            $type = $request->get('type', 0);
 
-            if($type == 1 && $user->userType != 1){
-                return $this->sendError(Lang::get('auth.failed'), '', 403);
-            }
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
             // TODO CLEAR this LOGGER after SECCUSS LOGIN
             return $this->sendResponse($success, Lang::get('auth.done'));
