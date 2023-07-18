@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTripRequest;
 use App\Http\Requests\Admin\UpdateTripRequest;
+use App\Http\Requests\CoinWallet\StoreCoinWalletTransactionRequest;
 use App\Http\Requests\Store\CreateTripRequest;
 use App\Http\Resources\TripChangesResource;
+use App\Models\NeighborhoodsAvailable;
 use App\Models\Store;
 use App\Models\Trip;
 use App\Models\TripChange;
@@ -446,8 +448,7 @@ class TripController extends BaseController
      */
     public function acceptTripByVehicle(Request $request, $code)
     {
-
-        $vehicle = Vehicle::where('user_id', Auth::id())->first();
+        $vehicle = Vehicle::with(['storesAvailable', 'storesBlocked'])->where('user_id', Auth::id())->firstOrFail();
         if (!$vehicle) {
             return $this->sendError(Lang::get('http-statuses.404'), '', 404);
         }
@@ -457,12 +458,24 @@ class TripController extends BaseController
             return $this->sendError($message, ['errors' => ['status' => $message]], 400);
         }
 
+        $storeAvailableIds = $vehicle->storesAvailable->pluck('store_id');
+        $storeBlockedIds = $vehicle->storesBlocked->pluck('store_id');
+        $neighborhoodIds = NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->pluck('neighborhood_id');
         $flag = false;
         DB::beginTransaction();
-        $trip = Trip::lockForUpdate()->where('trip_code', '=', $code)
+        $trip = Trip::lockForUpdate()
+            ->with('store')
+            ->where('trip_code', '=', $code)
             ->where(function ($query) use ($vehicle) {
                 $query->whereNull('vehicle_id')
                     ->orWhere('vehicle_id', '=', $vehicle->id);
+            })
+            ->whereHas('store', function ($query) use ($neighborhoodIds, $storeAvailableIds, $storeBlockedIds) {
+                $query->whereNotIn('id', $storeBlockedIds)
+                    ->where(function ($q) use ($neighborhoodIds, $storeAvailableIds) {
+                        $q->whereIn('neighborhood_id', $neighborhoodIds)
+                            ->orWhereIn('id', $storeAvailableIds);
+                    });
             })
             ->firstOrFail();
 
@@ -471,6 +484,15 @@ class TripController extends BaseController
             $trip->status = 2;
             $trip->save();
             $flag = true;
+            $data = new StoreCoinWalletTransactionRequest();
+            $data['user_id'] = Auth::id();
+            $data['action'] = 'decrease';
+            $data['coins'] = 1;
+            $data['reason_code'] = 21;
+            (new  CoinWalletController())->storeTransaction($data);
+
+            $data['user_id'] = $trip->store->user_id;
+            (new  CoinWalletController())->storeTransaction($data);
         }
         DB::commit();
 
@@ -796,9 +818,24 @@ class TripController extends BaseController
     {
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+
+        $vehicle = Vehicle::with(['storesAvailable', 'storesBlocked'])->where('user_id', '=', Auth::id())->firstOrFail();
+
+        $storeAvailableIds = $vehicle->storesAvailable->pluck('store_id');
+        $storeBlockedIds = $vehicle->storesBlocked->pluck('store_id');
+        $neighborhoodIds = NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->pluck('neighborhood_id');
+
         $res = Trip::with(['store', 'origin', 'destination'])
             ->whereNull('vehicle_id')
+            ->whereHas('store', function ($query) use ($neighborhoodIds, $storeAvailableIds, $storeBlockedIds) {
+                $query->whereNotIn('id', $storeBlockedIds)
+                    ->where(function ($q) use ($neighborhoodIds, $storeAvailableIds) {
+                        $q->whereIn('neighborhood_id', $neighborhoodIds)
+                            ->orWhereIn('id', $storeAvailableIds);
+                    });
+            })
             ->paginate($perPage, ['*'], 'page', $page);
+
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
 

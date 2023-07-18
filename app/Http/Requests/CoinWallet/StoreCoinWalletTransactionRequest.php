@@ -58,7 +58,7 @@ class StoreCoinWalletTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'user_id' => ['nullable', 'exists:users,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
             'action' => ['required', 'in:increase,decrease'],
             'coins' => ['required', 'numeric'],
             'reason_code' => ['required', 'numeric', 'exists:coin_wallet_transaction_reasons,code'],

@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('wallet')->as('wallet::')->group(function () {
             Route::get('', [WalletController::class, 'show'])->name('show');
-            Route::post('/transaction', [WalletController::class, 'storeTransaction'])->name('store-transaction');
+            // Route::post('/transaction', [WalletController::class, 'storeTransaction'])->name('store-transaction');
             Route::post('/buy-coin', [WalletController::class, 'buyCoin'])->name('buy-coin');
             Route::post('/increase/online', [WalletController::class, 'increaseWalletOnline'])->name('increase-online');
 
@@ -53,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('coin-wallet')->as('coin-wallet::')->group(function () {
             Route::get('', [CoinWalletController::class, 'show'])->name('show');
-            Route::post('/transaction', [CoinWalletController::class, 'storeTransaction'])->name('store-transaction');
+            // Route::post('/transaction', [CoinWalletController::class, 'storeTransaction'])->name('store-transaction');
             Route::post('/travel-transaction', [CoinWalletController::class, 'storeTravelTransaction'])->name('store-travel-transaction');
             Route::post('/buy-coin/online', [CoinWalletController::class, 'buyCoinOnline'])->name('buy-coin-online');
 
@@ -219,10 +219,10 @@ Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class,
 // Route::post('/activeTrip/updateOrCreate', [ActiveTripController::class, 'updateOrCreate']);
 
 //Constraint Routes
-Route::get('/getActiveConstraints', [ConstraintController::class, 'getActiveConstraints'])->middleware('auth:sanctum');
-Route::post('/applyConstraint', [ConstraintController::class, 'applyConstraint'])->middleware('auth:sanctum');
-Route::post('/Constraint/changeStatus', [ConstraintController::class, 'changeStatus'])->middleware('auth:sanctum');
+// Route::get('/getActiveConstraints', [ConstraintController::class, 'getActiveConstraints'])->middleware('auth:sanctum');
+// Route::post('/applyConstraint', [ConstraintController::class, 'applyConstraint'])->middleware('auth:sanctum');
+// Route::post('/Constraint/changeStatus', [ConstraintController::class, 'changeStatus'])->middleware('auth:sanctum');
 
 
 //vehicle constrait routes
-Route::post('/applyVehicleConstraint', [VehicleConstraintController::class, 'applyVehicleConstraint']);
+// Route::post('/applyVehicleConstraint', [VehicleConstraintController::class, 'applyVehicleConstraint']);
