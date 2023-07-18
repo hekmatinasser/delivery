@@ -164,7 +164,7 @@ class RegisterController extends BaseController
         // TODO CHECK if validation Logger is available
         $user = User::findByMobile($request->mobile);
         if (!$user) {
-            return $this->sendResponse('', Lang::get('auth.failed'));
+            return $this->sendError(Lang::get('auth.failed'), '', 401);
         }
 
         try {
