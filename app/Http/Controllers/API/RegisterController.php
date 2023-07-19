@@ -254,8 +254,9 @@ class RegisterController extends BaseController
         if($type == 1 && $user->userType != 1){
             return $this->sendError(Lang::get('auth.failed'), '', 403);
         }
-
-        $pluck = collect(Auth::user()->abilites)->pluck('name');
+        $user = User::find(Auth::id());
+        $user->load('abilites');
+        $pluck = collect($user->abilites)->pluck('name');
         $abilities = $pluck->all();
         $tokenName = 'client';
         if (count($abilities)) {
@@ -345,7 +346,9 @@ class RegisterController extends BaseController
                 return $this->sendError(Lang::get('auth.failed'), '', 403);
             }
 
-            $pluck = collect(Auth::user()->abilites)->pluck('name');
+            $user = User::find(Auth::id());
+            $user->load('abilites');
+            $pluck = collect($user->abilites)->pluck('name');
             $abilities = $pluck->all();
             $tokenName = 'client';
             if (count($abilities)) {
