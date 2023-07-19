@@ -254,7 +254,6 @@ class RegisterController extends BaseController
         if($type == 1 && $user->userType != 1){
             return $this->sendError(Lang::get('auth.failed'), '', 403);
         }
-        $user = User::find(Auth::id());
         $user->load('abilites');
         $pluck = collect($user->abilites)->pluck('name');
         $abilities = $pluck->all();
