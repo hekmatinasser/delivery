@@ -93,6 +93,10 @@ class UserController extends BaseController
      */
     public function update(UpdateProfileRequest $request)
     {
+        $request->validate([
+            'mobile' => 'unique:users,mobile,' . Auth::id()
+        ])
+        
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
                 return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
