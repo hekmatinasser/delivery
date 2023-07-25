@@ -40,7 +40,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => 'nullable|max:70',
             'family' => 'nullable|max:70',
-            'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile',
+            'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile,'.$this->user->id,
             'nationalCode' => 'nullable|digits:10|numeric',
             'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',
             'address' => 'nullable|max:255',
