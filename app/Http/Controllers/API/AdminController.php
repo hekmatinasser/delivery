@@ -509,7 +509,13 @@ class AdminController extends BaseController
         $inputUser['password'] =  bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
-            $path = $request->file('nationalPhoto')->store('national_photos');
+            // $path = $request->file('nationalPhoto')->store('national_photos');
+
+            if ($user->nationalPhoto) {
+                Storage::disk('liara')->delete($user->nationalPhoto);
+            }
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+
             $inputUser['nationalPhoto'] = $path;
         }
 
@@ -832,7 +838,13 @@ class AdminController extends BaseController
             $inputUser['password'] =  bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
-            $path = $request->file('nationalPhoto')->store('national_photos');
+            // $path = $request->file('nationalPhoto')->store('national_photos');
+
+            if ($user->nationalPhoto) {
+                Storage::disk('liara')->delete($user->nationalPhoto);
+            }
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+
             $inputUser['nationalPhoto'] = $path;
         }
 
@@ -1062,7 +1074,13 @@ class AdminController extends BaseController
         $inputUser['password'] =  bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
-            $path = $request->file('nationalPhoto')->store('national_photos');
+            // $path = $request->file('nationalPhoto')->store('national_photos');
+
+            if ($user->nationalPhoto) {
+                Storage::disk('liara')->delete($user->nationalPhoto);
+            }
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+
             $inputUser['nationalPhoto'] = $path;
         }
 
@@ -1452,7 +1470,13 @@ class AdminController extends BaseController
             $inputUser['password'] =  bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
-            $path = $request->file('nationalPhoto')->store('national_photos');
+            // $path = $request->file('nationalPhoto')->store('national_photos');
+
+            if ($user->nationalPhoto) {
+                Storage::disk('liara')->delete($user->nationalPhoto);
+            }
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+            
             $inputUser['nationalPhoto'] = $path;
         }
 

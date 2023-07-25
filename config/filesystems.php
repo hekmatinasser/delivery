@@ -44,11 +44,11 @@ return [
             'throw' => false,
         ],
 
-        'national_photos' => [
-            'driver' => 'local',
-            'root' => storage_path('app/images/national_photos'),
-            'throw' => false,
-        ],
+        // 'national_photos' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/images/national_photos'),
+        //     'throw' => false,
+        // ],
 
         'transaction_photos' => [
             'driver' => 'local',
