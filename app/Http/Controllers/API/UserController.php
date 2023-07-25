@@ -95,7 +95,7 @@ class UserController extends BaseController
     {
         $request->validate([
             'mobile' => 'unique:users,mobile,' . Auth::id()
-        ])
+        ]);
         
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
