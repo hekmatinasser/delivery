@@ -251,7 +251,7 @@ class RegisterController extends BaseController
 
         VerifyCode::where('mobile', $user->mobile)->delete();
 
-        if($type == 1 && $user->userType != 1){
+        if($type == 1 && $user->userType != "1"){
             return $this->sendError(Lang::get('auth.failed'), '', 403);
         }
         $user->load('abilites');
@@ -265,9 +265,6 @@ class RegisterController extends BaseController
         $success['name'] =  $user->name;
         $success['family'] =  $user->family;
 
-        if($type == 1 && $user->userType != 1){
-            return $this->sendError(Lang::get('auth.failed'), '', 403);
-        }
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
         // TODO CLEAR this LOGGER after SECCUSS LOGIN
         return $this->sendResponse($success, Lang::get('auth.done'));
@@ -341,7 +338,7 @@ class RegisterController extends BaseController
 
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
 
-            if($type == 1 && $user->userType != 1){
+            if($type == 1 && $user->userType != "1"){
                 return $this->sendError(Lang::get('auth.failed'), '', 403);
             }
 
