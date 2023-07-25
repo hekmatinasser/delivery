@@ -102,9 +102,9 @@ class UserController extends BaseController
 
         if ($request->hasFile('nationalPhoto')) {
             if ($user->nationalPhoto) {
-                Storage::delete($user->nationalPhoto);
+                Storage::disk('liara')->delete($user->nationalPhoto);
             }
-            $path = $request->file('nationalPhoto')->store('national_photos');
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
 
             $input['nationalPhoto'] = $path;
         }
@@ -119,4 +119,5 @@ class UserController extends BaseController
 
         return $this->sendResponse($newData, ".بروزرسانی با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
     }
+
 }
