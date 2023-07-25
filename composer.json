@@ -33,7 +33,8 @@
         },
         "files": [
             "app/Helper/myHelper.php",
-            "app/Helper/sms.php"
+            "app/Helper/sms.php",
+            "app/Helper/uploadHelper.php"
         ]
     },
     "autoload-dev": {
