@@ -222,4 +222,9 @@ class User extends Authenticatable
             Log::store($user->userType == '0' ? LogUserTypesEnum::USER : LogUserTypesEnum::ADMIN, $user->id, LogModelsEnum::USER, LogActionsEnum::EDIT, json_encode($changes));
         }
     }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by')->select(['id', 'name', 'family']);
+    }
 }

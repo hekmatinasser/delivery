@@ -28,7 +28,7 @@ class UpdateVehicleRequest extends FormRequest
             'mobile' => 'required|regex:/(09)[0-9]{9}/|digits:11|numeric',
             'password' => 'nullable|min:5',
             'nationalCode' => 'nullable|digits:10|numeric',
-            'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',
+            'nationalPhoto' => 'nullable|mimes:jpeg,png,jpg|max:15360|dimensions:min_width=100,min_height=100',
             'address' => 'nullable|max:255',
             'postCode' => 'nullable|digits:10|numeric',
             'phone' => 'nullable|numeric',
@@ -38,9 +38,9 @@ class UpdateVehicleRequest extends FormRequest
             'pelak' => 'required|max:50',
             'color' => 'required|max:50',
             'model' => 'required|max:150',
-            'neighborhoodAvailable' => 'required',
+            'neighborhoodAvailable' => 'nullable',
             'neighborhoodAvailable.*' => 'integer|exists:neighborhoods,id',
-            'storeAvailable.*.id' => 'integer|exists:store,id',
+            'storeAvailable.*.id' => 'nullable|integer|exists:store,id',
             'storeAvailable.*.expire' => 'nullable|date',
         ];
     }

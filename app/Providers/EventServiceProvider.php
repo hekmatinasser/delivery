@@ -6,8 +6,10 @@ use App\Models\Constraint;
 use App\Models\InterNeighborhoodFare;
 use App\Models\Trip;
 use App\Models\TripChange;
+use App\Models\User;
 use App\Models\VehicleConstraint;
 use App\Observers\ConstraintObserver;
+use App\Observers\userObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use App\Observers\InterNeighborhoodFareObserver;
@@ -38,6 +40,7 @@ class EventServiceProvider extends ServiceProvider
         Constraint::observe(ConstraintObserver::class);
         VehicleConstraint::observe(VehicleConstraintObserver::class);
         Trip::observe(TripObserver::class);
+        User::observe(userObserver::class);
     }
 
     /**

@@ -32,6 +32,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -511,9 +512,6 @@ class AdminController extends BaseController
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
-            if ($user->nationalPhoto) {
-                Storage::disk('liara')->delete($user->nationalPhoto);
-            }
             $path = uploadNationalImageToS3($request->file('nationalPhoto'));
 
             $inputUser['nationalPhoto'] = $path;
@@ -624,7 +622,7 @@ class AdminController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::SHOW_ALL);
-        return User::with('store')->whereHas('store')->paginate($perPage, ['*'], 'page', $page);
+        return User::with(['store', 'wallet', 'coinWallet', 'createdBy'])->whereHas('store')->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -837,6 +835,8 @@ class AdminController extends BaseController
         if ($request->password)
             $inputUser['password'] =  bcrypt($request->password);
 
+        $user = $this->getStore($request, $storeId);
+
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
@@ -848,7 +848,6 @@ class AdminController extends BaseController
             $inputUser['nationalPhoto'] = $path;
         }
 
-        $user = $this->getStore($request, $storeId);
 
         // if (Validator::make($inputUser, ['mobile' => ])->failed()) {
         //     return $this->sendError('شماره همراه قبلا انتخاب شده است.', ['error' => ['mobile' => 'شماره همراه قبلا انتخاب شده است.']], 422);
@@ -1076,12 +1075,13 @@ class AdminController extends BaseController
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
-            if ($user->nationalPhoto) {
-                Storage::disk('liara')->delete($user->nationalPhoto);
-            }
-            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+            try {
+                $path = uploadNationalImageToS3($request->file('nationalPhoto'));
 
-            $inputUser['nationalPhoto'] = $path;
+                $inputUser['nationalPhoto'] = $path;
+            } catch (Exception $th) {
+                return $this->sendError('خطایی در آپلود فایل اتفاق افتاد', ['errors' => ['nationalPhoto' => $th->getMessage()]], 422);
+            }
         }
 
         DB::beginTransaction();
@@ -1259,7 +1259,7 @@ class AdminController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_ALL);
-        return User::with('vehicle')->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
+        return User::with(['vehicle', 'wallet', 'coinWallet', 'createdBy'])->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -1469,6 +1469,8 @@ class AdminController extends BaseController
         if ($request->password)
             $inputUser['password'] =  bcrypt($request->password);
 
+        $user = $this->getVehicle($request, $vehicleId);
+
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
@@ -1476,11 +1478,10 @@ class AdminController extends BaseController
                 Storage::disk('liara')->delete($user->nationalPhoto);
             }
             $path = uploadNationalImageToS3($request->file('nationalPhoto'));
-            
+
             $inputUser['nationalPhoto'] = $path;
         }
 
-        $user = $this->getVehicle($request, $vehicleId);
 
         $request->validate([
             'mobile' => 'unique:users,mobile,' . $user->id

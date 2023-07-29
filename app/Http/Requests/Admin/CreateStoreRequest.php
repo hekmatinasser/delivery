@@ -26,7 +26,7 @@ class CreateStoreRequest extends FormRequest
             'name' => 'nullable|max:70',
             'family' => 'nullable|max:70',
             'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile',
-            'password' => 'required|min:5',
+            'password' => 'nullable|min:5',
             'nationalCode' => 'nullable|digits:10|numeric',
             'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',
             'address' => 'nullable|max:255',
@@ -34,14 +34,14 @@ class CreateStoreRequest extends FormRequest
             'phone' => 'nullable|numeric',
             'status' => 'nullable|in:1,0,-1,-2',
             'storeCategory_id' => 'required|numeric|exists:store_category,id',
-            'neighborhood_id' => 'required|numeric|exists:neighborhoods,id',
+            'neighborhood_id' => 'nullable|numeric|exists:neighborhoods,id',
             'storeAreaType' => 'required|in:RENT,OWNERSHIP',
             'storeName' => 'required|max:255',
             'storeAddress' => 'required|max:255',
             'storePostCode' => 'required|digits:10|numeric',
             'storePhone' => 'required|numeric',
-            'storeLat' => 'required|numeric',
-            'storeLang' => 'required|numeric',
+            'storeLat' => 'nullable|numeric',
+            'storeLang' => 'nullable|numeric',
         ];
     }
 

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('areaType')->unsigned()->nullable();
             $table->string('address')->nullable();
             $table->string('postCode')->nullable();
-            $table->integer('phone')->nullable();
+            $table->text('phone')->nullable();
             $table->string('name')->nullable();
             $table->decimal('lat')->nullable();
             $table->decimal('lang')->nullable();
