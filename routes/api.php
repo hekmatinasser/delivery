@@ -113,6 +113,8 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
+        Route::post('roles', 'addNewRole')->middleware(['ability:user-modify']);
+        Route::get('permissions', 'getPermissions')->middleware(['ability:user-modify']);
     });
 
     Route::prefix('v1/vehicle')->controller(VehicleController::class)->group(function () {
@@ -177,6 +179,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('v1/neighborhood')->controller(NeighborhoodController::class)->group(function () {
         Route::get('', 'index')->name('index');
+        Route::get('/fee', 'fees')->name('fees');
+        Route::get('/fee/histories', 'histories')->name('fees.histories')->middleware(['ability:user-modify']);;
         Route::get('{neighborhood_id}', 'show')->name('show');
 
         //Inter Neighborhood Fare routes

@@ -19,6 +19,7 @@ use App\Models\Log;
 use App\Models\Neighborhood;
 use App\Models\NeighborhoodsAvailable;
 use App\Models\Role;
+use App\Models\Permission;
 use App\Models\RoleUser;
 use App\Models\Store;
 use App\Models\StoreAvailable;
@@ -109,7 +110,13 @@ class AdminController extends BaseController
 
         $input['userType'] = '1';
         $input['password'] =  bcrypt($request->password);
+        if ($request->hasFile('nationalPhoto')) {
+            // $path = $request->file('nationalPhoto')->store('national_photos');
 
+            $path = uploadNationalImageToS3($request->file('nationalPhoto'));
+
+            $inputUser['nationalPhoto'] = $path;
+        }
         $user = User::create($input);
         $user->wallet()->create();
         $user->coinWallet()->create();
@@ -1642,8 +1649,72 @@ class AdminController extends BaseController
      */
     public function getRoles(Request $request)
     {
-        $roles = collect(Role::select('name', 'display_name', 'description')->get());
+        $roles = collect(Role::select('id', 'name', 'display_name', 'description')->get());
         // $roles->push(['name' => 'client', 'display_name' => 'مشتری', 'description' => 'پیک یا مغازه دار ها']);
         return $this->sendResponse($roles, Lang::get('http-statuses.200'));
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/permissions",
+     *     summary="Get all permissions",
+     *     description="Returns all permissions",
+     *     operationId="getPermissions",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     * )
+     */
+    public function getPermissions(Request $request)
+    {
+        $permissions = collect(Permission::select('id', 'name', 'display_name', 'description')->get());
+        return $this->sendResponse($permissions, Lang::get('http-statuses.200'));
+    }
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/role",
+     *     summary="Add new role",
+     *     description="Add new role",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     * )
+     */
+    public function addNewRole(Request $request)
+    {
+        // Create the role
+        $role = Role::create(['name' => $request->name]);
+
+        $permissions = Permission::whereIn('id', $request->get('permissions', []));
+        // Assign permissions to the role
+        foreach ($permissions as $permissionName) {
+            $permission = Permission::first(['name' => $permissionName]);
+            $role->givePermissionTo($permission);
+        }
+        return $this->sendResponse($role, Lang::get('http-statuses.200'));
     }
 }

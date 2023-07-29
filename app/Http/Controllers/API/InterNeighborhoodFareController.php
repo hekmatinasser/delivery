@@ -236,7 +236,7 @@ class InterNeighborhoodFareController extends BaseController
         return $this->sendResponse('', 'کرایه با موفقیت اصلاح شد');
     }
 
-    protected function CheckRepetitiveRecored(string $origin, string $destination)
+    public function CheckRepetitiveRecored(string $origin, string $destination)
     {
         $original = $origin . '-' . $destination;
         $record = InterNeighborhoodFare::orWhere('original', '=', $original)

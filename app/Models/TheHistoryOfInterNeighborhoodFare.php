@@ -16,10 +16,10 @@ class TheHistoryOfInterNeighborhoodFare extends Model
         return $this->belongsTo(User::class);
     }
 
-    
+
     //Inter Neighborhood Fare
     public function inf(): BelongsTo
     {
-        return $this->belongsTo(InterNeighborhoodFare::class, 'INF_id');
+        return $this->belongsTo(InterNeighborhoodFare::class, 'INF_id')->with('origin', 'destination');
     }
 }

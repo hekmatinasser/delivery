@@ -15,4 +15,14 @@ class InterNeighborhoodFare extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function origin(): BelongsTo
+    {
+        return $this->belongsTo(Neighborhood::class, 'origin', 'id');
+    }
+
+    public function destination(): BelongsTo
+    {
+        return $this->belongsTo(Neighborhood::class, 'destination', 'id');
+    }
 }

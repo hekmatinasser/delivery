@@ -35,7 +35,7 @@ class CreateNeighborhoodRequest extends FormRequest
     {
         return [
             'name' => 'required|min:5|max:25|unique:neighborhoods,name',
-            'code' => 'required|min:5|max:25|unique:neighborhoods,code',
+            'code' => 'nullable|min:5|max:25|unique:neighborhoods,code',
             'status' => 'required|in:0,1',
         ];
     }

@@ -28,6 +28,12 @@ use Laravel\Sanctum\Sanctum;
  *         example="Doe"
  *     ),
  *     @OA\Property(
+ *         property="employee_code",
+ *         type="string",
+ *         description="Employee's code",
+ *         example="Doe1523"
+ *     ),
+ *     @OA\Property(
  *         property="mobile",
  *         type="string",
  *         description="Employee's mobile number",
@@ -95,11 +101,13 @@ class CreateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|max:70',
-            'family' => 'nullable|max:70',
+            'name' => 'Required|max:70',
+            'employee_code' => 'Required|max:70',
+            'family' => 'Required|max:70',
             'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile',
-            'password' => 'required|min:5',
+            'password' => 'nullable|min:5',
             'nationalCode' => 'nullable|digits:10|numeric',
+            'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',
             'address' => 'nullable|max:255',
             'postCode' => 'nullable|digits:10|numeric',
             'phone' => 'nullable|numeric',
@@ -122,6 +130,7 @@ class CreateEmployeeRequest extends FormRequest
             'lat' => 'طول جغرافیایی',
             'lang' => 'عرض جغرافیایی',
             'status' => 'وضعیت',
+            'employee_code' => 'کد کارمند'
         ];
     }
 }

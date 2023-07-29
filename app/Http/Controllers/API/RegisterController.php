@@ -53,7 +53,7 @@ class RegisterController extends BaseController
         $user = User::findByMobile($request->mobile);
         $isNew = true;
         if (!$user) {
-            $user = User::create($request->all());
+            $user = User::create($request->only('mobile'));
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::REGISTER, LogActionsEnum::REQUEST);
         } else {
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::REQUEST);
@@ -124,7 +124,7 @@ class RegisterController extends BaseController
         $user->status = 1;
         $user->save();
 
-        $data['token'] =  $user->createToken('client')->plainTextToken;
+        $data['token'] =  $user->createToken('client', [])->plainTextToken;
         $data['name'] =  $user->name;
         $data['family'] =  $user->family;
 
@@ -251,7 +251,7 @@ class RegisterController extends BaseController
 
         VerifyCode::where('mobile', $user->mobile)->delete();
 
-        if($type == 1 && $user->userType != "1"){
+        if ($type == 1 && $user->userType != "1") {
             return $this->sendError(Lang::get('auth.failed'), '', 403);
         }
         $user->load('abilites');
@@ -338,7 +338,7 @@ class RegisterController extends BaseController
 
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
 
-            if($type == 1 && $user->userType != "1"){
+            if ($type == 1 && $user->userType != "1") {
                 return $this->sendError(Lang::get('auth.failed'), '', 403);
             }
 

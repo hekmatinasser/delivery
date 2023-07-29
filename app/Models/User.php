@@ -58,6 +58,7 @@ class User extends Authenticatable
         'postCode',
         'phone',
         'userType',
+        'employee_code'
     ];
 
     public function userTypes()

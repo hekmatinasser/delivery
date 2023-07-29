@@ -2,6 +2,7 @@
 
 
 use Illuminate\Support\Facades\Storage;
+
 function checkNationalcode($code)
 {
     if (!preg_match('/^[0-9]{10}$/', $code))
@@ -34,6 +35,28 @@ function uploadNationalImageToS3($image)
 
         // Return the path of the uploaded image
         return 'images/national_photos/' . $filename;
+    } catch (Exception $th) {
+        throw new Error($th->getMessage());
+    }
+}
+
+
+
+function uploadPublicImageToS3($image, $path = '')
+{
+    try {
+        // Generate a unique filename for the image
+        $filename = time() . '_' . $image->getClientOriginalName();
+
+        if (config('app.env') == 'local') {
+            Storage::disk('public')->put('images/' . $path . $filename, file_get_contents($image));
+        } else {
+            // Store the image in the 'images' directory on S3
+            Storage::disk('liara')->put('images/' . $path . $filename, file_get_contents($image));
+        }
+
+        // Return the path of the uploaded image
+        return 'images/' . $path . $filename;
     } catch (Exception $th) {
         throw new Error($th->getMessage());
     }
