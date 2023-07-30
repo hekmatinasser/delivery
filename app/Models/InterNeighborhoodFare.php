@@ -18,11 +18,11 @@ class InterNeighborhoodFare extends Model
 
     public function origin(): BelongsTo
     {
-        return $this->belongsTo(Neighborhood::class, 'origin', 'id');
+        return $this->belongsTo(Neighborhood::class,'origin','id');
     }
 
     public function destination(): BelongsTo
     {
-        return $this->belongsTo(Neighborhood::class, 'destination', 'id');
+        return $this->belongsTo(Neighborhood::class,'destination','id');
     }
 }

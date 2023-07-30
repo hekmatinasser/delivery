@@ -19,6 +19,7 @@ use App\Http\Controllers\API\NeighborhoodController;
 use App\Http\Controllers\API\TripFeedBackController;
 use App\Http\Controllers\API\InterNeighborhoodFareController;
 use App\Http\Controllers\API\VehicleConstraintController;
+use Illuminate\Support\Facades\Storage;
 
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
@@ -230,3 +231,25 @@ Route::any('/coin-wallet/buy-coin/payment/verify', [CoinWalletController::class,
 
 //vehicle constrait routes
 // Route::post('/applyVehicleConstraint', [VehicleConstraintController::class, 'applyVehicleConstraint']);
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/files/images/national_photos/{image_path}', function ($image_path) {
+        $image = "/images/national_photos/$image_path";
+        if (Storage::disk('liara')->exists($image)) {
+            return Storage::disk('liara')->get($image);
+        } else {
+            return '-------';
+        }
+    })->middleware(['ability:user-modify']);
+});
+
+Route::get('/files/images/public/{image_path}', function ($image_path) {
+    $image = "/images/public/$image_path";
+    if (Storage::disk('liara')->exists($image)) {
+        return Storage::disk('liara')->get($image);
+    } else {
+        return '-------';
+    }
+});

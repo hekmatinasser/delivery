@@ -147,12 +147,12 @@ class NeighborhoodController extends BaseController
 
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
-        $res = TheHistoryOfInterNeighborhoodFare::with(['inf','user'])->paginate($perPage, ['*'], 'page', $page);
+        $res = TheHistoryOfInterNeighborhoodFare::with(['inf', 'user'])->paginate($perPage, ['*'], 'page', $page);
 
         // $res['data'] = NeighborhoodResource::collection(($res['data']));
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
-        /**
+    /**
      *
      * @OA\Get(
      *     path="/api/v1/neighborhood/fee",
@@ -207,7 +207,7 @@ class NeighborhoodController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         $origin = $request->input('origin_neighborhood_id', null);
-        $res = InterNeighborhoodFare::with(['origin','destination'])->paginate($perPage, ['*'], 'page', $page);
+        $res = InterNeighborhoodFare::with(['origin', 'destination'])->paginate($perPage, ['*'], 'page', $page);
 
         // $res['data'] = NeighborhoodResource::collection(($res['data']));
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
@@ -253,42 +253,42 @@ class NeighborhoodController extends BaseController
     public function store(CreateNeighborhoodRequest $request)
     {
         $user_id = Auth::user()->id;
-        $code = $request->get('code',(new TripController())->generateUniqueCode(10,'code-'));
+        $code = $request->get('code', (new TripController())->generateUniqueCode(10, 'code-'));
 
         if ($request->hasFile('image')) {
-            $path = uploadPublicImageToS3($request->file('image'),'neighborhood/');
-        }else $path = '';
+            $path = uploadPublicImageToS3($request->file('image'), 'public/');
+        } else $path = '';
 
         $response = Neighborhood::create([
             'user_id' => $user_id,
             'name' => $request->name,
-            'code' =>$code,
-            'image' =>$path,
+            'code' => $code,
+            'image' => $path,
             'status' => $request->status,
         ]);
 
         $neighborhoods = Neighborhood::select('id')->get();
 
         $origin = $response->id;
-        foreach($neighborhoods as $neighborhood){
+        foreach ($neighborhoods as $neighborhood) {
             $destination = $neighborhood->id;
 
 
-        if (!(new InterNeighborhoodFareController())->CheckRepetitiveRecored($origin, $destination)) {
+            if (!(new InterNeighborhoodFareController())->CheckRepetitiveRecored($origin, $destination)) {
 
 
-            $original = $origin . '-' . $destination;
-            $reverse = $destination . '-' . $origin;
+                $original = $origin . '-' . $destination;
+                $reverse = $destination . '-' . $origin;
 
-            InterNeighborhoodFare::create([
-                'user_id' => auth()->user()->id,
-                'origin' => $origin ,
-                'destination' => $destination,
-                'original' => $original,
-                'reverse' => $reverse,
-                'fare' => 0,
-            ]);
-        }
+                InterNeighborhoodFare::create([
+                    'user_id' => auth()->user()->id,
+                    'origin' => $origin,
+                    'destination' => $destination,
+                    'original' => $original,
+                    'reverse' => $reverse,
+                    'fare' => 0,
+                ]);
+            }
         }
 
 
@@ -424,5 +424,4 @@ class NeighborhoodController extends BaseController
         $neighborhood->delete();
         return $this->sendResponse('', 'Neighborhood Deleted Successfully!');
     }
-
 }

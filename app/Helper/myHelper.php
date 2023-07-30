@@ -26,12 +26,8 @@ function uploadNationalImageToS3($image)
         // Generate a unique filename for the image
         $filename = time() . '_' . $image->getClientOriginalName();
 
-        if (config('app.env') == 'local') {
-            Storage::disk('public')->put('images/national_photos/' . $filename, file_get_contents($image));
-        } else {
-            // Store the image in the 'images' directory on S3
-            Storage::disk('liara')->put('images/national_photos/' . $filename, file_get_contents($image));
-        }
+        // Store the image in the 'images' directory on S3
+        Storage::disk('liara')->put('images/national_photos/' . $filename, file_get_contents($image));
 
         // Return the path of the uploaded image
         return 'images/national_photos/' . $filename;
@@ -48,12 +44,7 @@ function uploadPublicImageToS3($image, $path = '')
         // Generate a unique filename for the image
         $filename = time() . '_' . $image->getClientOriginalName();
 
-        if (config('app.env') == 'local') {
-            Storage::disk('public')->put('images/' . $path . $filename, file_get_contents($image));
-        } else {
-            // Store the image in the 'images' directory on S3
-            Storage::disk('liara')->put('images/' . $path . $filename, file_get_contents($image));
-        }
+        Storage::disk('liara')->put('images/' . $path . $filename, file_get_contents($image));
 
         // Return the path of the uploaded image
         return 'images/' . $path . $filename;
