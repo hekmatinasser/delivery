@@ -7913,7 +7913,7 @@
                     "shipment_prepare_time": {
                         "description": "The time for shipment preparation",
                         "type": "string",
-                        "format": "date"
+                        "format": "date-time"
                     },
                     "trip_rial_fare": {
                         "description": "The fare for the trip",

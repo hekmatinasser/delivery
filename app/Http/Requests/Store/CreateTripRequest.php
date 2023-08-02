@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
  *     required={"destination_id", "vehicle_type", "shipment_prepare_time", "trip_rial_fare"},
  *     @OA\Property(property="destination_id", type="integer", description="The ID of the destination neighborhood"),
  *     @OA\Property(property="vehicle_type", type="integer", description="The type of vehicle",description="0 => MOTOR, 1 => CAR"),
- *     @OA\Property(property="shipment_prepare_time", type="string", format="date", description="The time for shipment preparation"),
+ *     @OA\Property(property="shipment_prepare_time", type="string", format="date-time", description="The time for shipment preparation"),
  *     @OA\Property(property="trip_rial_fare", type="number", format="float", description="The fare for the trip"),
  *     @OA\Property(property="customer_name", type="string", maxLength=50, nullable=true, description="The name of the customer"),
  *     @OA\Property(property="customer_phone", type="string", maxLength=50, nullable=true, description="The phone number of the customer"),
