@@ -37,3 +37,38 @@ function verifySMS($number, $code)
         throw new Exception('SMS was not sent!');
     }
 }
+
+
+
+function registerNotice($number, $pass)
+{
+    if (config('app.env') == 'local') return false;
+    $userName = config('admin.smsPanel.username');
+    $password = config('admin.smsPanel.pass');
+    $fromNumber = config('admin.smsPanel.number');
+
+    $toNumbers = $number;
+    $messageContent = "برای ورود از اطلات زیر استفاده کنید:\nنام کاربری:$number\nرمزعبور:$pass";
+    $url = "http://sms1.webhoma.ir/SMSInOutBox/SendSms?username=" . $userName . "&password=" . $password . "&from=" . $fromNumber . "&to=" . $toNumbers . "&text=" . $messageContent;
+    $response = Http::get($url);
+    if ($response != 'SendWasSuccessful') {
+        throw new Exception('SMS was not sent!');
+    }
+}
+
+
+function updatePassNotice($number, $pass)
+{
+    if (config('app.env') == 'local') return false;
+    $userName = config('admin.smsPanel.username');
+    $password = config('admin.smsPanel.pass');
+    $fromNumber = config('admin.smsPanel.number');
+
+    $toNumbers = $number;
+    $messageContent = "رمز عبور جدید : $pass";
+    $url = "http://sms1.webhoma.ir/SMSInOutBox/SendSms?username=" . $userName . "&password=" . $password . "&from=" . $fromNumber . "&to=" . $toNumbers . "&text=" . $messageContent;
+    $response = Http::get($url);
+    if ($response != 'SendWasSuccessful') {
+        throw new Exception('SMS was not sent!');
+    }
+}

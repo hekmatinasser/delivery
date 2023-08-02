@@ -956,6 +956,7 @@ class AdminController extends BaseController
      *                      @OA\Property(property="family", type="string", maxLength=70),
      *                      @OA\Property(property="mobile", type="string", format="mobile", example="09123456789"),
      *                      @OA\Property(property="password", type="string", example="newPassword"),
+     *                      @OA\Property(property="sendNotice", type="boolean", example="true"),
      *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
      *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
      *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
@@ -1095,6 +1096,10 @@ class AdminController extends BaseController
         $user = User::create($inputUser);
         $user->wallet()->create();
         $user->coinWallet()->create();
+
+        if ($request->get('sendNotice', false)) {
+            registerNotice($request->get('mobile'), $request->get('password'));
+        }
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::ADD, json_encode($user));
 
@@ -1478,6 +1483,11 @@ class AdminController extends BaseController
 
         $user = $this->getVehicle($request, $vehicleId);
 
+        if ($user->nationalPhoto || $user->nationalPhotoStatus == 'remove') {
+            Storage::disk('liara')->delete($user->nationalPhoto);
+            $inputUser['nationalPhoto'] = null;
+        }
+
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
@@ -1518,7 +1528,7 @@ class AdminController extends BaseController
             ]);
             $newData = $vehicle->toArray();
 
-            (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
+            // (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
         }
 
 
@@ -1716,5 +1726,19 @@ class AdminController extends BaseController
             $role->givePermissionTo($permission);
         }
         return $this->sendResponse($role, Lang::get('http-statuses.200'));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user =  User::findOrFail($request->get('user_id', 0));
+        if ($request->password)
+            $user->password =  bcrypt($request->password);
+        $user->save();
+        if ($request->get('sendNotice', false)) {
+            updatePassNotice($request->get('mobile'), $request->get('password'));
+        }
+
+
+        return $this->sendResponse($user, ".پیک با موفقیت انجام شد");
     }
 }

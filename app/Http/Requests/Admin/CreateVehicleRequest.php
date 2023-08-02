@@ -26,7 +26,7 @@ class CreateVehicleRequest extends FormRequest
             'name' => 'nullable|max:70',
             'family' => 'nullable|max:70',
             'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile',
-            'password' => 'nullable|min:5',
+            'password' => 'Required|min:5',
             'nationalCode' => 'nullable|digits:10|numeric',
             'nationalPhoto' => 'nullable|mimes:jpg,jpeg,png,bmp,tiff|max:15360|dimensions:min_width=100,min_height=100',
             'address' => 'nullable|max:255',

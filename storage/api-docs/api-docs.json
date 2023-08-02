@@ -1357,6 +1357,10 @@
                                         "type": "string",
                                         "example": "newPassword"
                                     },
+                                    "sendNotice": {
+                                        "type": "boolean",
+                                        "example": "true"
+                                    },
                                     "status": {
                                         "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
                                         "type": "integer",
