@@ -105,6 +105,7 @@ class CreateEmployeeRequest extends FormRequest
             'employee_code' => 'Required|max:70',
             'family' => 'Required|max:70',
             'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric|unique:users,mobile',
+            'email' => 'Required|email|unique:users,email',
             'password' => 'nullable|min:5',
             'nationalCode' => 'nullable|digits:10|numeric',
             'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',

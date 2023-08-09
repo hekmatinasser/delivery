@@ -105,13 +105,13 @@ class Store extends Model
         ];
     }
 
-    protected function areaType(): Attribute
-    {
-        return Attribute::make(
-            get: fn (string $value) =>  $this->areaTypes()[$value],
-            set: fn (string $value) => array_search($value, $this->areaTypes()),
-        );
-    }
+    // protected function areaType(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn (string $value) =>  $this->areaTypes()[$value],
+    //         set: fn (string $value) => array_search($value, $this->areaTypes()),
+    //     );
+    // }
 
 
     protected function categoryName(): Attribute

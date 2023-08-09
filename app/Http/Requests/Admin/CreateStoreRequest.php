@@ -35,7 +35,7 @@ class CreateStoreRequest extends FormRequest
             'status' => 'nullable|in:1,0,-1,-2',
             'storeCategory_id' => 'required|numeric|exists:store_category,id',
             'neighborhood_id' => 'nullable|numeric|exists:neighborhoods,id',
-            'storeAreaType' => 'required|in:RENT,OWNERSHIP',
+            'storeAreaType' => 'required|in:0,1',
             'storeName' => 'required|max:255',
             'storeAddress' => 'required|max:255',
             'storePostCode' => 'required|digits:10|numeric',

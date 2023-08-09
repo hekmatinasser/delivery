@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Storage;
 Route::controller(RegisterController::class)->prefix('v1')->group(function () {
     Route::post('register', 'register');
     Route::post('verify', 'verify');
+    Route::post('verify/code', 'verifyCode');
 
     Route::post('login', 'login')->name('login');
     Route::post('login/code', 'loginWithCode')->name('login.code');
@@ -114,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::get('roles', 'getRoles')->middleware(['ability:user-modify']);
+        Route::post('update-password', 'updatePassword')->middleware(['ability:user-modify']);
         Route::post('roles', 'addNewRole')->middleware(['ability:user-modify']);
         Route::get('permissions', 'getPermissions')->middleware(['ability:user-modify']);
     });
@@ -238,7 +240,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/files/images/national_photos/{image_path}', function ($image_path) {
         $image = "/images/national_photos/$image_path";
         if (Storage::disk('liara')->exists($image)) {
-            return Storage::disk('liara')->get($image);
+            $file = Storage::disk('liara')->get($image);
+            $type = Storage::disk('liara')->mimeType($image);
+            // $response = Response::make($file, 200);
+            // $response->header("Content-Type", $type);
+            $imagez = "data:$type;base64," . base64_encode(($file));
+
+            return $imagez;
+            // return Storage::disk('liara')->download($image);
         } else {
             return '-------';
         }

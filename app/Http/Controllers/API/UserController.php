@@ -96,23 +96,21 @@ class UserController extends BaseController
         $request->validate([
             'mobile' => 'unique:users,mobile,' . Auth::id()
         ]);
-        
+
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('کد ملی معتبر نمی باشد.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $input = $request->all();
         $user = User::find(Auth::id());
 
         if ($request->hasFile('nationalPhoto')) {
-            if ($user->nationalPhoto) {
-                Storage::disk('liara')->delete($user->nationalPhoto);
-            }
+            // $path = $request->file('nationalPhoto')->store('national_photos');
+
             $path = uploadNationalImageToS3($request->file('nationalPhoto'));
 
             $input['nationalPhoto'] = $path;
         }
-
         $input['status'] = 0;
 
         $oldData = $user->toArray();
@@ -123,5 +121,4 @@ class UserController extends BaseController
 
         return $this->sendResponse($newData, ".بروزرسانی با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
     }
-
 }

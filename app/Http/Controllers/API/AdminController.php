@@ -16,6 +16,7 @@ use App\Http\Requests\Admin\GetVehiclesRequest;
 use App\Http\Requests\Admin\UpdateStoreRequest;
 use App\Http\Requests\Admin\UpdateVehicleRequest;
 use App\Models\Log;
+use Illuminate\Support\Facades\Log as LogManager;
 use App\Models\Neighborhood;
 use App\Models\NeighborhoodsAvailable;
 use App\Models\Role;
@@ -37,7 +38,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Morilog\Jalali\Jalalian;
 use Spatie\FlareClient\Http\Exceptions\InvalidData;
+use Symfony\Component\HttpKernel\Log\Logger;
 
 class AdminController extends BaseController
 {
@@ -102,20 +105,21 @@ class AdminController extends BaseController
         $input = $request->all();
         $role = Role::where('name', $request->role)->first();
         if (!$role) {
-            return $this->sendError('مقدار نقش کاربر اشتباه است', ['error' => ['role' => 'مقدار نقش کاربر اشتباه است']], 422);
+            return $this->sendError('مقدار نقش کاربر اشتباه است', ['errors' => ['role' => 'مقدار نقش کاربر اشتباه است']], 422);
         }
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $input['userType'] = '1';
         $input['password'] =  bcrypt($request->password);
+
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
 
             $path = uploadNationalImageToS3($request->file('nationalPhoto'));
 
-            $inputUser['nationalPhoto'] = $path;
+            $input['nationalPhoto'] = $path;
         }
         $user = User::create($input);
         $user->wallet()->create();
@@ -235,8 +239,51 @@ class AdminController extends BaseController
     {
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $q = $request->input('q', null);
+        $startDate = $request->input('startDate', null);
+        $endDate = $request->input('endDate', null);
+        $type = $request->input('type', null);
+        $status = $request->input('status', null);
+
+        if ($startDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($startDate));
+            $startDate = $jDate->toCarbon();
+        }
+
+        if ($endDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($endDate));
+            $endDate = $jDate->toCarbon();
+        }
+
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::SHOW_ALL);
-        return User::with('roles')->where('userType', '1')->paginate($perPage, ['*'], 'page', $page);
+
+        $employees =  User::with(['roles',])->where('userType', '1')
+            ->where(function ($query) use ($q) {
+                $query->where('id', 'like', '%' . $q . '%')
+                    ->orWhere('users.name', 'like', '%' . $q . '%')
+                    ->orWhere('users.family', 'like', '%' . $q . '%')
+                    ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
+                    ->orWhere('users.mobile', 'like', '%' . $q . '%')
+                    ->orWhere('users.email', 'like', '%' . $q . '%')
+                    ->orWhere('users.employee_code', 'like', '%' . $q . '%')
+                    ->orWhere('name', 'like', '%' . $q . '%');
+            });
+
+        if ($status) {
+            $employees->where('users.status', '=', $status);
+        }
+
+
+        if ($startDate) {
+            $employees->whereDate('users.created_at', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $employees->whereDate('users.created_at', '<=', $endDate);
+        }
+
+
+        return $employees->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -270,7 +317,7 @@ class AdminController extends BaseController
      */
     public function getEmployee(Request $request, $employeeId)
     {
-        $user = User::with('roles')->where('userType', '1')->where('id', $employeeId)->firstOrFail();
+        $user = User::with(['roles', 'createdBy'])->where('userType', '1')->where('id', $employeeId)->firstOrFail();
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::SHOW_PROFILE, $user);
         return $user;
     }
@@ -323,7 +370,7 @@ class AdminController extends BaseController
 
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $input = $request->all();
 
@@ -413,10 +460,10 @@ class AdminController extends BaseController
      *     ),
      *     @OA\Property(
      *         property="storeAreaType",
-     *         description="Area Type",
+     *         description="Area Type 0 = RENT, 1 OWNERSHIP",
      *         type="string",
-     *         enum={"RENT", "OWNERSHIP"},
-     *         example="RENT"
+     *         enum={"0", "1"},
+     *         example="0"
      *     ),
      *     @OA\Property(
      *         property="storeName",
@@ -508,7 +555,7 @@ class AdminController extends BaseController
     {
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
@@ -543,6 +590,10 @@ class AdminController extends BaseController
             'lang' => $request->storeLang,
             'neighborhood_id' => $request->neighborhood_id,
         ]);
+
+        if ($request->get('sendNotice', false)) {
+            registerNotice($request->get('mobile'), $request->get('password'));
+        }
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::ADD, json_encode($store));
         $user->save();
@@ -628,8 +679,47 @@ class AdminController extends BaseController
     {
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $q = $request->input('q', null);
+        $startDate = $request->input('startDate', null);
+        $endDate = $request->input('endDate', null);
+        $type = $request->input('type', null);
+        $status = $request->input('status', null);
+
+        if ($startDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($startDate));
+            $startDate = $jDate->toCarbon();
+        }
+
+        if ($endDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($endDate));
+            $endDate = $jDate->toCarbon();
+        }
+
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::SHOW_ALL);
-        return User::with(['store', 'wallet', 'coinWallet', 'createdBy'])->whereHas('store')->paginate($perPage, ['*'], 'page', $page);
+        $stores = User::with(['store', 'wallet', 'coinWallet', 'createdBy'])
+            ->whereHas('store', function ($query) use ($startDate) {
+                return $startDate ? $query->whereDate('users.created_at', '>=', $startDate)
+                    : $query;
+            })->whereHas('store', function ($query) use ($endDate) {
+                return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
+                    : $query;
+            })->whereHas('store', function ($query) use ($status) {
+                return $status != null ? $query->where('users.status', '=', $status)
+                    : $query;
+            })->whereHas('store', function ($query) use ($type) {
+                return $type != null ? $query->where('category_id', '=', $type)
+                    : $query;
+            })->whereHas('store', function ($query) use ($q) {
+                return $q ? $query
+                    ->where('id', 'like', '%' . $q . '%')
+                    ->orWhere('users.name', 'like', '%' . $q . '%')
+                    ->orWhere('users.family', 'like', '%' . $q . '%')
+                    ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
+                    ->orWhere('users.mobile', 'like', '%' . $q . '%')
+                    ->orWhere('name', 'like', '%' . $q . '%')
+                    : $query;
+            });
+        return $stores->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -835,7 +925,7 @@ class AdminController extends BaseController
     {
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
@@ -857,7 +947,7 @@ class AdminController extends BaseController
 
 
         // if (Validator::make($inputUser, ['mobile' => ])->failed()) {
-        //     return $this->sendError('شماره همراه قبلا انتخاب شده است.', ['error' => ['mobile' => 'شماره همراه قبلا انتخاب شده است.']], 422);
+        //     return $this->sendError('شماره همراه قبلا انتخاب شده است.', ['errors' => ['mobile' => 'شماره همراه قبلا انتخاب شده است.']], 422);
         // }
         $request->validate([
             'mobile' => 'unique:users,mobile,' . $user->id
@@ -876,7 +966,7 @@ class AdminController extends BaseController
 
         if ($store) {
             $oldData = $store->toArray();
-            $data = $request->only(['storeCategory_id', 'storeAreaType', 'storeName', 'storePostCode', 'storePhone', 'storeLat', 'storeLang']);
+            $data = $request->only(['storeCategory_id', 'storeAreaType', 'storeName', 'storePostCode', 'storePhone', 'storeLat', 'storeLang', 'neighborhood_id']);
 
             $store->update([
                 'category_id' => $data['storeCategory_id'],
@@ -884,8 +974,9 @@ class AdminController extends BaseController
                 'name' => $data['storeName'],
                 'postCode' => $data['storePostCode'],
                 'storePhone' => $data['storePhone'],
-                'lat' => $data['storeLat'],
-                'lang' => $data['storeLang'],
+                'lat' => $data['storeLat'] || 0,
+                'lang' => $data['storeLang'] || 0,
+                'neighborhood_id' => $data['neighborhood_id'],
             ]);
             $newData = $store->toArray();
 
@@ -956,6 +1047,7 @@ class AdminController extends BaseController
      *                      @OA\Property(property="family", type="string", maxLength=70),
      *                      @OA\Property(property="mobile", type="string", format="mobile", example="09123456789"),
      *                      @OA\Property(property="password", type="string", example="newPassword"),
+     *                      @OA\Property(property="sendNotice", type="boolean", example="true"),
      *                      @OA\Property(property="status", type="integer", example="0",description="User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked"),
      *                      @OA\Property(property="nationalCode", type="string", format="nationalCode", example="0123456789"),
      *                      @OA\Property(property="nationalPhoto", type="string", format="binary", description="The user's national photo image file (JPEG or PNG format, max size 15MB, min dimensions 100x100, max dimensions 1000x1000)."),
@@ -1071,7 +1163,7 @@ class AdminController extends BaseController
     {
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
@@ -1095,6 +1187,10 @@ class AdminController extends BaseController
         $user = User::create($inputUser);
         $user->wallet()->create();
         $user->coinWallet()->create();
+
+        if ($request->get('sendNotice', false)) {
+            registerNotice($request->get('mobile'), $request->get('password'));
+        }
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::ADD, json_encode($user));
 
@@ -1265,8 +1361,55 @@ class AdminController extends BaseController
     {
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $q = $request->input('q', null);
+        $startDate = $request->input('startDate', null);
+        $endDate = $request->input('endDate', null);
+        $vehicleType = $request->input('type', null);
+        $status = $request->input('status', null);
+
+        if ($startDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($startDate));
+            $startDate = $jDate->toCarbon();
+        }
+
+        if ($endDate) {
+            $jDate = Jalalian::fromFormat('Y/m/d', convertNumbers($endDate));
+            $endDate = $jDate->toCarbon();
+        }
+
+        if ($vehicleType == 'CAR') {
+            $vehicleType = 1;
+        } else {
+            $vehicleType = 0;
+        }
+
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_ALL);
-        return User::with(['vehicle', 'wallet', 'coinWallet', 'createdBy'])->whereHas('vehicle')->paginate($perPage, ['*'], 'page', $page);
+        $vehicles = User::with(['vehicle', 'wallet', 'coinWallet', 'createdBy'])
+            ->whereHas('vehicle', function ($query) use ($startDate) {
+                return $startDate ? $query->whereDate('users.created_at', '>=', $startDate)
+                    : $query;
+            })->whereHas('vehicle', function ($query) use ($endDate) {
+                return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
+                    : $query;
+            })->whereHas('vehicle', function ($query) use ($vehicleType) {
+                return $vehicleType != null ? $query->where('vehicle.type', '=', $vehicleType)
+                    : $query;
+            })->whereHas('vehicle', function ($query) use ($status) {
+                return $status != null ? $query->where('users.status', '=', $status)
+                    : $query;
+            })->whereHas('vehicle', function ($query) use ($q) {
+                return $q ? $query->where('id', 'like', '%' . $q . '%')
+                    ->orWhere('users.name', 'like', '%' . $q . '%')
+                    ->orWhere('users.family', 'like', '%' . $q . '%')
+                    ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
+                    ->orWhere('users.mobile', 'like', '%' . $q . '%')
+                    ->orWhere('vehicle.brand', 'like', '%' . $q . '%')
+                    ->orWhere('vehicle.color', 'like', '%' . $q . '%')
+                    ->orWhere('vehicle.model', 'like', '%' . $q . '%')
+                    ->orWhere('vehicle.pelak', 'like', '%' . $q . '%')
+                    : $query;
+            });
+        return $vehicles->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -1469,7 +1612,7 @@ class AdminController extends BaseController
     {
         if ($request->nationalCode)
             if (!checkNationalcode($request->nationalCode))
-                return $this->sendError('national Code Not Valid.', ['error' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
+                return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
@@ -1477,6 +1620,11 @@ class AdminController extends BaseController
             $inputUser['password'] =  bcrypt($request->password);
 
         $user = $this->getVehicle($request, $vehicleId);
+
+        if ($user->nationalPhoto || $user->nationalPhotoStatus == 'remove') {
+            Storage::disk('liara')->delete($user->nationalPhoto);
+            $inputUser['nationalPhoto'] = null;
+        }
 
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
@@ -1518,7 +1666,7 @@ class AdminController extends BaseController
             ]);
             $newData = $vehicle->toArray();
 
-            (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
+            // (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
         }
 
 
@@ -1716,5 +1864,19 @@ class AdminController extends BaseController
             $role->givePermissionTo($permission);
         }
         return $this->sendResponse($role, Lang::get('http-statuses.200'));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user =  User::findOrFail($request->get('user_id', 0));
+        if ($request->password)
+            $user->password =  bcrypt($request->password);
+        $user->save();
+        if ($request->get('sendNotice', false)) {
+            updatePassNotice($request->get('mobile'), $request->get('password'));
+        }
+
+
+        return $this->sendResponse($user, ".پیک با موفقیت انجام شد");
     }
 }

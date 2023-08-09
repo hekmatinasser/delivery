@@ -70,7 +70,7 @@ class VehicleController extends BaseController
         $user = User::find(Auth::id());
         $user->load('vehicle');
         if ($user->vehicle) {
-            return $this->sendError('وسیله نقلیه قبلا ایجاد شده است.', ['error' => ['vehicle' => 'وسیله نقلیه قبلا ایجاد شده است.']], 409);
+            return $this->sendError('وسیله نقلیه قبلا ایجاد شده است.', ['errors' => ['vehicle' => 'وسیله نقلیه قبلا ایجاد شده است.']], 409);
         }
         $input = $request->all();
         $input['user_id'] = $user->id;

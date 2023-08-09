@@ -11,6 +11,7 @@ use App\Http\Requests\Auth\LoginWithCodeRequest;
 use App\Http\Requests\Auth\LoginWithPasswordRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\VerifyCodeRequest;
 use App\Http\Requests\Auth\VerifyRequest;
 use App\Models\Log;
 use App\Models\VerifyCode;
@@ -130,7 +131,56 @@ class RegisterController extends BaseController
 
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::REGISTER, LogActionsEnum::SUCCESS);
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
-        return $this->sendResponse([$data], Lang::get('auth.profile_created'));
+        return $this->sendResponse($data, Lang::get('auth.profile_created'));
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/verify/code",
+     *     summary="Complete user registration",
+     *     description="Complete user registration with activation code",
+     *     tags={"Authentication"},
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(ref="#/components/schemas/VerifyCodeRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="token", type="string", example="hash-value"),
+     *                  @OA\Property(property="name", type="string", example="John"),
+     *                  @OA\Property(property="family", type="string", example="Doe"),
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Completed")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation Error",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorValidation")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Error Response",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
+     */
+    public function verifyCode(VerifyCodeRequest $request)
+    {
+        // TODO CHECK if validation Logger is available
+        $user = (new User())->getUserByActivationCode($request->code);
+        if (!$user || $user->mobile != $request->mobile) {
+            if (!$user) {
+                $user = User::findByMobile($request->mobile);
+                Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::REGISTER, LogActionsEnum::FAILED, Lang::get('auth.code_failed'));
+            }
+            return $this->sendError(Lang::get('auth.code_failed'), [], 400);
+        }
+
+        return $this->sendResponse(['done'], Lang::get('auth.profile_created'));
     }
 
     /**

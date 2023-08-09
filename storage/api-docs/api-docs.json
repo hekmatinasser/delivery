@@ -600,13 +600,13 @@
                                         "example": "1"
                                     },
                                     "storeAreaType": {
-                                        "description": "Area Type",
+                                        "description": "Area Type 0 = RENT, 1 OWNERSHIP",
                                         "type": "string",
                                         "enum": [
-                                            "RENT",
-                                            "OWNERSHIP"
+                                            "0",
+                                            "1"
                                         ],
-                                        "example": "RENT"
+                                        "example": "0"
                                     },
                                     "storeName": {
                                         "description": "Name",
@@ -1356,6 +1356,10 @@
                                     "password": {
                                         "type": "string",
                                         "example": "newPassword"
+                                    },
+                                    "sendNotice": {
+                                        "type": "boolean",
+                                        "example": "true"
                                     },
                                     "status": {
                                         "description": "User's status :: 1 => active, 0 => inactive, -1 => suspended, -2 => blocked",
@@ -3655,6 +3659,84 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/VerifyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "hash-value"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "family": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Completed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/verify/code": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Complete user registration",
+                "description": "Complete user registration with activation code",
+                "operationId": "e9024b8ccefbec3b91e2ae04056468a7",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyCodeRequest"
                             }
                         }
                     }
@@ -7836,6 +7918,26 @@
                 },
                 "type": "object"
             },
+            "VerifyCodeRequest": {
+                "title": "Compleate RegistrationRequest Request",
+                "description": "Pass user mobile number and activation code",
+                "required": [
+                    "mobile",
+                    "code",
+                    "password"
+                ],
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "example": "09123456789"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "1234"
+                    }
+                },
+                "type": "object"
+            },
             "VerifyRequest": {
                 "title": "Compleate RegistrationRequest Request",
                 "description": "Pass user mobile number and activation code",
@@ -7913,7 +8015,7 @@
                     "shipment_prepare_time": {
                         "description": "The time for shipment preparation",
                         "type": "string",
-                        "format": "date"
+                        "format": "date-time"
                     },
                     "trip_rial_fare": {
                         "description": "The fare for the trip",
@@ -7967,11 +8069,11 @@
                         "example": "1"
                     },
                     "areaType": {
-                        "description": "Area Type",
+                        "description": "Area Type 0 => RENT, 1 => OWNERSHIP",
                         "type": "string",
                         "enum": [
-                            "RENT",
-                            "OWNERSHIP"
+                            "0",
+                            "1"
                         ],
                         "example": "RENT"
                     },

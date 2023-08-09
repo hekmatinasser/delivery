@@ -35,9 +35,9 @@ use Illuminate\Support\Facades\Auth;
  *     ),
  *     @OA\Property(
  *         property="areaType",
- *         description="Area Type",
+ *         description="Area Type 0 => RENT, 1 => OWNERSHIP",
  *         type="string",
- *         enum={"RENT", "OWNERSHIP"},
+ *         enum={"0", "1"},
  *         example="RENT"
  *     ),
  *     @OA\Property(
@@ -100,7 +100,7 @@ class StoreStoreRequest extends FormRequest
         return [
             'category_id' => 'required|numeric|exists:store_category,id',
             'neighborhood_id' => 'required|numeric|exists:neighborhoods,id',
-            'areaType' => 'required|in:RENT,OWNERSHIP',
+            'areaType' => 'required|in:0,1',
             'name' => 'required|max:255',
             'address' => 'required|max:255',
             'postCode' => 'required|digits:10|numeric',

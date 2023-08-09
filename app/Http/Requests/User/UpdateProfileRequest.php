@@ -42,7 +42,7 @@ class UpdateProfileRequest extends FormRequest
             'family' => 'nullable|max:70',
             'mobile' => 'Required|regex:/(09)[0-9]{9}/|digits:11|numeric',
             'nationalCode' => 'nullable|digits:10|numeric',
-            'nationalPhoto' => 'nullable|mimes:jpeg,png|max:15360|dimensions:min_width=100,min_height=100',
+            'nationalPhoto' => 'nullable|image|max:15360|',
             'address' => 'nullable|max:255',
             'postCode' => 'nullable|digits:10|numeric',
             'phone' => 'nullable|numeric',
@@ -59,6 +59,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'nationalPhoto' => 'تصویر کارت ملی',
             'postCode' => 'کد پستی',
+            'nationalCode' => 'کد ملی',
         ];
     }
 }
