@@ -125,9 +125,9 @@ class RegisterController extends BaseController
         $user->status = 1;
         $user->save();
 
-        $data['token'] =  $user->createToken('client', [])->plainTextToken;
-        $data['name'] =  $user->name;
-        $data['family'] =  $user->family;
+        $data['token'] = $user->createToken('client', [])->plainTextToken;
+        $data['name'] = $user->name;
+        $data['family'] = $user->family;
 
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::REGISTER, LogActionsEnum::SUCCESS);
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
@@ -180,7 +180,7 @@ class RegisterController extends BaseController
             return $this->sendError(Lang::get('auth.code_failed'), [], 400);
         }
 
-        return $this->sendResponse(['done'], Lang::get('auth.profile_created'));
+        return $this->sendResponse(['done'], Lang::get('http-statuses.200'));
     }
 
     /**
@@ -311,9 +311,9 @@ class RegisterController extends BaseController
         if (count($abilities)) {
             $tokenName = 'admin';
         }
-        $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
-        $success['name'] =  $user->name;
-        $success['family'] =  $user->family;
+        $success['token'] = $user->createToken($tokenName, $abilities)->plainTextToken;
+        $success['name'] = $user->name;
+        $success['family'] = $user->family;
 
         Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
         // TODO CLEAR this LOGGER after SECCUSS LOGIN
@@ -400,9 +400,9 @@ class RegisterController extends BaseController
             if (count($abilities)) {
                 $tokenName = 'admin';
             }
-            $success['token'] =  $user->createToken($tokenName, $abilities)->plainTextToken;
-            $success['name'] =  $user->name;
-            $success['family'] =  $user->family;
+            $success['token'] = $user->createToken($tokenName, $abilities)->plainTextToken;
+            $success['name'] = $user->name;
+            $success['family'] = $user->family;
 
 
             Log::store(LogUserTypesEnum::USER, $user->id, LogModelsEnum::LOGIN, LogActionsEnum::SUCCESS);
