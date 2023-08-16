@@ -119,6 +119,6 @@ class UserController extends BaseController
 
         (new User())->logUserModelChanges($user, $oldData, $newData);
 
-        return $this->sendResponse($newData, ".بروزرسانی با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($newData, "بروزرسانی با موفقیت انجام شد. منتظر تایید ادمین باشید");
     }
 }

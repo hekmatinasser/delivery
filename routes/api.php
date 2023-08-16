@@ -183,7 +183,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('v1/neighborhood')->controller(NeighborhoodController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::get('/fee', 'fees')->name('fees');
-        Route::get('/fee/histories', 'histories')->name('fees.histories')->middleware(['ability:user-modify']);;
+        Route::get('/fee/histories', 'histories')->name('fees.histories')->middleware(['ability:user-modify']);
+        ;
         Route::get('{neighborhood_id}', 'show')->name('show');
 
         //Inter Neighborhood Fare routes
@@ -252,6 +253,30 @@ Route::middleware('auth:sanctum')->group(function () {
             return '-------';
         }
     })->middleware(['ability:user-modify']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/files/{id}/images/national_photos/{image_path}', function ($id, $image_path) {
+
+        $user = Auth::user();
+        $path = 'images/national_photos/' . $image_path;
+        if (($user->nationalPhoto) != $path)
+            return '';
+
+        $image = "/images/national_photos/$image_path";
+        if (Storage::disk('liara')->exists($image)) {
+            $file = Storage::disk('liara')->get($image);
+            $type = Storage::disk('liara')->mimeType($image);
+            // $response = Response::make($file, 200);
+            // $response->header("Content-Type", $type);
+            $imagez = "data:$type;base64," . base64_encode(($file));
+
+            return $imagez;
+            // return Storage::disk('liara')->download($image);
+        } else {
+            return '-------';
+        }
+    });
 });
 
 Route::get('/files/images/public/{image_path}', function ($image_path) {

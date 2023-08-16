@@ -81,7 +81,7 @@ class VehicleController extends BaseController
         $user->status = 2;
         $user->save();
 
-        return $this->sendResponse($vehicle, ".وسیله نقلیه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($vehicle, "وسیله نقلیه با موفقیت ایجاد شد. منتظر تایید ادمین باشید");
     }
 
     /**
@@ -133,7 +133,7 @@ class VehicleController extends BaseController
         } else
             return $this->sendError('', 'وسیله نقلیه یافت نشد', 404);
 
-        return $this->sendResponse($vehicle, ".وسیله نقلیه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($vehicle, "وسیله نقلیه با موفقیت به روز شد. منتظر تایید ادمین باشید");
     }
 
     /**

@@ -85,7 +85,7 @@ class StoreController extends BaseController
         $user->status = 2;
         $user->save();
 
-        return $this->sendResponse($store, ".مغازه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($store, "مغازه با موفقیت ایجاد شد.منتظر تایید ادمین باشید");
     }
 
     /**
@@ -141,7 +141,7 @@ class StoreController extends BaseController
         $store->load('category');
         $store->load('neighborhood');
 
-        return $this->sendResponse($store, ".مغازه با موفقیت انجام شد\\nمنتظر تایید ادمین باشید");
+        return $this->sendResponse($store, "مغازه با موفقیت به روز شد. منتظر تایید ادمین باشید");
     }
 
     /**
