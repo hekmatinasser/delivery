@@ -24,7 +24,8 @@ use Illuminate\Support\Facades\Log;
 
 function verifySMS($number, $code)
 {
-    if (config('app.env') == 'local') return false;
+    if (config('app.env') == 'local')
+        return false;
     $userName = config('admin.smsPanel.username');
     $password = config('admin.smsPanel.pass');
     $fromNumber = config('admin.smsPanel.number');
@@ -42,7 +43,8 @@ function verifySMS($number, $code)
 
 function registerNotice($number, $pass)
 {
-    if (config('app.env') == 'local') return false;
+    if (config('app.env') == 'local')
+        return false;
     $userName = config('admin.smsPanel.username');
     $password = config('admin.smsPanel.pass');
     $fromNumber = config('admin.smsPanel.number');
@@ -59,13 +61,52 @@ function registerNotice($number, $pass)
 
 function updatePassNotice($number, $pass)
 {
-    if (config('app.env') == 'local') return false;
+    if (config('app.env') == 'local')
+        return false;
     $userName = config('admin.smsPanel.username');
     $password = config('admin.smsPanel.pass');
     $fromNumber = config('admin.smsPanel.number');
 
     $toNumbers = $number;
     $messageContent = "رمز عبور جدید : $pass";
+    $url = "http://sms1.webhoma.ir/SMSInOutBox/SendSms?username=" . $userName . "&password=" . $password . "&from=" . $fromNumber . "&to=" . $toNumbers . "&text=" . $messageContent;
+    $response = Http::get($url);
+    if ($response != 'SendWasSuccessful') {
+        throw new Exception('SMS was not sent!');
+    }
+}
+
+
+function updateUserStatusNotice($number, $newStatus)
+{
+    $status = '';
+    switch ($newStatus) {
+        case '1':
+            $status = 'فعال';
+            break;
+        case '-2':
+            $status = 'تعلیق';
+            break;
+        case '-1':
+            $status = 'غیر فعال';
+            break;
+        case '0':
+            $status = 'درانتظار بررسی';
+            break;
+        case '2':
+        default:
+            $status = 'نامشخص';
+            break;
+    }
+    Log::debug('call sms :: ' . $status);
+    if (config('app.env') == 'local')
+        return false;
+    $userName = config('admin.smsPanel.username');
+    $password = config('admin.smsPanel.pass');
+    $fromNumber = config('admin.smsPanel.number');
+
+    $toNumbers = $number;
+    $messageContent = "وضعیت کاربری شما به $status تغییر پیدا کرد.";
     $url = "http://sms1.webhoma.ir/SMSInOutBox/SendSms?username=" . $userName . "&password=" . $password . "&from=" . $fromNumber . "&to=" . $toNumbers . "&text=" . $messageContent;
     $response = Http::get($url);
     if ($response != 'SendWasSuccessful') {

@@ -112,7 +112,7 @@ class AdminController extends BaseController
                 return $this->sendError('national Code Not Valid.', ['errors' => ['nationalCode' => 'کد ملی معتبر نمی باشد']], 422);
 
         $input['userType'] = '1';
-        $input['password'] =  bcrypt($request->password);
+        $input['password'] = bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
@@ -257,7 +257,7 @@ class AdminController extends BaseController
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::SHOW_ALL);
 
-        $employees =  User::with(['roles',])->where('userType', '1')
+        $employees = User::with(['roles',])->where('userType', '1')
             ->where(function ($query) use ($q) {
                 $query->where('id', 'like', '%' . $q . '%')
                     ->orWhere('users.name', 'like', '%' . $q . '%')
@@ -377,6 +377,9 @@ class AdminController extends BaseController
         $oldData = $user->toArray();
         $user->update($input);
         $newData = $user->toArray();
+        if ($oldData['status'] != $newData['status']) {
+            updateUserStatusNotice($user->mobile, $user->status);
+        }
 
         (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
 
@@ -561,7 +564,7 @@ class AdminController extends BaseController
 
 
         $inputUser['userType'] = '0';
-        $inputUser['password'] =  bcrypt($request->password);
+        $inputUser['password'] = bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
@@ -579,7 +582,7 @@ class AdminController extends BaseController
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::USER, LogActionsEnum::ADD, json_encode($user));
 
         $store = Store::create([
-            'user_id' =>  $user->id,
+            'user_id' => $user->id,
             'category_id' => $request->storeCategory_id,
             'areaType' => $request->storeAreaType,
             'name' => $request->storeName,
@@ -701,24 +704,24 @@ class AdminController extends BaseController
                 return $startDate ? $query->whereDate('users.created_at', '>=', $startDate)
                     : $query;
             })->whereHas('store', function ($query) use ($endDate) {
-                return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
-                    : $query;
-            })->whereHas('store', function ($query) use ($status) {
-                return $status != null ? $query->where('users.status', '=', $status)
-                    : $query;
-            })->whereHas('store', function ($query) use ($type) {
-                return $type != null ? $query->where('category_id', '=', $type)
-                    : $query;
-            })->whereHas('store', function ($query) use ($q) {
-                return $q ? $query
-                    ->where('id', 'like', '%' . $q . '%')
-                    ->orWhere('users.name', 'like', '%' . $q . '%')
-                    ->orWhere('users.family', 'like', '%' . $q . '%')
-                    ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
-                    ->orWhere('users.mobile', 'like', '%' . $q . '%')
-                    ->orWhere('name', 'like', '%' . $q . '%')
-                    : $query;
-            });
+            return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
+                : $query;
+        })->whereHas('store', function ($query) use ($status) {
+            return $status != null ? $query->where('users.status', '=', $status)
+                : $query;
+        })->whereHas('store', function ($query) use ($type) {
+            return $type != null ? $query->where('category_id', '=', $type)
+                : $query;
+        })->whereHas('store', function ($query) use ($q) {
+            return $q ? $query
+                ->where('id', 'like', '%' . $q . '%')
+                ->orWhere('users.name', 'like', '%' . $q . '%')
+                ->orWhere('users.family', 'like', '%' . $q . '%')
+                ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
+                ->orWhere('users.mobile', 'like', '%' . $q . '%')
+                ->orWhere('name', 'like', '%' . $q . '%')
+                : $query;
+        });
         return $stores->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -930,7 +933,7 @@ class AdminController extends BaseController
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
         if ($request->password)
-            $inputUser['password'] =  bcrypt($request->password);
+            $inputUser['password'] = bcrypt($request->password);
 
         $user = $this->getStore($request, $storeId);
 
@@ -958,6 +961,9 @@ class AdminController extends BaseController
         $oldData = $user->toArray();
         $user->update($inputUser);
         $newData = $user->toArray();
+        if ($oldData['status'] != $newData['status']) {
+            updateUserStatusNotice($user->mobile, $user->status);
+        }
 
         (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
 
@@ -1169,7 +1175,7 @@ class AdminController extends BaseController
 
 
         $inputUser['userType'] = '0';
-        $inputUser['password'] =  bcrypt($request->password);
+        $inputUser['password'] = bcrypt($request->password);
 
         if ($request->hasFile('nationalPhoto')) {
             // $path = $request->file('nationalPhoto')->store('national_photos');
@@ -1206,9 +1212,9 @@ class AdminController extends BaseController
         $adminId = Auth::id();
         $available = $neighborhoodIds->map(function ($neighborhood) use ($vehicle, $adminId) {
             return [
-                'vehicle_id'            => $vehicle->id,
-                'neighborhood_id'         => $neighborhood->id,
-                'user_id'     => $adminId,
+                'vehicle_id' => $vehicle->id,
+                'neighborhood_id' => $neighborhood->id,
+                'user_id' => $adminId,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -1227,7 +1233,7 @@ class AdminController extends BaseController
         $adminId = Auth::id();
         $parameters = collect(json_decode($req));
         $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
-            $data =  collect($parameters)->firstWhere('id', $store->id);
+            $data = collect($parameters)->firstWhere('id', $store->id);
 
             try {
                 $expire = Carbon::parse($data->expire);
@@ -1258,7 +1264,7 @@ class AdminController extends BaseController
         $adminId = Auth::id();
         $parameters = collect(json_decode($req));
         $blocked = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
-            $data =  collect($parameters)->firstWhere('id', $store->id);
+            $data = collect($parameters)->firstWhere('id', $store->id);
 
             try {
                 $expire = Carbon::parse($data->expire);
@@ -1389,26 +1395,26 @@ class AdminController extends BaseController
                 return $startDate ? $query->whereDate('users.created_at', '>=', $startDate)
                     : $query;
             })->whereHas('vehicle', function ($query) use ($endDate) {
-                return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
-                    : $query;
-            })->whereHas('vehicle', function ($query) use ($vehicleType) {
-                return $vehicleType != null ? $query->where('vehicle.type', '=', $vehicleType)
-                    : $query;
-            })->whereHas('vehicle', function ($query) use ($status) {
-                return $status != null ? $query->where('users.status', '=', $status)
-                    : $query;
-            })->whereHas('vehicle', function ($query) use ($q) {
-                return $q ? $query->where('id', 'like', '%' . $q . '%')
-                    ->orWhere('users.name', 'like', '%' . $q . '%')
-                    ->orWhere('users.family', 'like', '%' . $q . '%')
-                    ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
-                    ->orWhere('users.mobile', 'like', '%' . $q . '%')
-                    ->orWhere('vehicle.brand', 'like', '%' . $q . '%')
-                    ->orWhere('vehicle.color', 'like', '%' . $q . '%')
-                    ->orWhere('vehicle.model', 'like', '%' . $q . '%')
-                    ->orWhere('vehicle.pelak', 'like', '%' . $q . '%')
-                    : $query;
-            });
+            return $endDate ? $query->whereDate('users.created_at', '<=', $endDate)
+                : $query;
+        })->whereHas('vehicle', function ($query) use ($vehicleType) {
+            return $vehicleType != null ? $query->where('vehicle.type', '=', $vehicleType)
+                : $query;
+        })->whereHas('vehicle', function ($query) use ($status) {
+            return $status != null ? $query->where('users.status', '=', $status)
+                : $query;
+        })->whereHas('vehicle', function ($query) use ($q) {
+            return $q ? $query->where('id', 'like', '%' . $q . '%')
+                ->orWhere('users.name', 'like', '%' . $q . '%')
+                ->orWhere('users.family', 'like', '%' . $q . '%')
+                ->orWhere('users.nationalCode', 'like', '%' . $q . '%')
+                ->orWhere('users.mobile', 'like', '%' . $q . '%')
+                ->orWhere('vehicle.brand', 'like', '%' . $q . '%')
+                ->orWhere('vehicle.color', 'like', '%' . $q . '%')
+                ->orWhere('vehicle.model', 'like', '%' . $q . '%')
+                ->orWhere('vehicle.pelak', 'like', '%' . $q . '%')
+                : $query;
+        });
         return $vehicles->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -1617,7 +1623,7 @@ class AdminController extends BaseController
         $inputUser = $request->only(['name', 'family', 'mobile', 'nationalCode', 'address', 'postCode', 'phone', 'status']);
 
         if ($request->password)
-            $inputUser['password'] =  bcrypt($request->password);
+            $inputUser['password'] = bcrypt($request->password);
 
         $user = $this->getVehicle($request, $vehicleId);
 
@@ -1647,6 +1653,10 @@ class AdminController extends BaseController
         $oldData = $user->toArray();
         $user->update($inputUser);
         $newData = $user->toArray();
+        
+        if ($oldData['status'] != $newData['status']) {
+            updateUserStatusNotice($user->mobile, $user->status);
+        }
 
         (new User())->logUserModelChanges(Auth::user(), $oldData, $newData);
 
@@ -1678,7 +1688,7 @@ class AdminController extends BaseController
             return [
                 'vehicle_id' => $vehicle->id,
                 'neighborhood_id' => $neighborhood->id,
-                'user_id'     => $adminId,
+                'user_id' => $adminId,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -1697,7 +1707,7 @@ class AdminController extends BaseController
         $adminId = Auth::id();
         $parameters = collect(json_decode($req));
         $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
-            $data =  collect($parameters)->firstWhere('id', $store->id);
+            $data = collect($parameters)->firstWhere('id', $store->id);
 
             try {
                 // $expire = date('Y-m-d', $data->expire);
@@ -1868,9 +1878,9 @@ class AdminController extends BaseController
 
     public function updatePassword(Request $request)
     {
-        $user =  User::findOrFail($request->get('user_id', 0));
+        $user = User::findOrFail($request->get('user_id', 0));
         if ($request->password)
-            $user->password =  bcrypt($request->password);
+            $user->password = bcrypt($request->password);
         $user->save();
         if ($request->get('sendNotice', false)) {
             updatePassNotice($request->get('mobile'), $request->get('password'));
