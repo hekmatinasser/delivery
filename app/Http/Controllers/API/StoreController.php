@@ -82,7 +82,7 @@ class StoreController extends BaseController
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::STORE, LogActionsEnum::ADD, json_encode($store));
 
-        $user->status = 2;
+        $user->status = 0;
         $user->save();
 
         return $this->sendResponse($store, "مغازه با موفقیت ایجاد شد.منتظر تایید ادمین باشید");
@@ -132,7 +132,7 @@ class StoreController extends BaseController
 
             (new Store())->logStoreModelChanges($user, $oldData, $newData);
 
-            $user->status = 2;
+            $user->status = 0;
             $user->save();
         } else
             return $this->sendError('', 'مغازه یافت نشد', 404);

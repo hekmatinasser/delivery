@@ -8136,7 +8136,7 @@
                         "type": "string",
                         "enum": [
                             "RENT",
-                            "PEROPERTY"
+                            "OWNERSHIP"
                         ],
                         "example": "RENT"
                     },
