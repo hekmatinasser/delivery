@@ -151,7 +151,7 @@ class TripController extends BaseController
      */
     public function create(StoreTripRequest $request)
     {
-        $vehicle  = Vehicle::find($request->vehicle_id);
+        $vehicle = Vehicle::find($request->vehicle_id);
         $trip =
             Trip::create(
                 [
@@ -244,7 +244,7 @@ class TripController extends BaseController
     {
         $trip = Trip::where('trip_code', '=', $code)->firstOrFail();
 
-        $vehicle  = Vehicle::find($request->vehicle_id);
+        $vehicle = Vehicle::find($request->vehicle_id);
 
         $trip =
             Trip::updateOrCreate(
@@ -414,6 +414,51 @@ class TripController extends BaseController
     }
 
     /**
+     ** @OA\Get(
+     *     path="/api/v1/store/trip/{code}",
+     *     security={ {"sanctum": {} }},
+     *     tags={"Vehicle"},
+     *     summary="Get trip details by trip code",
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="path",
+     *         description="The code of the trip",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="Trip not found",
+     *     )
+     * )
+     */
+    public function detailsForStore(Request $request, $code)
+    {
+        $store = Store::where('user_id', Auth::id())->first();
+        if (!$store) {
+            return $this->sendError(Lang::get('http-statuses.404'), '', 404);
+        }
+        $res = Trip::with(['store', 'vehicle', 'origin', 'destination'])
+            ->where('trip_code', '=', $code)
+            ->where(function ($query) use ($store) {
+                $query->where('store_id', '=', $store->id);
+            })
+            ->first();
+
+        return $this->sendResponse($res, Lang::get('http-statuses.200'));
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/vehicle/trip/{code}/accept",
      *     summary="Accept a trip by its code",
@@ -489,10 +534,10 @@ class TripController extends BaseController
             $data['action'] = 'decrease';
             $data['coins'] = 1;
             $data['reason_code'] = 21;
-            (new  CoinWalletController())->storeTransaction($data);
+            (new CoinWalletController())->storeTransaction($data);
 
             $data['user_id'] = $trip->store->user_id;
-            (new  CoinWalletController())->storeTransaction($data);
+            (new CoinWalletController())->storeTransaction($data);
         }
         DB::commit();
 
@@ -938,15 +983,15 @@ class TripController extends BaseController
     }
 
     /*
-* Generate a random and unique code.
-*
-* @param int $length The length of the code to generate.
-* @param string $prefix A prefix to add to the code (optional).
-* @param string $suffix A suffix to add to the code (optional).
-* @param string $chars A string of characters to use for generating the code (optional).
-*
-* @return string The generated code.
-*/
+     * Generate a random and unique code.
+     *
+     * @param int $length The length of the code to generate.
+     * @param string $prefix A prefix to add to the code (optional).
+     * @param string $suffix A suffix to add to the code (optional).
+     * @param string $chars A string of characters to use for generating the code (optional).
+     *
+     * @return string The generated code.
+     */
     function generateUniqueCode($length = 8, $prefix = '', $suffix = '', $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
         $code = '';
@@ -1028,7 +1073,8 @@ class TripController extends BaseController
     {
         $user = User::find(Auth::id());
         $user->load('store');
-        if (!$user->store) return $this->sendError(Lang::get('http-statuses.404'), '', 404);
+        if (!$user->store)
+            return $this->sendError(Lang::get('http-statuses.404'), '', 404);
 
         if ($user->status != 1) {
             $message = 'شما امکان ویرایش سفر را ندارید!';
@@ -1123,7 +1169,8 @@ class TripController extends BaseController
     {
         $user = User::find(Auth::id());
         $user->load('store');
-        if (!$user->store) return $this->sendError(Lang::get('http-statuses.404'), '', 404);
+        if (!$user->store)
+            return $this->sendError(Lang::get('http-statuses.404'), '', 404);
 
         if ($user->status != 1) {
             $message = 'شما امکان افزودن  سفر جدید را ندارید!';
@@ -1214,7 +1261,8 @@ class TripController extends BaseController
     {
         $user = User::find(Auth::id());
         $user->load('store');
-        if (!$user->store) return $this->sendError(Lang::get('http-statuses.404'), '', 404);
+        if (!$user->store)
+            return $this->sendError(Lang::get('http-statuses.404'), '', 404);
 
         if ($user->status != 1) {
             $message = 'شما امکان ویرایش سفر را ندارید!';

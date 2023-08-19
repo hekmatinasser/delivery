@@ -166,7 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{code}', [TripController::class, 'updateTripWithStore']);
             Route::put('/{code}/cancel', [TripController::class, 'cancelTripWithStore']);
             Route::get('/my', [TripController::class, 'storeTrips']);
-            Route::get('/{code}', [TripController::class, 'details']);
+            Route::get('/{code}', [TripController::class, 'detailsForStore']);
             Route::post('/{code}/feedback', [TripFeedBackController::class, 'createWithStore']);
             Route::put('/{code}/feedback/{id}', [TripFeedBackController::class, 'updateWithStore']);
             Route::get('/{code}/feedback', [TripFeedBackController::class, 'getWithStore']);

@@ -19,6 +19,11 @@ class Neighborhood extends Model
 
     public function fee()
     {
+        return $this->hasMany(InterNeighborhoodFare::class, 'origin', 'id');
+    }
+
+    public function feeBack()
+    {
         return $this->hasMany(InterNeighborhoodFare::class, 'destination', 'id');
     }
 }

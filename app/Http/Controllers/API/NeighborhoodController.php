@@ -81,12 +81,21 @@ class NeighborhoodController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         $origin = $request->input('origin_neighborhood_id', null);
-        $res = Neighborhood::with(['user' => function ($query) {
-            $query->select('id', 'name', 'family');
-        }])
-            ->with(['fee' => function ($query) use ($origin) {
-                $query->where('origin', '=', $origin);
-            }])
+        $res = Neighborhood::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'family');
+            }
+        ])
+            ->with([
+                'fee' => function ($query) use ($origin) {
+                    $query->where('destination', '=', $origin);
+                }
+            ])
+            ->with([
+                'feeBack' => function ($query) use ($origin) {
+                    $query->where('origin', '=', $origin);
+                }
+            ])
             ->paginate($perPage, ['*'], 'page', $page);
 
         // $res['data'] = NeighborhoodResource::collection(($res['data']));
@@ -257,7 +266,8 @@ class NeighborhoodController extends BaseController
 
         if ($request->hasFile('image')) {
             $path = uploadPublicImageToS3($request->file('image'), 'public/');
-        } else $path = '';
+        } else
+            $path = '';
 
         $response = Neighborhood::create([
             'user_id' => $user_id,

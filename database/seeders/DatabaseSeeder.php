@@ -79,6 +79,33 @@ class DatabaseSeeder extends Seeder
             foreach ($neighborhoods as $key => $value) {
                 Neighborhood::create($value);
             }
+
+
+            $stores = [
+                [
+                    'user_id' => 1,
+                    'category_id' => 1,
+                    'neighborhood_id' => 1,
+                    'name' => 'store one'
+                ],
+            ];
+            foreach ($stores as $key => $value) {
+                Store::create($value);
+            }
+
+            $vehicles = [
+                [
+                    'user_id' => 1,
+                    'type' => 0,
+                    'brand' => 'honda',
+                    'pelak' => '123456',
+                    'color' => 'red',
+                    'model' => 'cg125'
+                ],
+            ];
+            foreach ($vehicles as $key => $value) {
+                Vehicle::create($value);
+            }
         }
 
         CoinSetting::create([
@@ -99,30 +126,5 @@ class DatabaseSeeder extends Seeder
 
 
 
-        $stores = [
-            [
-                'user_id' => 1,
-                'category_id' => 1,
-                'neighborhood_id' => 1,
-                'name' => 'store one'
-            ],
-        ];
-        foreach ($stores as $key => $value) {
-            Store::create($value);
-        }
-
-        $vehicles = [
-            [
-                'user_id' => 1,
-                'type' => 0,
-                'brand' => 'honda',
-                'pelak' => '123456',
-                'color' => 'red',
-                'model' => 'cg125'
-            ],
-        ];
-        foreach ($vehicles as $key => $value) {
-            Vehicle::create($value);
-        }
     }
 }
