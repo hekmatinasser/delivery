@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             \App\Models\CoinWallet::factory()->create([
-                'user_id' => $user->id,
+                'user_id' => $userStore->id,
                 'coins' => 0
             ]);
             $neighborhoods = [
