@@ -1257,7 +1257,7 @@ class TripController extends BaseController
      *         ),
      * ))
      */
-    public function cancelTripWithStore($request, $code)
+    public function cancelTripWithStore(Request $request, $code)
     {
         $user = User::find(Auth::id());
         $user->load('store');
@@ -1369,10 +1369,16 @@ class TripController extends BaseController
             case 'pending':
                 $res->whereIn('status', [1]);
                 break;
+            case 'active':
+                $res->whereIn('status', [1, 2, 3, 4]);
+                break;
+            case 'old':
+                $res->whereIn('status', [6, 5]);
+                break;
             default:
                 break;
         }
-        $res = $res->paginate($perPage, ['*'], 'page', $page);
+        $res = $res->orderBy('request_registration_time', 'DESC')->paginate($perPage, ['*'], 'page', $page);
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
 }

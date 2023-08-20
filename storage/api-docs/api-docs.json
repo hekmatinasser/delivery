@@ -4954,13 +4954,49 @@
                 ]
             }
         },
+        "/api/v1/vehicle/trip/{code}": {
+            "get": {
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Get trip details by trip code",
+                "operationId": "0f8b09c38d1102eb4a0fe34602e240d3",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "The code of the trip",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Trip not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/store/trip/{code}": {
             "get": {
                 "tags": [
-                    "Store"
+                    "Vehicle"
                 ],
                 "summary": "Get trip details by trip code",
-                "operationId": "bdb61521aa672ce92789c85596780ed0",
+                "operationId": "e95413f07a830599ce6db0f858e7cf13",
                 "parameters": [
                     {
                         "name": "code",
