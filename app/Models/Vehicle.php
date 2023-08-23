@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LaravelLang\Publisher\Constants\Types;
 use App\Models\Log;
+use Illuminate\Support\Facades\Log as Logger;
 
 /**
  * @OA\Schema(
@@ -70,6 +71,10 @@ class Vehicle extends Model
         'model',
     ];
 
+    // protected $attributes = [
+    //     'max_trip',
+    // ];
+
     public function types()
     {
         return [
@@ -81,8 +86,8 @@ class Vehicle extends Model
     protected function type(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) =>  $this->types()[$value],
-            set: fn (string $value) => array_search($value, $this->types()),
+            get: fn(string $value) => $this->types()[$value],
+            set: fn(string $value) => array_search($value, $this->types()),
         );
     }
 
@@ -138,15 +143,83 @@ class Vehicle extends Model
             });
     }
 
-
     public function storesBlocked()
     {
-        return $this->hasMany(StoresBlocked::class)->with('store', function ($query) {
-            return $query->select(['*'])->get();
-        })
+        return $this->hasMany(StoresBlocked::class)
+            ->with('store', function ($query) {
+                return $query->select(['*'])->get();
+            })
             ->where(function ($query) {
                 $query->whereNull('expire')
                     ->orWhereDate('expire', '>', now());
             });
     }
+
+
+    public function storesAdminAccess()
+    {
+        return $this->hasMany(StoreAvailable::class)
+            ->with('store', function ($query) {
+                return $query->select(['*'])->get();
+            })
+            ->where('with_admin', '1')
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            });
+    }
+
+    public function storesAdminBlock()
+    {
+        return $this->hasMany(StoresBlocked::class)->with('store', function ($query) {
+            return $query->select(['*'])->get();
+        })
+            ->where('with_admin', '1')
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            });
+    }
+
+    public function storesBlockedWithUser()
+    {
+        return $this->hasMany(StoresBlocked::class)
+            ->with('store', function ($query) {
+                return $query->select(['*'])->get();
+            })
+            ->where('with_admin', '0')
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            });
+    }
+
+    public function storesBlockedWithStore()
+    {
+        return $this->hasMany(StoresBlocked::class)
+            ->with('store', function ($query) {
+                return $query->select(['*'])->get();
+            })
+            ->where('with_admin', '0')
+            ->where(function ($query) {
+                $query->whereNull('expire')
+                    ->orWhereDate('expire', '>', now());
+            });
+    }
+
+
+    // public function getMaxTripAttribute()
+    // {
+    //     $value = $this->max_active_trip;
+    //     if ($this->max_active_trip === null) {
+    //         // Retrieve the default_value from the profiles table
+    //         $setting = Setting::first();
+
+    //         if ($setting) {
+    //             $value = $setting->max_active_trip_with_vehicle;
+    //         }
+    //     }
+    //     $this->attributes['max_trip'] = $value;
+    //     return $value;
+    // }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
             $table->integer('type')->unsigned()->nullable();
+            $table->integer('max_active_trip')->nullable();
             $table->string('brand')->nullable();
             $table->string('pelak')->nullable();
             $table->string('color')->nullable();

@@ -35,6 +35,7 @@ return new class extends Migration
             $table->text('manager_description')->nullable();
             $table->dateTime('expire');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

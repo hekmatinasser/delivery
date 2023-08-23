@@ -26,87 +26,88 @@ class DatabaseSeeder extends Seeder
             'status' => '1',
             'userType' => '1'
         ]);
+        \App\Models\Setting::factory(1)->create();
 
-        if (config('app.env') == 'local') {
-            $user = \App\Models\User::factory()->create([
-                'mobile' => '09123456789',
-                'status' => '1',
-                'userType' => '0',
-                'password' => '$2y$10$x.D2SM4Oh0neDkWpdrBF5.UOB5LSJxE.wTubI3shur0TdgDz4qOAW', // MyNewPassword123
-            ]);
+        // if (config('app.env') == 'local') {
+        //     $user = \App\Models\User::factory()->create([
+        //         'mobile' => '09123456789',
+        //         'status' => '1',
+        //         'userType' => '0',
+        //         'password' => '$2y$10$x.D2SM4Oh0neDkWpdrBF5.UOB5LSJxE.wTubI3shur0TdgDz4qOAW', // MyNewPassword123
+        //     ]);
 
-            \App\Models\Wallet::factory()->create([
-                'user_id' => $user->id,
-                'amount' => 1000
-            ]);
+        //     \App\Models\Wallet::factory()->create([
+        //         'user_id' => $user->id,
+        //         'amount' => 1000
+        //     ]);
 
-            \App\Models\CoinWallet::factory()->create([
-                'user_id' => $user->id,
-                'coins' => 1
-            ]);
+        //     \App\Models\CoinWallet::factory()->create([
+        //         'user_id' => $user->id,
+        //         'coins' => 1
+        //     ]);
 
-            $userStore = \App\Models\User::factory()->create([
-                'mobile' => '09000000001',
-                'status' => '1',
-                'userType' => '1'
-            ]);
+        //     $userStore = \App\Models\User::factory()->create([
+        //         'mobile' => '09000000001',
+        //         'status' => '1',
+        //         'userType' => '1'
+        //     ]);
 
-            \App\Models\Wallet::factory()->create([
-                'user_id' => $userStore->id,
-                'amount' => 0
-            ]);
+        //     \App\Models\Wallet::factory()->create([
+        //         'user_id' => $userStore->id,
+        //         'amount' => 0
+        //     ]);
 
-            \App\Models\CoinWallet::factory()->create([
-                'user_id' => $userStore->id,
-                'coins' => 0
-            ]);
-            $neighborhoods = [
-                [
-                    'name' => 'محله اول',
-                    'user_id' => 1,
-                    'code' => 'code__1',
-                    'status' => 1
-                ],
-                [
-                    'name' => 'محله دوم',
-                    'user_id' => 1,
-                    'code' => 'code__2',
-                    'status' => 1
-                ],
-            ];
-
-
-            foreach ($neighborhoods as $key => $value) {
-                Neighborhood::create($value);
-            }
+        //     \App\Models\CoinWallet::factory()->create([
+        //         'user_id' => $userStore->id,
+        //         'coins' => 0
+        //     ]);
+        //     $neighborhoods = [
+        //         [
+        //             'name' => 'محله اول',
+        //             'user_id' => 1,
+        //             'code' => 'code__1',
+        //             'status' => 1
+        //         ],
+        //         [
+        //             'name' => 'محله دوم',
+        //             'user_id' => 1,
+        //             'code' => 'code__2',
+        //             'status' => 1
+        //         ],
+        //     ];
 
 
-            $stores = [
-                [
-                    'user_id' => 1,
-                    'category_id' => 1,
-                    'neighborhood_id' => 1,
-                    'name' => 'store one'
-                ],
-            ];
-            foreach ($stores as $key => $value) {
-                Store::create($value);
-            }
+        //     foreach ($neighborhoods as $key => $value) {
+        //         Neighborhood::create($value);
+        //     }
 
-            $vehicles = [
-                [
-                    'user_id' => 1,
-                    'type' => 0,
-                    'brand' => 'honda',
-                    'pelak' => '123456',
-                    'color' => 'red',
-                    'model' => 'cg125'
-                ],
-            ];
-            foreach ($vehicles as $key => $value) {
-                Vehicle::create($value);
-            }
-        }
+
+        //     $stores = [
+        //         [
+        //             'user_id' => 1,
+        //             'category_id' => 1,
+        //             'neighborhood_id' => 1,
+        //             'name' => 'store one'
+        //         ],
+        //     ];
+        //     foreach ($stores as $key => $value) {
+        //         Store::create($value);
+        //     }
+
+        //     $vehicles = [
+        //         [
+        //             'user_id' => 1,
+        //             'type' => 0,
+        //             'brand' => 'honda',
+        //             'pelak' => '123456',
+        //             'color' => 'red',
+        //             'model' => 'cg125'
+        //         ],
+        //     ];
+        //     foreach ($vehicles as $key => $value) {
+        //         Vehicle::create($value);
+        //     }
+        // }
 
         CoinSetting::create([
             'id' => '1',

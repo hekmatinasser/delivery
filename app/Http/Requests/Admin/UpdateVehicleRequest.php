@@ -40,8 +40,10 @@ class UpdateVehicleRequest extends FormRequest
             'model' => 'required|max:150',
             'neighborhoodAvailable' => 'nullable',
             'neighborhoodAvailable.*' => 'integer|exists:neighborhoods,id',
-            'storeAvailable.*.id' => 'nullable|integer|exists:store,id',
-            'storeAvailable.*.expire' => 'nullable|date',
+            // 'storeAvailable.*.id' => 'nullable|integer|exists:store,id',
+            // 'storeAvailable.*.expire' => 'nullable|date',
+            // 'storeBlocked.*.id' => 'nullable|integer|exists:store,id',
+            // 'storeBlocked.*.expire' => 'nullable|date',
         ];
     }
 
@@ -63,6 +65,7 @@ class UpdateVehicleRequest extends FormRequest
             'nationalCode' => 'کد ملی',
             'neighborhoodAvailable' => 'محله های در دسترس',
             'storeAvailable' => 'مغازه های در دسترس',
+            'storeBlocked' => 'مغازه های بلاک شده',
         ];
     }
 }

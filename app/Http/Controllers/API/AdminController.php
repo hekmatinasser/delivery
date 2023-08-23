@@ -1060,33 +1060,6 @@ class AdminController extends BaseController
      *                      @OA\Property(property="address", type="string", maxLength=255, example="address"),
      *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
      *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
-     * *     @OA\Property(
-     *         property="neighborhoodAvailable",
-     *         type="array",
-     *         description="Required. Array of neighborhood IDs",
-     *         @OA\Items(
-     *             type="integer",
-     *             format="int64"
-     *         )
-     *     ),
-     *     @OA\Property(
-     *         property="storeAvailable",
-     *         type="array",
-     *         description="The available stores for the vehicle.",
-     *         @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="expire", type="string", format="date")
-     *         )
-     *     ),
-     *     @OA\Property(
-     *         property="storeBlocked",
-     *         type="array",
-     *         description="The blocked stores for the vehicle.",
-     *         @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="expire", type="string", format="date")
-     *         )
-     *     ),
      *     @OA\Property(
      *         property="type",
      *         type="string",
@@ -1205,85 +1178,6 @@ class AdminController extends BaseController
         $vehicle = Vehicle::create($input);
 
         Log::store(LogUserTypesEnum::USER, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::ADD, json_encode($vehicle));
-
-
-        $neighborhoodIds = explode(',', $request->get('neighborhoodAvailable', ''));
-        $neighborhoodIds = Neighborhood::whereIn('id', $neighborhoodIds)->get();
-        $adminId = Auth::id();
-        $available = $neighborhoodIds->map(function ($neighborhood) use ($vehicle, $adminId) {
-            return [
-                'vehicle_id' => $vehicle->id,
-                'neighborhood_id' => $neighborhood->id,
-                'user_id' => $adminId,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        });
-
-        NeighborhoodsAvailable::insert($available->all());
-
-
-        $req = '[' . $request->get('storeAvailable', '') . ']';
-        $parameters = collect(json_decode($req));
-
-        $storeIds = $parameters->map(function ($parameter) {
-            return $parameter->id;
-        });
-        $storeIds = Store::whereIn('id', $storeIds)->get();
-        $adminId = Auth::id();
-        $parameters = collect(json_decode($req));
-        $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
-            $data = collect($parameters)->firstWhere('id', $store->id);
-
-            try {
-                $expire = Carbon::parse($data->expire);
-            } catch (\Exception $e) {
-                $expire = null;
-            }
-
-            return [
-                'vehicle_id' => $vehicle->id,
-                'store_id' => $store->id,
-                'user_id' => $adminId,
-                'expire' => $expire,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        });
-
-        StoreAvailable::insert($available->all());
-
-
-        $req = '[' . $request->get('storeBlocked', '') . ']';
-        $parameters = collect(json_decode($req));
-
-        $storeIds = $parameters->map(function ($parameter) {
-            return $parameter->id;
-        });
-        $storeIds = Store::whereIn('id', $storeIds)->get();
-        $adminId = Auth::id();
-        $parameters = collect(json_decode($req));
-        $blocked = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
-            $data = collect($parameters)->firstWhere('id', $store->id);
-
-            try {
-                $expire = Carbon::parse($data->expire);
-            } catch (\Exception $e) {
-                $expire = null;
-            }
-
-            return [
-                'vehicle_id' => $vehicle->id,
-                'store_id' => $store->id,
-                'user_id' => $adminId,
-                'expire' => $expire,
-                'with_admin' => true,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        });
-
-        StoresBlocked::insert($blocked->all());
 
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
@@ -1481,11 +1375,34 @@ class AdminController extends BaseController
      */
     public function getVehicle(Request $request, $vehicleId)
     {
-        $user = User::with('vehicle')->whereHas('vehicle', function ($query) use ($vehicleId) {
+        $userId = Vehicle::where('id', $vehicleId)->first()->user_id;
+        $user = User::with([
+            'vehicle' => function ($q) use ($userId) {
+                return $q->with([
+                    'storesAdminAccess',
+                    'storesAdminBlock',
+                    'storesBlockedWithUser' => function ($q) use ($userId) {
+                        $q->where('user_id', '=', $userId);
+                    },
+                    'storesBlockedWithStore' => function ($q) use ($userId) {
+                        $q->where('user_id', '<>', $userId);
+                    },
+                ]);
+            }
+        ])->whereHas('vehicle', function ($query) use ($vehicleId) {
             $query->where('id', $vehicleId);
         })->firstOrFail();
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::SHOW_PROFILE, $user);
+        return $user;
+    }
+
+    public function getUserVehicle($vehicleId)
+    {
+        $userId = Vehicle::where('id', $vehicleId)->first()->user_id;
+        $user = User::whereHas('vehicle', function ($query) use ($vehicleId) {
+            $query->where('id', $vehicleId);
+        })->firstOrFail();
         return $user;
     }
 
@@ -1529,11 +1446,39 @@ class AdminController extends BaseController
      *         )
      *     ),
      *     @OA\Property(
-     *         property="storeAvailable",
+     *         property="storesAdminBlock",
      *         type="array",
      *         description="The available stores for the vehicle.",
      *         @OA\Items(
      *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesAdminAccess",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesBlockedWithUser",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesBlockedWithStore",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
      *             @OA\Property(property="expire", type="string", format="date")
      *         )
      *     ),
@@ -1625,7 +1570,7 @@ class AdminController extends BaseController
         if ($request->password)
             $inputUser['password'] = bcrypt($request->password);
 
-        $user = $this->getVehicle($request, $vehicleId);
+        $user = $this->getUserVehicle($vehicleId);
 
         if ($user->nationalPhoto || $user->nationalPhotoStatus == 'remove') {
             Storage::disk('liara')->delete($user->nationalPhoto);
@@ -1653,7 +1598,7 @@ class AdminController extends BaseController
         $oldData = $user->toArray();
         $user->update($inputUser);
         $newData = $user->toArray();
-        
+
         if ($oldData['status'] != $newData['status']) {
             updateUserStatusNotice($user->mobile, $user->status);
         }
@@ -1679,8 +1624,6 @@ class AdminController extends BaseController
             // (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
         }
 
-
-
         $neighborhoodIds = explode(',', $request->get('neighborhoodAvailable', ''));
         $neighborhoodIds = Neighborhood::whereIn('id', $neighborhoodIds)->get();
         $adminId = Auth::id();
@@ -1697,7 +1640,7 @@ class AdminController extends BaseController
         NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
         NeighborhoodsAvailable::insert($available->all());
 
-        $req = '[' . $request->get('storeAvailable', '') . ']';
+        $req = json_encode($request->get('storesAdminAccess', []));
         $parameters = collect(json_decode($req));
 
         $storeIds = $parameters->map(function ($parameter) {
@@ -1705,10 +1648,43 @@ class AdminController extends BaseController
         });
         $storeIds = Store::whereIn('id', $storeIds)->get();
         $adminId = Auth::id();
-        $parameters = collect(json_decode($req));
         $available = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
             $data = collect($parameters)->firstWhere('id', $store->id);
+            $expire = $data->expire;
+            try {
+                // $expire = date('Y-m-d', $data->expire);
+                Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
 
+
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $adminId,
+                'expire' => $expire,
+                'with_admin' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoreAvailable::where('vehicle_id', '=', $vehicle->id)->where('with_admin', '=', 1)->delete();
+        StoreAvailable::insert($available->all());
+
+        $req = json_encode($request->get('storesAdminBlock', []));
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $adminId = Auth::id();
+        $blocked = $storeIds->map(function ($store) use ($vehicle, $adminId, $parameters) {
+            $data = collect($parameters)->firstWhere('id', $store->id);
+
+            $expire = $data->expire;
             try {
                 // $expire = date('Y-m-d', $data->expire);
                 Carbon::parse($data->expire);
@@ -1721,13 +1697,82 @@ class AdminController extends BaseController
                 'store_id' => $store->id,
                 'user_id' => $adminId,
                 'expire' => $expire,
+                'with_admin' => 1,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
         });
 
-        StoreAvailable::where('vehicle_id', '=', $vehicle->id)->delete();
-        StoreAvailable::insert($available->all());
+        StoresBlocked::where('vehicle_id', '=', $vehicle->id)->where('with_admin', '=', '1')->delete();
+        StoresBlocked::insert($blocked->all());
+
+        // *****
+        $req = json_encode($request->get('storesBlockedWithUser', []));
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $userVehicleId = $user->id;
+        $blocked = $storeIds->map(function ($store) use ($vehicle, $userVehicleId, $parameters) {
+            $data = collect($parameters)->firstWhere('id', $store->id);
+
+            $expire = $data->expire;
+            try {
+                // $expire = date('Y-m-d', $data->expire);
+                Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $userVehicleId,
+                'expire' => $expire,
+                'with_admin' => 0,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoresBlocked::where('vehicle_id', '=', $vehicle->id)->where('user_id', $userVehicleId)->delete();
+        StoresBlocked::insert($blocked->all());
+        // ****
+
+        //********* 
+
+        $req = json_encode($request->get('storesBlockedWithStore', []));
+        $parameters = collect(json_decode($req));
+
+        $storeIds = $parameters->map(function ($parameter) {
+            return $parameter->id;
+        });
+        $storeIds = Store::whereIn('id', $storeIds)->get();
+        $blocked = $storeIds->map(function ($store) use ($vehicle, $parameters) {
+            $data = collect($parameters)->firstWhere('id', $store->id);
+
+            $expire = $data->expire;
+            try {
+                // $expire = date('Y-m-d', $data->expire);
+                Carbon::parse($data->expire);
+            } catch (\Exception $e) {
+                $expire = null;
+            }
+            return [
+                'vehicle_id' => $vehicle->id,
+                'store_id' => $store->id,
+                'user_id' => $data->user_id,
+                'expire' => $expire,
+                'with_admin' => 0,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        });
+
+        StoresBlocked::where('vehicle_id', '=', $vehicle->id)->where('with_admin', '=', '0')->where('user_id', '<>', $userVehicleId)->delete();
+        StoresBlocked::insert($blocked->all());
+        // ******* 
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 
@@ -1768,7 +1813,7 @@ class AdminController extends BaseController
      */
     public function deleteVehicle(Request $request, $vehicleId)
     {
-        $user = $this->getVehicle($request, $vehicleId);
+        $user = $this->getUserVehicle($vehicleId);
 
         Log::store(LogUserTypesEnum::ADMIN, Auth::id(), LogModelsEnum::VEHICLE, LogActionsEnum::DELETE, $user);
 

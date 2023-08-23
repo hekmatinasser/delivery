@@ -14,6 +14,7 @@ use App\Models\Trip;
 use App\Models\TripChange;
 use App\Models\User;
 use App\Models\Vehicle;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Date;
 use Illuminate\Http\Request;
@@ -453,7 +454,24 @@ class TripController extends BaseController
             ->where(function ($query) use ($store) {
                 $query->where('store_id', '=', $store->id);
             })
-            ->first();
+            ->firstOrFail();
+
+        if ($res) {
+            $setting = Setting::first();
+            if ($res->status == 1 && $res->expire < now()) {
+                if ($res->expire < now()->subMinutes($setting->travel_expire_pending_time)) {
+                    $res->delete();
+                    $res = null;
+                }
+            }
+
+            // if state is 1
+            //      check expire
+            //      if expired ? check max active time on setting
+            // if not active remove it
+
+
+        }
 
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
@@ -498,15 +516,26 @@ class TripController extends BaseController
             return $this->sendError(Lang::get('http-statuses.404'), '', 404);
         }
         $user = Auth::user();
+        $coins = $user->load('coinWallet');
+        $coin = $coins->coinWallet->coins;
+
         if ($user->status != 1) {
             $message = 'شما امکان تایید سفر را ندارید!';
+            return $this->sendError($message, ['errors' => ['status' => $message]], 400);
+        }
+
+        if (!$coin) {
+            $message = '(عدم موجودی سکه) شما امکان تایید سفر را ندارید!';
             return $this->sendError($message, ['errors' => ['status' => $message]], 400);
         }
 
         $storeAvailableIds = $vehicle->storesAvailable->pluck('store_id');
         $storeBlockedIds = $vehicle->storesBlocked->pluck('store_id');
         $neighborhoodIds = NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->pluck('neighborhood_id');
+
+
         $flag = false;
+
         DB::beginTransaction();
         $trip = Trip::lockForUpdate()
             ->with('store')
@@ -530,13 +559,18 @@ class TripController extends BaseController
             $trip->save();
             $flag = true;
             $data = new StoreCoinWalletTransactionRequest();
+            $setting = Setting::first();
+
             $data['user_id'] = Auth::id();
             $data['action'] = 'decrease';
-            $data['coins'] = 1;
+            $data['coins'] = $setting->pay_coin_per_trip_with_vehicle;
             $data['reason_code'] = 21;
+
             (new CoinWalletController())->storeTransaction($data);
 
             $data['user_id'] = $trip->store->user_id;
+            $data['coins'] = $setting->pay_coin_per_trip_with_store;
+
             (new CoinWalletController())->storeTransaction($data);
         }
         DB::commit();
@@ -872,8 +906,9 @@ class TripController extends BaseController
 
         $res = Trip::with(['store', 'origin', 'destination'])
             ->whereNull('vehicle_id')
+            ->where('status', 1)
             ->whereHas('store', function ($query) use ($neighborhoodIds, $storeAvailableIds, $storeBlockedIds) {
-                $query->whereNotIn('id', $storeBlockedIds)
+                $query->with('neighborhood')->whereNotIn('id', $storeBlockedIds)
                     ->where(function ($q) use ($neighborhoodIds, $storeAvailableIds) {
                         $q->whereIn('neighborhood_id', $neighborhoodIds)
                             ->orWhereIn('id', $storeAvailableIds);
@@ -1072,14 +1107,22 @@ class TripController extends BaseController
     public function createTripWithStore(CreateTripRequest $request)
     {
         $user = User::find(Auth::id());
-        $user->load('store');
+        $user->load(['store', 'coinWallet']);
         if (!$user->store)
             return $this->sendError(Lang::get('http-statuses.404'), '', 404);
 
         if ($user->status != 1) {
-            $message = 'شما امکان ویرایش سفر را ندارید!';
+            $message = 'شما امکان ثبت سفر را ندارید! (وضعیت غیر فعال)';
             return $this->sendError($message, ['errors' => ['status' => $message]], 400);
         }
+
+        $setting = Setting::first();
+        if ($user->coinWallet->coins < $setting->pay_coin_per_trip_with_store) {
+            $message = "شما امکان ثبت سفر را ندارید! (حداقل سکه برای درخواست $setting->pay_coin_per_trip_with_store  عدد است.)";
+            return $this->sendError($message, ['errors' => ['status' => $message]], 400);
+        }
+
+        $setting = Setting::first();
 
         $trip =
             Trip::create(
@@ -1096,7 +1139,7 @@ class TripController extends BaseController
                     'customer_name' => $request->customer_name,
                     'customer_phone' => $request->customer_phone,
                     'description' => $request->description,
-                    'expire' => Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s'),
+                    'expire' => Carbon::now()->addMinutes($setting->travel_expire_approve_time)->format('Y-m-d H:i:s'),
                 ]
             );
 

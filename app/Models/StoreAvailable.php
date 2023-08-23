@@ -13,6 +13,6 @@ class StoreAvailable extends Model
 
     public function store()
     {
-        return $this->belongsTo(Store::class)->select(['*']);
+        return $this->belongsTo(Store::class)->with('category')->select(['*']);
     }
 }

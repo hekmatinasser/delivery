@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->foreign('store_id')->references('id')->on('store');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->unique(['vehicle_id', 'store_id']);
+            $table->unique(['vehicle_id', 'store_id', 'user_id']);
             $table->dateTime('expire')->nullable();
             $table->boolean('with_admin')->default(false);
             $table->timestamps();

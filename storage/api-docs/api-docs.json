@@ -1391,46 +1391,6 @@
                                         "format": "phone",
                                         "example": "1234567890"
                                     },
-                                    "neighborhoodAvailable": {
-                                        "description": "Required. Array of neighborhood IDs",
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        }
-                                    },
-                                    "storeAvailable": {
-                                        "description": "The available stores for the vehicle.",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "expire": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "storeBlocked": {
-                                        "description": "The blocked stores for the vehicle.",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "expire": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
                                     "type": {
                                         "description": "The type of the vehicle (MOTOR or CAR)",
                                         "type": "string",
@@ -1842,12 +1802,63 @@
                                             "format": "int64"
                                         }
                                     },
-                                    "storeAvailable": {
+                                    "storesAdminBlock": {
                                         "description": "The available stores for the vehicle.",
                                         "type": "array",
                                         "items": {
                                             "properties": {
                                                 "id": {
+                                                    "type": "integer"
+                                                },
+                                                "expire": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "storesAdminAccess": {
+                                        "description": "The blocked stores for the vehicle.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "expire": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "storesBlockedWithUser": {
+                                        "description": "The blocked stores for the vehicle.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "expire": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "storesBlockedWithStore": {
+                                        "description": "The blocked stores for the vehicle.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
                                                     "type": "integer"
                                                 },
                                                 "expire": {
