@@ -312,7 +312,7 @@ class NeighborhoodController extends BaseController
     }
 
     /**
-     * @OA\Put(
+     * @OA\POST(
      *     path="/api/v1/admin/neighborhood/{neighborhood_id}",
      *     summary="Update a neighborhood",
      *     tags={"Neighborhood"},
@@ -367,17 +367,20 @@ class NeighborhoodController extends BaseController
     {
         $neighborhood = Neighborhood::findOrFail($neighborhoodId);
         $request->validate([
-            'code' => 'unique:neighborhoods,code,' . $neighborhood->id,
             'name' => 'unique:neighborhoods,name,' . $neighborhood->id
         ]);
 
-        $user_id = Auth::user()->id;
+        $path = $neighborhood->image;
+        if ($request->hasFile('image')) {
+            $path = uploadPublicImageToS3($request->file('image'), 'public/');
+        } else {
+            $path = '';
+        }
 
         $response = $neighborhood->update([
-            'user_id' => $user_id,
             'name' => $request->name,
-            'code' => $request->code,
             'status' => $request->status,
+            'image' => $path,
         ]);
         return $this->sendResponse($response, 'Neighborhood Updated Successfully!');
     }

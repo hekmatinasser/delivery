@@ -84,12 +84,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('', 'getVehicles')->middleware(['ability:user-modify']);
             Route::get('{vehicle_id}', 'getVehicle')->middleware(['ability:user-modify']);
             Route::post('{vehicle_id}/update', 'updateVehicle')->middleware(['ability:user-modify']);
+            Route::put('{vehicle_id}/update-access', 'updateVehicleAccess')->middleware(['ability:user-modify']);
             Route::delete('{vehicle_id}', 'deleteVehicle')->middleware(['ability:user-modify']);
         });
 
         Route::prefix('neighborhood')->controller(NeighborhoodController::class)->group(function () {
             Route::post('', 'store')->middleware(['ability:neighborhood-modify']);
-            Route::put('{neighborhood_id}', 'update')->middleware(['ability:neighborhood-modify']);
+            Route::post('{neighborhood_id}', 'update')->middleware(['ability:neighborhood-modify']);
             Route::delete('{neighborhood_id}', 'destroy')->middleware(['ability:neighborhood-modify']);
             //Inter Neighborhood Fare routes
             Route::prefix('fare')->controller(InterNeighborhoodFareController::class)->group(function () {

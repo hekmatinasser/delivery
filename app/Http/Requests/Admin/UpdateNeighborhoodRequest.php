@@ -9,9 +9,8 @@ use Illuminate\Support\Facades\Auth;
  * @OA\Schema(
  *     schema="UpdateNeighborhoodRequest",
  *     type="object",
- *     required={"name", "code", "status"},
+ *     required={"name","status"},
  *     @OA\Property(property="name", type="string", minLength=5, maxLength=25, example="Example Name"),
- *     @OA\Property(property="code", type="string", minLength=5, maxLength=25, example="Example Code"),
  *     @OA\Property(property="status", type="integer", enum={0, 1}, example=1)
  * )
  */
@@ -34,7 +33,6 @@ class UpdateNeighborhoodRequest extends FormRequest
     {
         return [
             'name' => 'required|min:5|max:25',
-            'code' => 'required|min:5|max:25',
             'status' => 'required|in:0,1',
         ];
     }

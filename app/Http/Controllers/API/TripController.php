@@ -253,7 +253,7 @@ class TripController extends BaseController
                 [
                     'store_id' => $request->store_id,
                     'vehicle_id' => $request->vehicle_id,
-                    'vehicle_type' => $vehicle->type == 'MOTOR' ? 0 : 1,
+                    'vehicle_type' => $vehicle?->type == 'MOTOR' ? 0 : 1,
                     'origin' => $request->origin_id,
                     'destination' => $request->destination_id,
                     'shipment_prepare_time' => Carbon::parse($request->shipment_prepare_time)->format('Y-m-d H:i:s'),
@@ -266,7 +266,6 @@ class TripController extends BaseController
                     'description' => $request->description,
                     'manager_description' => $request->manager_description,
                     'expire' => Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s'),
-
                 ]
             );
 
@@ -903,8 +902,9 @@ class TripController extends BaseController
         $storeAvailableIds = $vehicle->storesAvailable->pluck('store_id');
         $storeBlockedIds = $vehicle->storesBlocked->pluck('store_id');
         $neighborhoodIds = NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->pluck('neighborhood_id');
-
+        $_date = Carbon::now()->toDateTimeString();
         $res = Trip::with(['store', 'origin', 'destination'])
+            ->where('expire', '>', $_date)
             ->whereNull('vehicle_id')
             ->where('status', 1)
             ->whereHas('store', function ($query) use ($neighborhoodIds, $storeAvailableIds, $storeBlockedIds) {
@@ -1400,7 +1400,12 @@ class TripController extends BaseController
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
         $filter = $request->input('filter', 'all');
-        $res = Trip::with(['store', 'origin', 'destination'])->where('store_id', '=', $store->id);
+
+        $setting = Setting::first();
+        $_expire = now()->subMinutes($setting->travel_expire_pending_time);
+        $res = Trip::with(['store', 'origin', 'destination'])
+            ->whereDate('expire', '>=', $_expire)
+            ->where('store_id', '=', $store->id);
 
         switch ($filter) {
             case 'delivered':

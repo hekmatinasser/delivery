@@ -15,6 +15,7 @@ use App\Http\Requests\Admin\GetVehicleRequest;
 use App\Http\Requests\Admin\GetVehiclesRequest;
 use App\Http\Requests\Admin\UpdateStoreRequest;
 use App\Http\Requests\Admin\UpdateVehicleRequest;
+use App\Http\Requests\Admin\UpdateVehicleAccessRequest;
 use App\Models\Log;
 use Illuminate\Support\Facades\Log as LogManager;
 use App\Models\Neighborhood;
@@ -1436,42 +1437,6 @@ class AdminController extends BaseController
      *                      @OA\Property(property="address", type="string", maxLength=255,example="1234567890"),
      *                      @OA\Property(property="postCode", type="string", format="postCode", example="1234567890"),
      *                      @OA\Property(property="phone", type="string", format="phone", example="1234567890"),
-     *      @OA\Property(
-     *         property="neighborhoodAvailable",
-     *         type="array",
-     *         description="Required. Array of neighborhood IDs",
-     *         @OA\Items(
-     *             type="integer",
-     *             format="int64"
-     *         )
-     *     ),
-     *     @OA\Property(
-     *         property="storesAdminBlock",
-     *         type="array",
-     *         description="The available stores for the vehicle.",
-     *         @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="expire", type="string", format="date")
-     *         )
-     *     ),
-     *     @OA\Property(
-     *         property="storesAdminAccess",
-     *         type="array",
-     *         description="The blocked stores for the vehicle.",
-     *         @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="expire", type="string", format="date")
-     *         )
-     *     ),
-     *     @OA\Property(
-     *         property="storesBlockedWithUser",
-     *         type="array",
-     *         description="The blocked stores for the vehicle.",
-     *         @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="expire", type="string", format="date")
-     *         )
-     *     ),
      *     @OA\Property(
      *         property="storesBlockedWithStore",
      *         type="array",
@@ -1623,6 +1588,120 @@ class AdminController extends BaseController
 
             // (new Vehicle())->logVehicleModelChanges($user, $oldData, $newData);
         }
+
+        $user->load('vehicle', 'wallet', 'coinWallet');
+        DB::commit();
+
+        return $this->sendResponse($user, ".اطلاعات با موفقیت به روز شد");
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/admin/vehicle/{vehicleId}/update-access",
+     *     summary="Update vehicle",
+     *     description="Update the profile and vehicle information of a specific vehicle.",
+     *     tags={"Admin"},
+     *     security={ {"sanctum": {} }},
+     *     @OA\Parameter(
+     *         name="vehicleId",
+     *         in="path",
+     *         description="The ID of the vehicle to update.",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *      @OA\Property(
+     *         property="neighborhoodAvailable",
+     *         type="array",
+     *         description="Required. Array of neighborhood IDs",
+     *         @OA\Items(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesAdminBlock",
+     *         type="array",
+     *         description="The available stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesAdminAccess",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Property(
+     *         property="storesBlockedWithUser",
+     *         type="array",
+     *         description="The blocked stores for the vehicle.",
+     *         @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="expire", type="string", format="date")
+     *         )
+     *     ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object", example={"role": "مقدار نقش کاربر اشتباه است"}),
+     *             @OA\Property(property="message", type="string", example="مقدار نقش کاربر اشتباه است"),
+     *             @OA\Property(property="code", type="integer", example=400)
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}}),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="This action is unauthorized."),
+     *         ),
+     *     ),
+     * )
+     */
+    public function updateVehicleAccess(UpdateVehicleAccessRequest $request, $vehicleId)
+    {
+        $user = $this->getUserVehicle($vehicleId);
+
+
+        DB::beginTransaction();
+
+        $user->load('vehicle');
+        $vehicle = $user->vehicle;
 
         $neighborhoodIds = explode(',', $request->get('neighborhoodAvailable', ''));
         $neighborhoodIds = Neighborhood::whereIn('id', $neighborhoodIds)->get();
@@ -1776,7 +1855,7 @@ class AdminController extends BaseController
         $user->load('vehicle', 'wallet', 'coinWallet');
         DB::commit();
 
-        return $this->sendResponse($user, ".پیک با موفقیت انجام شد");
+        return $this->sendResponse($user, ".اطلاعات با موفقیت به روز شد");
     }
 
     /**
@@ -1932,6 +2011,6 @@ class AdminController extends BaseController
         }
 
 
-        return $this->sendResponse($user, ".پیک با موفقیت انجام شد");
+        return $this->sendResponse($user, ".اطلاعات با موفقیت به روز شد");
     }
 }

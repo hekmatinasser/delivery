@@ -1794,62 +1794,6 @@
                                         "format": "phone",
                                         "example": "1234567890"
                                     },
-                                    "neighborhoodAvailable": {
-                                        "description": "Required. Array of neighborhood IDs",
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        }
-                                    },
-                                    "storesAdminBlock": {
-                                        "description": "The available stores for the vehicle.",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "expire": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "storesAdminAccess": {
-                                        "description": "The blocked stores for the vehicle.",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "expire": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "storesBlockedWithUser": {
-                                        "description": "The blocked stores for the vehicle.",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "expire": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
                                     "storesBlockedWithStore": {
                                         "description": "The blocked stores for the vehicle.",
                                         "type": "array",
@@ -1908,6 +1852,145 @@
                         }
                     }
                 },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "role": "مقدار نقش کاربر اشتباه است"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "مقدار نقش کاربر اشتباه است"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This action is unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/vehicle/{vehicleId}/update-access": {
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update vehicle",
+                "description": "Update the profile and vehicle information of a specific vehicle.",
+                "operationId": "f39ab38a73b2acd2d43b8b8a0de729a0",
+                "parameters": [
+                    {
+                        "name": "vehicleId",
+                        "in": "path",
+                        "description": "The ID of the vehicle to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {},
                 "responses": {
                     "200": {
                         "description": "Successful operation",
