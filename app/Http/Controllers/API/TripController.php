@@ -300,6 +300,18 @@ class TripController extends BaseController
      *             default=1
      *         )
      *     ),
+     * 
+     *     @OA\Parameter(
+     *         name="filter",
+     *         in="query",
+     *         description="Filter with type : all or delivered or notDelivered or current or active or cancel",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             default="all"
+     *         )
+     *     ),
+
      *     @OA\Response(
      *         response="200",
      *         description="Successful operation"
@@ -331,7 +343,29 @@ class TripController extends BaseController
     {
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
-        $res = Trip::with(['store', 'vehicle', 'origin', 'destination'])->paginate($perPage, ['*'], 'page', $page);
+
+        $filter = $request->input('filter', 'all');
+        $res = Trip::with(['store', 'vehicle', 'origin', 'destination']);
+        switch ($filter) {
+            case 'delivered':
+                $res->whereIn('status', [5]);
+                break;
+            case 'notDelivered':
+                $res->whereNotIn('status', [5]);
+                break;
+            case 'pending':
+                $res->whereIn('status', [1]);
+                break;
+            case 'active':
+                $res->whereIn('status', [1, 2, 3, 4]);
+                break;
+            case 'cancel':
+                $res->whereIn('status', [6]);
+                break;
+            default:
+                break;
+        }
+        $res = $res->paginate($perPage, ['*'], 'page', $page);
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
 
@@ -408,7 +442,7 @@ class TripController extends BaseController
                 $query->whereNull('vehicle_id')
                     ->orWhere('vehicle_id', '=', $vehicle->id);
             })
-            ->get();
+            ->first();
 
         return $this->sendResponse($res, Lang::get('http-statuses.200'));
     }
@@ -539,6 +573,7 @@ class TripController extends BaseController
         $trip = Trip::lockForUpdate()
             ->with('store')
             ->where('trip_code', '=', $code)
+            ->where('vehicle_type', '=', $vehicle->type == 'CAR' ? 1 : 0)
             ->where(function ($query) use ($vehicle) {
                 $query->whereNull('vehicle_id')
                     ->orWhere('vehicle_id', '=', $vehicle->id);
@@ -551,8 +586,10 @@ class TripController extends BaseController
                     });
             })
             ->firstOrFail();
+        $setting = Setting::first();
+        $_expire = now()->subMinutes($setting->travel_expire_pending_time);
 
-        if ($trip->status == 1) {
+        if ($trip->status == 1 && $trip->expire >= $_expire) {
             $trip->vehicle_id = $vehicle->id;
             $trip->status = 2;
             $trip->save();
@@ -904,6 +941,7 @@ class TripController extends BaseController
         $neighborhoodIds = NeighborhoodsAvailable::where('vehicle_id', '=', $vehicle->id)->pluck('neighborhood_id');
         $_date = Carbon::now()->toDateTimeString();
         $res = Trip::with(['store', 'origin', 'destination'])
+            ->where('vehicle_type', '=', $vehicle->type == 'CAR' ? 1 : 0)
             ->where('expire', '>', $_date)
             ->whereNull('vehicle_id')
             ->where('status', 1)
@@ -1007,8 +1045,14 @@ class TripController extends BaseController
             case 'notDelivered':
                 $res->whereNotIn('status', [5]);
                 break;
-            case 'current':
-                $res->whereIn('status', [2, 3, 4]);
+            case 'pending':
+                $res->whereIn('status', [1]);
+                break;
+            case 'active':
+                $res->whereIn('status', [1, 2, 3, 4]);
+                break;
+            case 'old':
+                $res->whereIn('status', [6, 5]);
                 break;
             default:
                 break;
@@ -1226,15 +1270,15 @@ class TripController extends BaseController
             Trip::updateOrCreate(
                 ['id' => $trip->id],
                 [
-                    'vehicle_type' => $request->vehicle_type,
-                    'destination' => $request->destination_id,
-                    'shipment_prepare_time' => Carbon::parse($request->shipment_prepare_time)->format('Y-m-d H:i:s'),
-                    'trip_rial_fare' => $request->trip_rial_fare,
+                    // 'vehicle_type' => $request->vehicle_type,
+                    // 'destination' => $request->destination_id,
+                    // 'shipment_prepare_time' => Carbon::parse($request->shipment_prepare_time)->format('Y-m-d H:i:s'),
+                    // 'trip_rial_fare' => $request->trip_rial_fare,
                     'customer_name' => $request->customer_name,
                     'customer_phone' => $request->customer_phone,
                     'description' => $request->description,
-                    'manager_description' => $request->manager_description,
-                    'expire' => Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s'),
+                    // 'manager_description' => $request->manager_description,
+                    // 'expire' => Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s'),
 
                 ]
             );
@@ -1404,7 +1448,7 @@ class TripController extends BaseController
         $setting = Setting::first();
         $_expire = now()->subMinutes($setting->travel_expire_pending_time);
         $res = Trip::with(['store', 'origin', 'destination'])
-            ->whereDate('expire', '>=', $_expire)
+            // ->whereDate('expire', '>=', $_expire)
             ->where('store_id', '=', $store->id);
 
         switch ($filter) {

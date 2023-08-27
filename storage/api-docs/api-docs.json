@@ -3524,12 +3524,12 @@
             }
         },
         "/api/v1/admin/neighborhood/{neighborhood_id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Neighborhood"
                 ],
                 "summary": "Update a neighborhood",
-                "operationId": "3b8bbd4488593b0c228b077f5b6d2125",
+                "operationId": "f0d00d2c84a851bc12ea5fde882a679d",
                 "parameters": [
                     {
                         "name": "neighborhood_id",
@@ -4675,6 +4675,16 @@
                         "schema": {
                             "type": "integer",
                             "default": 1
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter with type : all or delivered or notDelivered or current or active or cancel",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all"
                         }
                     }
                 ],
@@ -7867,7 +7877,6 @@
             "UpdateNeighborhoodRequest": {
                 "required": [
                     "name",
-                    "code",
                     "status"
                 ],
                 "properties": {
@@ -7876,12 +7885,6 @@
                         "maxLength": 25,
                         "minLength": 5,
                         "example": "Example Name"
-                    },
-                    "code": {
-                        "type": "string",
-                        "maxLength": 25,
-                        "minLength": 5,
-                        "example": "Example Code"
                     },
                     "status": {
                         "type": "integer",

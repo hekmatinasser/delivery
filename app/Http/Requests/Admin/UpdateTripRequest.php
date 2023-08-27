@@ -30,7 +30,7 @@ class UpdateTripRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->tokenCan('trip-modify');
+        return Auth::check();
     }
 
     /**

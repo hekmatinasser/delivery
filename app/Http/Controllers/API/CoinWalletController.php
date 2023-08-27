@@ -122,9 +122,9 @@ class CoinWalletController extends BaseController
      */
     public function storeTransaction(StoreCoinWalletTransactionRequest $request)
     {
-        $validated = $request->validated();
+        $validated = $request->all();
 
-        $user = Auth::user();
+        $user =User::find($validated['user_id']);
         $changer = $user;
 
         $wallet = $user->coinWallet;
