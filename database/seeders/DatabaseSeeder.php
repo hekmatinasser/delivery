@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\CoinSetting;
 use App\Models\CoinWalletTransactionReason;
 use App\Models\Neighborhood;
+use App\Models\Setting;
 use App\Models\Store;
 use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
@@ -26,7 +27,24 @@ class DatabaseSeeder extends Seeder
             'status' => '1',
             'userType' => '1'
         ]);
-        \App\Models\Setting::factory(1)->create();
+        // \App\Models\Setting::factory(1)->create();
+        Setting::create([
+            'wrong_login_try_per_10_min' => 4,
+            'wrong_login_try_per_day' => 4,
+            'website_name' => 'website',
+            'website_url' => 'website_url',
+            'application_name' => 'application_name',
+            'pay_coin_per_trip_with_vehicle' => 1,
+            'pay_coin_per_trip_with_store' => 2,
+            'pay_for_each_coin_with_vehicle' => 1000,
+            'pay_for_each_coin_with_store' => 1200,
+            'delay_accepting_with_vehicle' => 60,
+            'delay_reaching_with_vehicle' => 15,
+            'delay_delivering_with_vehicle' => 35,
+            'delay_delivering_with_store' => 10,
+            'payment_gateway' => 'zarinpal',
+            'zarin_merchant' => 'zarin_merchant',
+        ]);
 
         // if (config('app.env') == 'local') {
         //     $user = \App\Models\User::factory()->create([
